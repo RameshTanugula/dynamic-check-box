@@ -1,0 +1,44 @@
+{
+    "id": 1,
+    "label": "Examinitations",
+    "Checked": false,
+    "ParentCatagoryId": 0,
+    "lstSubCatagoryTree": [
+        {
+            "CatagoryId": 9,
+            "label": "DSC",
+            "Checked": false,
+            "ParentCatagoryId": 1,
+            "lstSubCatagoryTree": null,
+            "id": 9,
+            "text": "DSC",
+            "state": {
+                "opened": false,
+                "checked": false
+            },
+            "children": []
+        }
+    ],
+    "id": 1,
+    "text": "Examinitations",
+    "state": {
+        "opened": false,
+        "checked": false
+    },
+    "children": [
+        {
+            "CatagoryId": 9,
+            "label": "DSC",
+            "Checked": false,
+            "ParentCatagoryId": 1,
+            "lstSubCatagoryTree": null,
+            "id": 9,
+            "text": "DSC",
+            "state": {
+                "opened": false,
+                "checked": false
+            },
+            "children": []
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+post: http://3.111.198.158:88/BitBankDetail/CatogoryBitBankMappingPost
+
+payload:{
+    "QuestionList": {
+        "lstQuestionList": [
+            {
+                "QuestionId": "1090"
+            }
+        ]
+    },
+    "ExamCategoryId": 0,
+    "SubCategoryId": 0,
+    "ConceptsCategoryId": 0,
+    "SourceCategoryId": 0,
+    "From": "",
+    "To": ""
+}
+
+__RequestVerificationToken=bqELHHYXn8b2FEDSESPQiwa8mbqswqrdgA0pIFij33gLfMmlb_wpUfoqSG7BUQ68cCXU_U7HqSjd3Rn-XWceE3OPCI1oscU34kXBbYpnsi81; ASP.NET_SessionId=c0hpldtt5qbspy4w3mf02icz
