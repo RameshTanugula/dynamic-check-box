@@ -5,9 +5,10 @@ export default async function api(reqObj, url, type) {
         method: type,
         headers: {
             "Authorization": "1",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers" : "Content-Type",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE"
+            "Access-Control-Allow-Origin": "http://master.d3iov9q4fsd2xh.amplifyapp.com/",
+            "Access-Control-Allow-Headers" : "Content-Type, Authorization, *",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+            "Access-Control-Allow-Credentials": true,
         },
         data: reqObj,
     })
