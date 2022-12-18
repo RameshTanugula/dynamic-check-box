@@ -14,7 +14,7 @@ const treeViewData = [
 ];
 
 export default function App() {
-  const serverUrl = `https://treeviewdatamapping-env.eba-jsbuwrm8.us-east-2.elasticbeanstalk.com/`
+  const serverUrl = `http://treeviewdatamapping-env.eba-jsbuwrm8.us-east-2.elasticbeanstalk.com/`
   const [checked, setChecked] = React.useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
   const [questionData, setQuestionData] = React.useState([]);
