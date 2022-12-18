@@ -1,9 +1,10 @@
 import axios from "axios";
 export default async function api(reqObj, url, type) {
     return await axios({
-url: "http://localhost:3000" + url,
+url:  url,
 method: type,
 headers: {
+    "Authorization":"1"
 },
 data: reqObj,
 })
