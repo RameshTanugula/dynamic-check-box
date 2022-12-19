@@ -38,8 +38,8 @@ export default function App() {
     async function fetchData() {
       // You can await here  
       const data = await api(null, serverUrl+'get/data', 'get');
-      // const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get', true);
-      // console.log(catData.data.lstConcepts[0], 'catData$$')
+      const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
+      console.log(catData, 'catData$$')
       // if(catData.status ===200){
       //   let catTmp = [catData.data.lstExaminitations[0], 
       //   catData.data.lstSubject[0],
