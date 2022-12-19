@@ -14,7 +14,8 @@ const treeViewData = [
 ];
 
 export default function App() {
-  const serverUrl = `http://treeviewdatamapping-env.eba-jsbuwrm8.us-east-2.elasticbeanstalk.com/`
+  // const serverUrl = `http://localhost:3000/`
+  const serverUrl = `https://treeviewdatamapping-env.eba-jsbuwrm8.us-east-2.elasticbeanstalk.com/`
   const [checked, setChecked] = React.useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
   const [questionData, setQuestionData] = React.useState([]);
@@ -48,8 +49,9 @@ export default function App() {
       //   setCategoryData([...catTmp]);
       //   console.log(catTmp, 'catTmp', catagoryData, treeViewData)
       // }
+      console.log(data, '$$$$data')
       if (data.status === 200) {
-        setQuestionData(data.data.res)
+        setQuestionData(data.data?.res)
       }
     }
     fetchData();
@@ -151,6 +153,7 @@ export default function App() {
       }
     }
   }
+  console.log(questionData, 'questionData==>')
   return (
     <div>
       <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
