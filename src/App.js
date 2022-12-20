@@ -15,7 +15,7 @@ const treeViewData = [
 
 export default function App() {
   // const serverUrl = `http://localhost:3000/`
-  const serverUrl = `https://treeviewdatamapping-env.eba-jsbuwrm8.us-east-2.elasticbeanstalk.com/`
+  const serverUrl = `http://65.2.168.137:8080/`
   const [checked, setChecked] = React.useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
   const [questionData, setQuestionData] = React.useState([]);
