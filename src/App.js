@@ -1,17 +1,17 @@
 import * as React from 'react'
 import CheckboxTree from 'react-dynamic-checkbox-tree';
-import subjectJson from './subject.json';
-import examinationsJson from './examinations.json';
-import conceptsJson from './concepts.json';
-import sourceJson from './source.json';
+// import subjectJson from './subject.json';
+// import examinationsJson from './examinations.json';
+// import conceptsJson from './concepts.json';
+// import sourceJson from './source.json';
 import api from './services/api';
 
-const treeViewData = [
-  examinationsJson,
-  subjectJson,
-  conceptsJson,
-  sourceJson,
-];
+// const treeViewData = [
+//   examinationsJson,
+// subjectJson,
+// conceptsJson,
+// sourceJson,
+// ];
 
 export default function App() {
   // const serverUrl = `http://localhost:3000/`
@@ -24,9 +24,10 @@ export default function App() {
   const [qFrom, setQFrom] = React.useState(null);
   const [qTo, setQTo] = React.useState(null);
   const [catagoryData, setCategoryData] = React.useState([]);
-  const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
-  const tmpData = { viewData: treeViewData }
-  const result = tmpData.viewData.flatMap(flat);
+  const [result, setResult] = React.useState([]);
+  // const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
+  // const tmpData = { viewData: treeViewData }
+  // const result = tmpData.viewData.flatMap(flat);
   const getTagName = (id) => {
     return result?.find(r => r.id === +id)?.label;
   }
@@ -37,28 +38,29 @@ export default function App() {
   React.useEffect(() => {
     async function fetchData() {
       // You can await here  
-      const data = await api(null, serverUrl+'get/data', 'get');
+      const data = await api(null, serverUrl + 'get/data', 'get');
       const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
-      console.log(catData, 'catData$$')
-      // if(catData.status ===200){
-      //   let catTmp = [catData.data.lstExaminitations[0], 
-      //   catData.data.lstSubject[0],
-      //   catData.data.lstConcepts[0],
-      //   catData.data.lstSubject[0]];
-      //   catTmp = catTmp.map((m)=>{m.label=m.text; return m})
-      //   setCategoryData([...catTmp]);
-      //   console.log(catTmp, 'catTmp', catagoryData, treeViewData)
-      // }
-      console.log(data, '$$$$data')
+      if (catData.status === 200) {
+        let catTmp = [catData.data.lstExaminitations[0],
+        catData.data.lstSubject[0],
+        catData.data.lstConcepts[0],
+        catData.data.lstSubject[0]];
+        setCategoryData(catTmp);
+      }
       if (data.status === 200) {
         setQuestionData(data.data?.res)
       }
     }
     fetchData();
-  }, []);
+    const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
+    const tmpData = { viewData: catagoryData }
+    const tmpResult = tmpData.viewData.flatMap(flat);
+    setResult([...tmpResult])
+
+  }, [catagoryData, serverUrl]);
   const getQuestions = async () => {
     if (from && to) {
-      const data = await api(null, serverUrl+'get/data/' + from + '/' + to, 'get');
+      const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
       if (data.status === 200) {
         setQuestionData(data.data.res);
       }
@@ -77,9 +79,9 @@ export default function App() {
     setQuestionData(questionData);
   }
   const removeTag = async (tagId, i, qId) => {
-    const data = await api({ tagToBeRemoved: tagId }, serverUrl+'delete/tag/' + qId, 'put');
+    const data = await api({ tagToBeRemoved: tagId }, serverUrl + 'delete/tag/' + qId, 'put');
     if (data.status === 200) {
-      const data = await api(null, serverUrl+'get/data', 'get');
+      const data = await api(null, serverUrl + 'get/data', 'get');
       if (data.status === 200) {
         setQuestionData(data.data.res);
       }
@@ -91,9 +93,9 @@ export default function App() {
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
 
       const catIds = generateCategoryIds(checked);
-      const data = await api({ selectedQuestions, checked: catIds }, serverUrl+'add/tags', 'post');
+      const data = await api({ selectedQuestions, checked: catIds }, serverUrl + 'add/tags', 'post');
       if (data.status === 200) {
-        const data = await api(null, serverUrl+'get/data', 'get');
+        const data = await api(null, serverUrl + 'get/data', 'get');
         if (data.status === 200) {
           setQuestionData(data.data.res);
         }
@@ -129,9 +131,9 @@ export default function App() {
     })
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
       const catIds = generateCategoryIds(checked);
-      const data = await api({ selectedQuestions, checked: catIds }, serverUrl+'add/tags', 'post');
+      const data = await api({ selectedQuestions, checked: catIds }, serverUrl + 'add/tags', 'post');
       if (data.status === 200) {
-        const data = await api(null, serverUrl+'get/data', 'get');
+        const data = await api(null, serverUrl + 'get/data', 'get');
         if (data.status === 200) {
           setQuestionData(data.data.res);
         }
@@ -153,7 +155,6 @@ export default function App() {
       }
     }
   }
-  console.log(questionData, 'questionData==>')
   return (
     <div>
       <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
@@ -184,8 +185,8 @@ export default function App() {
                   <div style={{
                     paddingTop: '5px',
                     border: '1px solid blue'
-                  }}><span>Question: {qData.question}</span> <br/>
-                  <span>Answer: {qData.answer}</span>
+                  }}><span>Question: {qData.question}</span> <br />
+                    <span>Answer: {qData.answer}</span>
                   </div>
                 </div>
                 <div style={{ display: 'flex' }}>
@@ -200,14 +201,13 @@ export default function App() {
         }
       </div>
       <div style={{ width: '20%', float: 'right', paddingRight: '5%', paddingTop: '5%' }}>
-        {/* <p>{catagoryData[0]?.CatagoryName}</p> */}
-        <CheckboxTree
-          nodes={treeViewData}
-          // nodes={catagoryData}
+        {catagoryData.length > 0 && <CheckboxTree
+          // nodes={treeViewData}
+          nodes={catagoryData}
           checked={checked}
           onCheck={checked => setChecked(checked)}
           onClick={(e) => onClickCheckBox(e)}
-        />
+        />}
       </div>
 
     </div>
