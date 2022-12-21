@@ -52,12 +52,13 @@ export default function App() {
       }
     }
     fetchData();
+  }, []);
+  React.useEffect(() => {
     const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
     const tmpData = { viewData: catagoryData }
     const tmpResult = tmpData.viewData.flatMap(flat);
     setResult([...tmpResult])
-
-  }, []);
+  }, [catagoryData])
   const getQuestions = async () => {
     if (from && to) {
       const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
