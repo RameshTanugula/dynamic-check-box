@@ -29,7 +29,7 @@ export default function App() {
   // const tmpData = { viewData: treeViewData }
   // const result = tmpData.viewData.flatMap(flat);
   const getTagName = (id) => {
-    return result?.find(r => r.id === +id)?.label;
+    return result?.find(r => r.id === +id)?.label + ' X';
   }
 
 
@@ -57,7 +57,7 @@ export default function App() {
     const tmpResult = tmpData.viewData.flatMap(flat);
     setResult([...tmpResult])
 
-  }, [catagoryData, serverUrl]);
+  }, []);
   const getQuestions = async () => {
     if (from && to) {
       const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
@@ -193,7 +193,7 @@ export default function App() {
                   {qData.tags &&
                     qData.tags?.split(',')?.sort()?.map((tg, j) =>
                       <div style={{ paddingRight: '5px' }}>
-                        <span><button onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>
+                        <span><button onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg) || ''}</button></span>
                       </div>)}
                 </div>
               </div>)
