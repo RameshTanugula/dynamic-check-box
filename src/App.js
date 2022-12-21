@@ -164,7 +164,7 @@ export default function App() {
       </div>
       <button onClick={() => { applyTags() }}>Apply Tags</button>
 
-      <div style={{ height: '15rem', overflow: 'auto', marginTop: '5%', width: '40%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
+      <div style={{ height: '15rem', overflow: 'auto', marginTop: '5%', width: '55%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
 
         <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
           <span>From:</span><input type="text" value={qFrom} onChange={(e) => setQFrom(e.target.value)} />
