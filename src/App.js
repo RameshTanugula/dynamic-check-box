@@ -6,12 +6,6 @@ import CheckboxTree from 'react-dynamic-checkbox-tree';
 // import sourceJson from './source.json';
 import api from './services/api';
 
-// const treeViewData = [
-//   examinationsJson,
-// subjectJson,
-// conceptsJson,
-// sourceJson,
-// ];
 
 export default function App() {
   // const serverUrl = `http://localhost:8080/`
@@ -25,9 +19,6 @@ export default function App() {
   const [qTo, setQTo] = React.useState(null);
   const [catagoryData, setCategoryData] = React.useState([]);
   const [result, setResult] = React.useState([]);
-  // const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
-  // const tmpData = { viewData: treeViewData }
-  // const result = tmpData.viewData.flatMap(flat);
   const getTagName = (id) => {
     return result?.find(r => r.id === +id)?.label;
   }
