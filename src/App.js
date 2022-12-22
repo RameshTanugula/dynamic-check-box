@@ -14,7 +14,7 @@ import api from './services/api';
 // ];
 
 export default function App() {
-  // const serverUrl = `http://localhost:3000/`
+  // const serverUrl = `http://localhost:8080/`
   const serverUrl = `http://65.2.168.137:8080/`
   const [checked, setChecked] = React.useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
@@ -39,13 +39,12 @@ export default function App() {
     async function fetchData() {
       // You can await here  
       const data = await api(null, serverUrl + 'get/data', 'get');
-      const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
+      // const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
+      
+      const catData = await api(null, serverUrl + 'get/categories', 'get');
+      
       if (catData.status === 200) {
-        let catTmp = [catData.data.lstExaminitations[0],
-        catData.data.lstSubject[0],
-        catData.data.lstConcepts[0],
-        catData.data.lstSubject[0]];
-        setCategoryData(catTmp);
+        setCategoryData(catData.data);
       }
       if (data.status === 200) {
         setQuestionData(data.data?.res)
@@ -202,7 +201,7 @@ export default function App() {
         }
       </div>
       <div style={{ width: '20%', float: 'right', paddingRight: '5%', paddingTop: '5%' }}>
-        {catagoryData.length > 0 && <CheckboxTree
+        {catagoryData?.length > 0 && <CheckboxTree
           // nodes={treeViewData}
           nodes={catagoryData}
           checked={checked}
