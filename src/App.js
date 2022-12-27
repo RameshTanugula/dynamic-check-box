@@ -1,206 +1,184 @@
-import * as React from 'react'
-import CheckboxTree from 'react-dynamic-checkbox-tree';
-// import subjectJson from './subject.json';
-// import examinationsJson from './examinations.json';
-// import conceptsJson from './concepts.json';
-// import sourceJson from './source.json';
-import api from './services/api';
+// import * as React from 'react'
+// // import CheckboxTree from 'react-dynamic-checkbox-tree';
+// import Mapping from './components/mapping';
+// import TestCreation from './components/testCreation';
+// import FileUpload from './components/fileUpload';
+// import FlashCard from './components/flashCard';
+// // import subjectJson from './subject.json';
+// // import examinationsJson from './examinations.json';
+// // import conceptsJson from './concepts.json';
+// // import sourceJson from './source.json';
+// // import api from './services/api';
 
+
+// export default function App() {
+//   const [comp, setComp] =React.useState("testcreation");
+//   return (
+//     <>
+//     <div className="w3-sidebar w3-light-grey w3-bar-block" style={{width:"25%"}}>
+//   <h3 className="w3-bar-item">Menu</h3>
+//   <a href="#" className="w3-bar-item w3-button">Link 1</a>
+//   <a href="#" className="w3-bar-item w3-button">Link 2</a>
+//   <a href="#" className="w3-bar-item w3-button">Link 3</a>
+// </div>
+
+// <div style={{marginLeft:"25%"}}>
+
+// <div className="w3-container w3-teal">
+//   <h1>My Page</h1>
+// </div>
+// </div>
+//     {/* {comp === 'testcreation' &&<Mapping />} */}
+//     {/* {comp === 'testcreation' && <TestCreation />} */}
+//     {/* {comp === 'testcreation' && <FileUpload />} */}
+
+//     {comp === 'testcreation' && <FlashCard />}
+//     </>
+//   )
+// }
+
+import * as React from 'react';
+import { styled, useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import CssBaseline from '@mui/material/CssBaseline';
+import MuiAppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import List from '@mui/material/List';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+// import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+
+import Mapping from './components/mapping';
+import TestCreation from './components/testCreation';
+import FileUpload from './components/fileUpload';
+import FlashCard from './components/flashCard';
+import { useEffect } from 'react';
+
+const drawerWidth = 240;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  }),
+);
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}));
 
 export default function App() {
-  // const serverUrl = `http://localhost:8080/`
-  const serverUrl = `http://65.2.168.137:8080/`
-  const [checked, setChecked] = React.useState([]);
-  const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
-  const [questionData, setQuestionData] = React.useState([]);
-  const [from, setFrom] = React.useState(null);
-  const [to, setTo] = React.useState(null);
-  const [qFrom, setQFrom] = React.useState(null);
-  const [qTo, setQTo] = React.useState(null);
-  const [catagoryData, setCategoryData] = React.useState([]);
-  const [result, setResult] = React.useState([]);
-  const getTagName = (id) => {
-    return result?.find(r => r.id === +id)?.label;
-  }
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+  const [comp, setComp] = React.useState("Home");
 
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
-
-
-  React.useEffect(() => {
-    async function fetchData() {
-      // You can await here  
-      const data = await api(null, serverUrl + 'get/data', 'get');
-      // const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
-      
-      const catData = await api(null, serverUrl + 'get/categories', 'get');
-      
-      if (catData.status === 200) {
-        setCategoryData(catData.data);
-      }
-      if (data.status === 200) {
-        setQuestionData(data.data?.res)
-      }
-    }
-    fetchData();
-  }, []);
-  React.useEffect(() => {
-    const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
-    const tmpData = { viewData: catagoryData }
-    const tmpResult = tmpData.viewData.flatMap(flat);
-    setResult([...tmpResult])
-  }, [catagoryData])
-  const getQuestions = async () => {
-    if (from && to) {
-      const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
-      if (data.status === 200) {
-        setQuestionData(data.data.res);
-      }
-    } else {
-      alert('please try with from and to values')
-    }
-  }
-  const onClickCheckBox = (id, index) => {
-    if (id && index >= 0) {
-      setAllCheckBoxValue(false);
-      questionData[index]['checked'] = !questionData[index]['checked'];
-    } else {
-      setAllCheckBoxValue(!allCheckBoxValue)
-      questionData.map(q => q.checked = !allCheckBoxValue)
-    }
-    setQuestionData(questionData);
-  }
-  const removeTag = async (tagId, i, qId) => {
-    const data = await api({ tagToBeRemoved: tagId }, serverUrl + 'delete/tag/' + qId, 'put');
-    if (data.status === 200) {
-      const data = await api(null, serverUrl + 'get/data', 'get');
-      if (data.status === 200) {
-        setQuestionData(data.data.res);
-      }
-    }
-    // /delete/tag
-  }
-  const applyTags = async () => {
-    const selectedQuestions = questionData.filter(q => q.checked)?.map(sq => sq.q_id)
-    if (selectedQuestions?.length > 0 && checked?.length > 0) {
-
-      const catIds = generateCategoryIds(checked);
-      const data = await api({ selectedQuestions, checked: catIds }, serverUrl + 'add/tags', 'post');
-      if (data.status === 200) {
-        const data = await api(null, serverUrl + 'get/data', 'get');
-        if (data.status === 200) {
-          setQuestionData(data.data.res);
-        }
-      }
-    } else {
-      alert('please select categories and question to apply tags')
-    }
-  }
-  function removeDuplicates(arr) {
-    return arr.filter((item,
-      index) => arr.indexOf(item) === index);
-  }
-  const generateCategoryIds = (checkedIds) => {
-
-    let selCatIds = [];
-    if (checkedIds?.length > 0) {
-      for (let i = 0; i < checkedIds.length; i++) {
-        selCatIds = selCatIds.concat(getPath(result, checkedIds[i]));
-
-      }
-      return removeDuplicates(checkedIds.concat(selCatIds));
-    }
-    return [];
-  }
-
-  const applyTagsToQset = async () => {
-    let selectedQuestions = [];
-    questionData.map((q) => {
-      if ((q.q_id >= qFrom) && (q.q_id <= qTo)) {
-        selectedQuestions.push(q.q_id);
-      }
-      return q;
-    })
-    if (selectedQuestions?.length > 0 && checked?.length > 0) {
-      const catIds = generateCategoryIds(checked);
-      const data = await api({ selectedQuestions, checked: catIds }, serverUrl + 'add/tags', 'post');
-      if (data.status === 200) {
-        const data = await api(null, serverUrl + 'get/data', 'get');
-        if (data.status === 200) {
-          setQuestionData(data.data.res);
-        }
-      }
-    } else {
-      alert('please select categories and question to apply tags')
-    }
-  }
-  function getPath(object, search) {
-    if (object.id === search) return [object.id];
-    else if ((object.lstSubCatagoryTree) || Array.isArray(object)) {
-      let children = Array.isArray(object) ? object : object.lstSubCatagoryTree;
-      for (let child of children) {
-        let result = getPath(child, search);
-        if (result) {
-          if (object.id) result.unshift(object.id);
-          return result;
-        }
-      }
-    }
-  }
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+ 
+console.log(comp, '####')
   return (
-    <div>
-      <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
-        <span>From:</span><input type="text" value={from} onChange={(e) => setFrom(e.target.value)} />
-        <span>To:</span><input type="text" value={to} onChange={(e) => setTo(e.target.value)} /><br /><br />
-        <button onClick={() => { getQuestions() }}>Get Questions</button>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar position="fixed" open={open}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+          E Author - Admin - {comp}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        variant="persistent"
+        anchor="left"
+        open={open}
+      >
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <List>
+          {['Mapping', 'Create a Test', 'Upload Files', 'Flash Cards'].map((text, index) => (
+            <ListItem key={text} disablePadding>
+              <ListItemButton>
+                <ListItemText primary={text} onClick={() => setComp(text)} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <Main open={open}>
+        <DrawerHeader />
+        {comp?.toLowerCase() === 'mapping' && <Mapping />}
+        {comp?.toLowerCase() === 'create a test' && <TestCreation />}
+        {comp?.toLowerCase() === 'upload files' && <FileUpload />}
 
-      </div>
-      <button onClick={() => { applyTags() }}>Apply Tags</button>
-
-      <div style={{ height: '15rem', overflow: 'auto', marginTop: '5%', width: '55%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
-
-        <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
-          <span>From:</span><input type="text" value={qFrom} onChange={(e) => setQFrom(e.target.value)} />
-          <span>To:</span><input type="text" value={qTo} onChange={(e) => setQTo(e.target.value)} /><br /><br />
-          <button onClick={() => { applyTagsToQset() }}>Apply Tags </button>
-
-        </div>
-        {questionData?.length > 0 && <><p>Select All:</p><input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" /></>}
-
-        {questionData?.length > 0 &&
-          questionData?.map((qData, i) => {
-            return (
-              <div style={{ padding: '5px' }}>
-
-                <div style={{ display: 'flex' }}>
-                  <div><input checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
-                  <div style={{
-                    paddingTop: '5px',
-                    border: '1px solid blue'
-                  }}><span>Question: {qData.question}</span> <br />
-                    <span>Answer: {qData.answer}</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex' }}>
-                  {qData.tags &&
-                    qData.tags?.split(',')?.sort()?.map((tg, j) =>
-                      <div style={{ paddingRight: '5px' }}>
-                        <span><button onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>
-                      </div>)}
-                </div>
-              </div>)
-          })
-        }
-      </div>
-      <div style={{ width: '20%', float: 'right', paddingRight: '5%', paddingTop: '5%' }}>
-        {catagoryData?.length > 0 && <CheckboxTree
-          // nodes={treeViewData}
-          nodes={catagoryData}
-          checked={checked}
-          onCheck={checked => setChecked(checked)}
-          onClick={(e) => onClickCheckBox(e)}
-        />}
-      </div>
-
-    </div>
-  )
+        {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
+      </Main>
+    </Box>
+  );
 }
