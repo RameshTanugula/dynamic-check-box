@@ -1,44 +1,46 @@
 import * as React from 'react'
+import { useState } from 'react';
 import CheckboxTree from 'react-dynamic-checkbox-tree';
-// import subjectJson from './subject.json';
-// import examinationsJson from './examinations.json';
-// import conceptsJson from './concepts.json';
-// import sourceJson from './source.json';
 import api from '../services/api';
 
 
 export default function Mapping() {
-  // const serverUrl = `http://localhost:8080/`
-  const serverUrl = `http://3.111.29.120:8080/`
-  const [checked, setChecked] = React.useState([]);
-  const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
-  const [questionData, setQuestionData] = React.useState([]);
-  const [from, setFrom] = React.useState(null);
-  const [to, setTo] = React.useState(null);
-  const [qFrom, setQFrom] = React.useState(null);
-  const [qTo, setQTo] = React.useState(null);
-  const [catagoryData, setCategoryData] = React.useState([]);
-  const [result, setResult] = React.useState([]);
+  const serverUrl = `http://localhost:8080/`
+  // const serverUrl = `http://3.111.29.120:8080/`
+  const [checked, setChecked] = useState([]);
+  const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
+  const [questionData, setQuestionData] = useState([]);
+  const [from, setFrom] = useState(null);
+  const [to, setTo] = useState(null);
+  const [qFrom, setQFrom] = useState(null);
+  const [qTo, setQTo] = useState(null);
+  const [catagoryData, setCategoryData] = useState([]);
+  const [result, setResult] = useState([]);
+  const [user, setUser] = useState([]);
+  const [selectedUser, setSelectedUser] =useState("");
+  const [type, setType] = useState("");
   const getTagName = (id) => {
     return result?.find(r => r.id === +id)?.label;
   }
 
-
-
-
   React.useEffect(() => {
     async function fetchData() {
-      // You can await here  
-      const data = await api(null, serverUrl + 'get/data', 'get');
-      // const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
-      
+      // You can await here 
+      const user = await api(null, serverUrl + 'get/users', 'get');
+      if(user.status === 200){
+        setSelectedUser(user.data.res[0].user);
+        setUser(user.data.res);
+        if(user?.data?.res[0]?.user && type){
+        const data = await api(null, serverUrl + 'get/data/'+type+'/'+user.data.res[0].user, 'get');
+        if (data.status === 200) {
+          setQuestionData(data.data?.res)
+        }
+      }
+      }
       const catData = await api(null, serverUrl + 'get/categories', 'get');
-      
+
       if (catData.status === 200) {
         setCategoryData(catData.data);
-      }
-      if (data.status === 200) {
-        setQuestionData(data.data?.res)
       }
     }
     fetchData();
@@ -49,9 +51,20 @@ export default function Mapping() {
     const tmpResult = tmpData.viewData.flatMap(flat);
     setResult([...tmpResult])
   }, [catagoryData])
+  React.useEffect(() => {
+    async function fetchData() {
+      if(selectedUser && type){
+    const data = await api(null, serverUrl + 'get/data/'+type+'/'+selectedUser, 'get');
+    if (data.status === 200) {
+      setQuestionData(data.data?.res)
+    }
+  }
+  }
+  fetchData();
+  }, [type])
   const getQuestions = async () => {
     if (from && to) {
-      const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
+      const data = await api(null, serverUrl + 'get/data/'+type+'/'+selectedUser +'/'+ from + '/' + to, 'get');
       if (data.status === 200) {
         setQuestionData(data.data.res);
       }
@@ -70,9 +83,9 @@ export default function Mapping() {
     setQuestionData(questionData);
   }
   const removeTag = async (tagId, i, qId) => {
-    const data = await api({ tagToBeRemoved: tagId }, serverUrl + 'delete/tag/' + qId, 'put');
+    const data = await api({ tagToBeRemoved: tagId }, serverUrl + 'delete/tag/' + type +'/' + qId, 'put');
     if (data.status === 200) {
-      const data = await api(null, serverUrl + 'get/data', 'get');
+      const data = await api(null, serverUrl + 'get/data/'+ type +'/' + selectedUser, 'get');
       if (data.status === 200) {
         setQuestionData(data.data.res);
       }
@@ -84,9 +97,9 @@ export default function Mapping() {
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
 
       const catIds = generateCategoryIds(checked);
-      const data = await api({ selectedQuestions, checked: catIds }, serverUrl + 'add/tags', 'post');
+      const data = await api({ selectedQuestions, checked: catIds, type }, serverUrl + 'add/tags', 'post');
       if (data.status === 200) {
-        const data = await api(null, serverUrl + 'get/data', 'get');
+        const data = await api(null, serverUrl + 'get/data/'+ type +'/' +selectedUser, 'get');
         if (data.status === 200) {
           setQuestionData(data.data.res);
         }
@@ -122,9 +135,9 @@ export default function Mapping() {
     })
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
       const catIds = generateCategoryIds(checked);
-      const data = await api({ selectedQuestions, checked: catIds }, serverUrl + 'add/tags', 'post');
+      const data = await api({ selectedQuestions, checked: catIds, type }, serverUrl + 'add/tags', 'post');
       if (data.status === 200) {
-        const data = await api(null, serverUrl + 'get/data', 'get');
+        const data = await api(null, serverUrl + 'get/data/'+ type + '/'+ selectedUser, 'get');
         if (data.status === 200) {
           setQuestionData(data.data.res);
         }
@@ -146,9 +159,28 @@ export default function Mapping() {
       }
     }
   }
+  const onChangeUser=async (user)=>{
+    setSelectedUser(user);
+    setQuestionData([])
+    const data = await api(null, serverUrl + 'get/data/'+ type + '/' + user, 'get');
+    if (data.status === 200) {
+      setQuestionData(data.data?.res)
+    }
+  }
   return (
     <div>
-      <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
+      <div style={{marginTop: '2%', paddingLeft: '10%' }}>
+        <span>User: <select onChange={(e)=>onChangeUser(e.target.value)}>
+          { user && user?.map((u, i)=> {
+            return(
+            <option key={i} value={u.user}>{u.user}</option>
+            )
+            })}
+          </select>
+          </span>
+          <span>Questions:<input type="checkbox" checked={type==="questions"} onClick={()=>setType("questions")}/>
+           BitBank:<input type="checkbox" checked={type==="bitbank"} onClick={()=>setType("bitbank")}/> </span>
+          <br/>
         <span>From:</span><input type="text" value={from} onChange={(e) => setFrom(e.target.value)} />
         <span>To:</span><input type="text" value={to} onChange={(e) => setTo(e.target.value)} /><br /><br />
         <button onClick={() => { getQuestions() }}>Get Questions</button>
@@ -156,7 +188,7 @@ export default function Mapping() {
       </div>
       <button onClick={() => { applyTags() }}>Apply Tags</button>
 
-      <div style={{ height: '15rem', overflow: 'auto', marginTop: '5%', width: '55%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
+      <div style={{ height: '15rem', overflow: 'auto', marginTop: '5%', width: '65%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
 
         <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
           <span>From:</span><input type="text" value={qFrom} onChange={(e) => setQFrom(e.target.value)} />
@@ -191,7 +223,7 @@ export default function Mapping() {
           })
         }
       </div>
-      <div style={{ width: '20%', float: 'right', paddingRight: '5%', paddingTop: '5%' }}>
+      <div style={{height:'15rem', width: '20%', float: 'right', paddingRight: '5%', paddingTop: '5%', overflow: 'auto' }}>
         {catagoryData?.length > 0 && <CheckboxTree
           // nodes={treeViewData}
           nodes={catagoryData}
