@@ -5,8 +5,8 @@ import api from '../services/api';
 
 
 export default function Mapping() {
-  const serverUrl = `http://localhost:8080/`
-  // const serverUrl = `http://3.111.29.120:8080/`
+  // const serverUrl = `http://localhost:8080/`
+  const serverUrl = `http://3.111.29.120:8080/`
   const [checked, setChecked] = useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
   const [questionData, setQuestionData] = useState([]);
