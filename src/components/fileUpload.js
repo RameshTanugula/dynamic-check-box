@@ -30,6 +30,7 @@ export default function FileUpload() {
 	const onFileUpload = async () => {
 	
 	// Create an object of formData
+	if(selectedFile?.length > 0){
 	const formData = new FormData();
 	
     for(let i=0; i< selectedFile?.length; i++){
@@ -41,9 +42,18 @@ export default function FileUpload() {
     selectedSubject)
     const data = await api(formData, serverUrl + 'upload', 'post');
 	if(data.status === 200){
-		setSelectedSubject(null);
+		const data = await api(null, serverUrl + 'get/subjects', 'get');
+
+            if (data.status === 200) {
+                setSelectedSubject(data.data[0].id)
+                setSubjects(data.data)
+            }
+		alert('File uploaded!')
 		setSelectedFile([])
 	}
+} else {
+	alert('Please choose file to uplad!')
+}
 };
 	const fileData = () => {
 	
