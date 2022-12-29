@@ -300,7 +300,7 @@ const getExpandedKeys=()=> {
                   {qData.tags &&
                     qData.tags?.split(',')?.sort()?.map((tg, j) =>
                       <div style={{ paddingRight: '5px' }}>
-                        <span><button onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>
+                       {tg !=='' && <span><button onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>}
                       </div>)}
                 </div>
               </div>)
