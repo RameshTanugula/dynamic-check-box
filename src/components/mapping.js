@@ -22,7 +22,11 @@ export default function Mapping() {
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(true);
   const [isRange, setIsRange] = useState(false);
-  const contentTypeList = [{label:"Content Type", value:null},{label:"Bit Bank",value:"bitbank"}, {label:"Questions", value:"questions"}]
+  const contentTypeList = [
+    { label: "Content Type", value: null },
+    { label: "Bit Bank", value: "bitbank" },
+    { label: "Questions", value: "questions" },
+    { label: "Statements", value: "statements" }];
   const getTagName = (id) => {
     return result?.find(r => r.id === +id)?.label;
   }
@@ -107,7 +111,6 @@ export default function Mapping() {
     // /delete/tag
   }
   const applyTags = async () => {
-    console.log(isRange, from , to, 'applytags******');
     const selectedQuestions = questionData.filter(q => q.checked)?.map(sq => sq.q_id)
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
 
@@ -187,7 +190,7 @@ const getExpandedKeys=()=> {
     })
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
       // const catIds = generateCategoryIds(checked);
-      const catIds = getExpandedKeys();console.log(catIds, 'catIds****')
+      const catIds = getExpandedKeys();
       setLoading(true);
       const data = await api({ selectedQuestions, checked: catIds, type }, serverUrl + 'add/tags', 'post');
       if (data.status === 200) {
