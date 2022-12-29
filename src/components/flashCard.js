@@ -3,16 +3,18 @@ import { useState } from 'react';
 import CheckboxTree from 'react-dynamic-checkbox-tree';
 import uniqid from 'uniqid';
 import api from '../services/api';
-import './common.css';
+import './flashCard.css';
 
 
 export default function FlashCard() {
     // const serverUrl = `http://localhost:8080/flashcard/`
-      const serverUrl = `http://3.111.29.120:8080/flashcard/`
+    const serverUrl = `http://3.111.29.120:8080/flashcard/`
     const initialValue = [{ id: 1, frontValue: '', backValue: '', frontImgValue: "", backImgValue: "" }]
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);
-    const [title, setTitle] = useState("")
+    const [title, setTitle] = useState("");
+    const [cardData, setCardData] = useState([]);
+    const [showTable, setShowTable] = useState(true);
     const validateList = () => {
         list.map((l) => {
             if (((l.frontValue === '') && (l.backValue === ''))) {
@@ -21,6 +23,15 @@ export default function FlashCard() {
         })
         return false;
     }
+    React.useEffect(() => {
+        async function fetchData() {
+            const cardData = await api(null, serverUrl + 'titles', 'get');
+            if (cardData.status === 200) {
+                setCardData(cardData.data)
+            }
+        }
+        fetchData();
+    })
     const onSubmitHandler = async () => {
         if (title === '') {
             alert('please enter title')
@@ -42,6 +53,12 @@ export default function FlashCard() {
                 setList([]);
                 setTitle("");
                 setFileList([]);
+                const cardData = await api(null, serverUrl + 'titles', 'get');
+                if (cardData.status === 200) {
+                    setCardData(cardData.data);
+                    setShowTable(true)
+                }
+                alert('Flash Card saved succesfully!')
             }
         }
     }
@@ -92,8 +109,24 @@ export default function FlashCard() {
     }
     return (
         <div>
+            {showTable && <div style={{ "textAlign": "right", paddingBottom: '2rem' }}>
+                <button style={{ height: '2rem' }} onClick={() => setShowTable(false)}>Add New Flash Card</button>
+            </div>}
+            {showTable && <table>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Title</th>
+                </tr>
+                {cardData?.map((c, i) => {
+                    return (<tr>
+                        <td>{i + 1}</td>
+                        <td>{c.title}</td>
+                    </tr>)
+                })
+                }
 
-            {
+            </table>}
+            {!showTable &&
                 <div className="App">
                     <header className="App-header">
                         <label >
@@ -124,7 +157,7 @@ export default function FlashCard() {
                                     </tr>
                                 ))}
                             </table>
-                            <button id="addBtn" onClick={addRow}>Add New Row</button><br/><br/>
+                            <button id="addBtn" onClick={addRow}>Add New Row</button><br /><br />
                         </div>
                         <input type="submit" onClick={() => onSubmitHandler()} value="Submit" />
                     </header>
