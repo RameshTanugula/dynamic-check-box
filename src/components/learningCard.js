@@ -15,19 +15,16 @@ export default function LearningCard() {
     const [cardData, setCardData] = useState([]);
     const [showTable, setShowTable] = useState(true);
     const [subjects, setSubjects] = useState([]);
+    const [title, setTitle] = useState("");
     const [selectedSubject, setSelectedSubject] = useState();
-    const validateList = () => {
-        list.map((l) => {
-            if (((l.frontValue === '') && (l.backValue === ''))) {
-                return true
-            }
-        })
-        return false;
-    }
+
     React.useEffect(() => {
         async function fetchData() {
             const subData = await api(null, serverUrl + 'get/subjects', 'get');
-
+            const cardData = await api(null, serverUrl + 'cards', 'get');
+            if (cardData.status === 200) {
+                setCardData(cardData.data);
+            }
             if (subData.status === 200) {
                 setSelectedSubject(subData.data[0].id)
                 setSubjects(subData.data)
@@ -39,8 +36,10 @@ export default function LearningCard() {
     const onSubmitHandler = async () => {
         if (!selectedSubject) {
             alert('please select Subject')
-        } else if (validateList()) {
-            alert('please fill required fields')
+        } else if (!title) {
+            alert('please enter Title')
+        } else if (!fileList || fileList?.length === 0) {
+            alert('please select required files')
         } else {
             const formData = new FormData();
             for (let i = 0; i < fileList?.length; i++) {
@@ -50,11 +49,14 @@ export default function LearningCard() {
             }
             formData.append('selectedSubject',
                 selectedSubject)
+            formData.append('title',
+                title)
             const data = await api(formData, serverUrl + 'upload/learning/card', 'post');
             if (data.status === 200) {
                 setList([]);
                 setSelectedSubject("");
                 setFileList([]);
+                setTitle("");
                 const cardData = await api(null, serverUrl + 'cards', 'get');
                 if (cardData.status === 200) {
                     setCardData(cardData.data);
@@ -68,31 +70,18 @@ export default function LearningCard() {
         const tmpList = { id: list.length + 1, frontImgValue: "", backImgValue: "" };
         setList(list.concat([tmpList]))
     }
-    const onChangeCell = async (value, i, type, isCheck) => {
-        if (type === 'fi') {
-            const tmpFileName = uniqid() + '$' + value.target.files[0].name;
-            const myNewFile = new File(
-                [value.target.files[0]],
-                `${tmpFileName}`,
-                { type: value.target.files[0].type }
-            );
+    const onChangeCell = async (value, i) => {
+        const tmpFileName = uniqid() + '$' + value.target.files[0].name;
+        const myNewFile = new File(
+            [value.target.files[0]],
+            `${tmpFileName}`,
+            { type: value.target.files[0].type }
+        );
 
-            const tmp = fileList.concat(myNewFile)
-            setFileList([...tmp])
-            list[i].frontImgValue = tmpFileName;
-        }
-        if (type === 'bi') {
-            const tmpFileName = uniqid() + '$' + value.target.files[0].name;
-            const myNewFile = new File(
-                [value.target.files[0]],
-                `${tmpFileName}`,
-                { type: value.target.files[0].type }
-            );
+        const tmp = fileList.concat(myNewFile)
+        setFileList([...tmp])
+        list[i].frontImgValue = tmpFileName;
 
-            const tmp = fileList.concat(myNewFile);
-            setFileList([...tmp]);
-            list[i].backImgValue = tmpFileName;
-        }
         setList([...list])
 
     }
@@ -104,12 +93,14 @@ export default function LearningCard() {
             {showTable && <table>
                 <tr>
                     <th>S.No.</th>
+                    <th>Title</th>
                     <th>Subject</th>
                     <th>Url</th>
                 </tr>
                 {cardData?.map((c, i) => {
                     return (<tr>
                         <td>{i + 1}</td>
+                        <td>{c.title}</td>
                         <td>{c.name}</td>
                         <td>{c.location_url}</td>
                     </tr>)
@@ -127,21 +118,20 @@ export default function LearningCard() {
                                 })}</select>
                         </div>
                         <br />
+                        <label >
+                            Title:<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+                        </label><br />
                         <div>
                             <table>
                                 <th>S.No</th>
-                                <th>Front</th>
-                                <th>Back</th>
+                                <th>File</th>
                                 {list.map((r, i) => (
                                     <tr>
                                         <td>{r.id}.</td>
+
                                         <td><div>
                                             &nbsp;&nbsp;
-                                            <input type="file" onChange={(e) => onChangeCell(e, i, 'fi')} />
-                                        </div></td>
-                                        <td><div>
-                                            &nbsp;&nbsp;
-                                            <input type="file" onChange={(e) => onChangeCell(e, i, 'bi')} />
+                                            <input type="file" onChange={(e) => onChangeCell(e, i)} />
                                         </div></td>
                                     </tr>
                                 ))}
