@@ -35,7 +35,7 @@ export default function Mapping() {
     async function fetchData() {
       // You can await here 
       setLoading(true);
-      const user = await api(null, serverUrl + 'get/users', 'get');
+      const user = await api(null, serverUrl + 'get/users/'+type, 'get');
       if(user.status === 200){
         // setSelectedUser(user.data.res[0].user);
         setUser(user.data.res);
@@ -236,25 +236,32 @@ const getExpandedKeys=()=> {
     setFrom("");
     setTo("");
   }
+  const onChangeType=async (type)=>{
+    setType(type);
+    const user = await api(null, serverUrl + 'get/users/'+type, 'get');
+      if(user.status === 200){
+        setUser(user.data.res);
+      }
+  }
   return (
     <>
     {/* {loading && <Loader />} */}
     {/* {loading && "Loading...!"} */}
     { <div>
       <div style={{}}>
-        <span><select value={selectedUser} onChange={(e)=>onChangeUser(e.target.value)}>
-        <option  value={""}>Select User</option>
-          { user && user?.map((u, i)=> {
+      <span><select onChange={(e)=>onChangeType(e.target.value)}>
+          { contentTypeList.map((c, i)=> {
             return(
-            <option key={i} value={u.user}>{u.user}</option>
+            <option key={i} value={c.value}>{c.label}</option>
             )
             })}
           </select>
           </span>
-          &nbsp;&nbsp;<span><select onChange={(e)=>setType(e.target.value)}>
-          { contentTypeList.map((c, i)=> {
+          &nbsp;&nbsp;<span><select value={selectedUser} onChange={(e)=>onChangeUser(e.target.value)}>
+        <option  value={""}>Select User</option>
+          { user && user?.map((u, i)=> {
             return(
-            <option key={i} value={c.value}>{c.label}</option>
+            <option key={i} value={u.user}>{u.user}</option>
             )
             })}
           </select>
