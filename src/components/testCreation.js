@@ -47,13 +47,56 @@ export default function TestCreation() {
     }, [catagoryData])
     React.useEffect(() => {
         async function getData() {
-            const data = await api({ catIds: checked }, serverUrl + 'get/data/bycategory', 'post');
+            const catIds = prepareCatIds();
+            const data = await api({ catIds: catIds }, serverUrl + 'get/data/bycategory', 'post');
             if (data.status === 200) {
                 setQuestionData(data.data?.res)
             }
         }
         getData();
     }, [checked])
+    const prepareCatIds = () => {
+        let ids1 = [];
+        let ids2 = [];
+        let ids3 = [];
+        let ids4 = [];
+        const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
+        if (catagoryData && catagoryData.length > 0) {
+            const l1 = { viewData: [catagoryData[0]] };
+            const l2 = { viewData: [catagoryData[1]] };
+            const l3 = { viewData: [catagoryData[2]] };
+            const l4 = { viewData: [catagoryData[3]] };
+            const tmpResult1 = l1.viewData.flatMap(flat);
+            const tmpResult2 = l2.viewData.flatMap(flat);
+            const tmpResult3 = l3.viewData.flatMap(flat);
+            const tmpResult4 = l4.viewData.flatMap(flat);
+            const examCatIds = tmpResult1.map(e => e.id);
+            const subjectCatIds = tmpResult2.map(e => e.id);
+            const conceptCatIds = tmpResult3.map(e => e.id);
+            const sourceCatIds = tmpResult4.map(e => e.id);
+
+            for (let i = 0; i < checked.length; i++) {
+                const examIdExist = examCatIds.find(ec => ec === checked[i]);
+                const subIdExist = subjectCatIds.find(sc => sc === checked[i]);
+                const conceptIdExist = conceptCatIds.find(cc => cc === checked[i]);
+                const sourceIdExist = sourceCatIds.find(soc => soc === checked[i]);
+                if (examIdExist) {
+                    ids1.push(checked[i]);
+                }
+                if (subIdExist) {
+                    ids2.push(checked[i]);
+                }
+                if (conceptIdExist) {
+                    ids3.push(checked[i]);
+                }
+                if (sourceIdExist) {
+                    ids4.push(checked[i]);
+                }
+            }
+
+        }
+        return [ids1, ids2, ids3, ids4]
+    }
     const onClickCheckBox = (id, index) => {
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
