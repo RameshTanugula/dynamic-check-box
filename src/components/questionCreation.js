@@ -220,6 +220,10 @@ export default function CustomPaginationActionsTable() {
                 setInputOptionNumber("");
                 setSelectedOptions([]);
                 setOpen(false);
+                const data = await api(null, serverUrl + 'get/data', 'get');
+                if (data.status === 200) {
+                    setQuestionData(data.data?.res)
+                }
             }
         }
     }
@@ -325,7 +329,7 @@ export default function CustomPaginationActionsTable() {
     const getOptionNumberInputBox = (row, i) => {
         return (<div>Option Number &nbsp;&nbsp;<input type="text" value={inputOptionNumber} onChange={(e) => setInputOptionNumber(e.target?.value)} /></div>)
     }
-    const openModalHandler=(row, i)=>{
+    const openModalHandler = (row, i) => {
         setOpen(true);
         setSelectedIndex(i);
         row.isChecked = false;
