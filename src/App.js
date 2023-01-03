@@ -22,7 +22,7 @@ import TestCreation from './components/testCreation';
 import FileUpload from './components/fileUpload';
 import FlashCard from './components/flashCard';
 import LearningCard from './components/learningCard';
-
+import QuestionCreation from './components/questionCreation';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -123,7 +123,7 @@ console.log(comp, '####')
         </DrawerHeader>
         <Divider />
         <List>
-          {['Mapping', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards'].map((text, index) => (
+          {['Mapping', 'Create Question', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemText primary={text} onClick={() => setComp(text)} />
@@ -135,6 +135,7 @@ console.log(comp, '####')
       <Main open={open}>
         <DrawerHeader />
         {comp?.toLowerCase() === 'mapping' && <Mapping />}
+        {comp?.toLowerCase() === 'create question' && <QuestionCreation />}
         {comp?.toLowerCase() === 'create a test' && <TestCreation />}
         {comp?.toLowerCase() === 'upload files' && <FileUpload />}
 
