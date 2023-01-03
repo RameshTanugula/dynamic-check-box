@@ -116,6 +116,7 @@ export default function CustomPaginationActionsTable() {
 
     const [selectedOptions, setSelectedOptions] = React.useState([]);
     const [selectedIndex, setSelectedIndex] = React.useState(null);
+    const [selectedRow, setSelectedRow] = React.useState(null)
 
     React.useEffect(() => {
         async function fetchData() {
@@ -222,7 +223,7 @@ export default function CustomPaginationActionsTable() {
             }
         }
     }
-    const renderModal = (row, i) => {
+    const renderModal = () => {
         return (
             <div>
                 <Modal
@@ -245,18 +246,18 @@ export default function CustomPaginationActionsTable() {
                                 return (<><span>Option{so.inputOptionNumber}: <b>{so.inputOptionValue}</b></span> <br /></>)
                             })}
                         </div>}
-                        {allotOptions(row, i)}
-                        {getOptionNumberInputBox(row, i)}
+                        {allotOptions(selectedRow, selectedIndex)}
+                        {getOptionNumberInputBox(selectedRow, selectedIndex)}
                         <br />
-                        {!row.isChecked && getInputBox(row, i)}
+                        {!selectedRow.isChecked && getInputBox(selectedRow, selectedIndex)}
                         <br />
-                        {row.isChecked && getTitles(row, i)}
+                        {selectedRow.isChecked && getTitles(selectedRow, selectedIndex)}
                         <br />
 
-                        {(selectedTitle && titleOptionsList) && getTitleOptions(row, i)}
+                        {(selectedTitle && titleOptionsList) && getTitleOptions(selectedRow, selectedIndex)}
 
-                        <Button onClick={() => SetOption(row, i)}>Set Option</Button> <br />
-                        <Button onClick={() => createQuestion(row, i)}>Create Question</Button>
+                        <Button onClick={() => SetOption(selectedRow, selectedIndex)}>Set Option</Button> <br />
+                        <Button onClick={() => createQuestion(selectedRow, selectedIndex)}>Create Question</Button>
                         <br />
                         <Button onClick={() => onCloseHandler()}>close</Button>
 
@@ -324,6 +325,12 @@ export default function CustomPaginationActionsTable() {
     const getOptionNumberInputBox = (row, i) => {
         return (<div>Option Number &nbsp;&nbsp;<input type="text" value={inputOptionNumber} onChange={(e) => setInputOptionNumber(e.target?.value)} /></div>)
     }
+    const openModalHandler=(row, i)=>{
+        setOpen(true);
+        setSelectedIndex(i);
+        row.isChecked = false;
+        setSelectedRow(row);
+    }
 
     return (
         <div>
@@ -372,8 +379,8 @@ export default function CustomPaginationActionsTable() {
                                     <TableCell style={{ width: 160 }} align="right">
                                         {/* <Button variant='primary' onClick={()=>setOpen(true)}>Create Question</Button> */}
 
-                                        <Button onClick={() => openModal()}>Create Question</Button>
-                                        {open && renderModal(row, i)}
+                                        <Button onClick={() => openModalHandler(row, i)}>Create Question</Button>
+                                        {open && renderModal()}
                                         {/* {allotOptions(row, i)}
                                     { getOptionNumberInputBox(row, i)}
                                     <br />
