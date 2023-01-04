@@ -45,11 +45,13 @@ export default function Categories() {
         getData();
     }, [selectedMainCategory]);
     const getMainCategories = () => {
-        return (<div>
+        return (
             <Select
+                sx={{ width: '25%' }}
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
                 value={selectedMainCategory}
+                autoWidth
                 onChange={(e) => setSelectedMainCategory(e?.target?.value)}
             >
                 <MenuItem value="">
@@ -57,7 +59,8 @@ export default function Categories() {
                 </MenuItem>
                 {categoryMainData.map((tl) => { return (<MenuItem value={tl.id}>{tl.label}</MenuItem>) })}
             </Select>
-        </div>)
+
+        )
     }
     const resetAll = () => {
         setSelectedMainCategory(``);
@@ -84,21 +87,21 @@ export default function Categories() {
         <div>
             {categoryMainData?.length && getMainCategories()} <br /><br />
             <Autocomplete
+                sx={{ width: '25%' }}
                 disablePortal
                 id="combo-box-demo"
                 options={subCategoryData}
                 onChange={(event, newValue) => {
                     setSelectedSubCategory(newValue?.id);
                 }}
-                defaultValue={''}
+                value={selectedSubCategory && subCategoryData?.find(sc => sc.id === selectedSubCategory)?.label}
                 filterSelectedOptions
-                sx={{ width: 300 }}
                 renderInput={(params) => <TextField {...params} label="Categories" />}
             />
             <br /><br />
             <div>
 
-                <TextField id="outlined-basic" value={newCatValue} onChange={(e) => setNewCatValue(e.target?.value)} label="New Category" variant="outlined" />
+                <TextField sx={{ width: '25%' }} id="outlined-basic" value={newCatValue} onChange={(e) => setNewCatValue(e.target?.value)} label="New Category" variant="outlined" />
             </div>
             <br /><br /><br />
             <div>
