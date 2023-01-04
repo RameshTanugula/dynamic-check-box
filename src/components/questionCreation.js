@@ -147,13 +147,13 @@ export default function CustomPaginationActionsTable() {
         const isExistOption = selectedOptions.find(so => so.inputOptionNumber === inputOptionNumber);
         const isExistValue = selectedOptions.find(so => so.inputOptionValue === inputOptionValue);
 
-        if ((inputOptionNumber < 2) || (inputOptionNumber > 5)) {
-            alert('please start selecting between Option 2 and Option 5')
+        if ((inputOptionNumber < 2) || (inputOptionNumber > 4)) {
+            alert('please start selecting between Option 2 and Option 4')
         } else if (isExistOption) {
             alert('Option ' + inputOptionNumber + ' is already added');
         } else if (isExistValue) {
             alert('This value already configured to another Option')
-        } else if (selectedOptions && selectedOptions.length <= 4) {
+        } else if (selectedOptions && selectedOptions.length <= 3) {
             if (!row.isChecked) {
                 if (!inputOptionValue) {
                     alert('please select the option value for ' + inputOptionNumber)
@@ -207,8 +207,8 @@ export default function CustomPaginationActionsTable() {
         setSelectedIndex(i)
     }
     const createQuestion = async (row) => {
-        if (selectedOptions && selectedOptions?.length < 4) {
-            alert('Please select minimum 4 options')
+        if (selectedOptions && selectedOptions?.length < 3) {
+            alert('Please select minimum 3 options')
         } else {
             const response = await api({ bitBankObj: row, selectedOptions }, serverUrl + 'create/question', 'post');
             if (response.status === 200) {
