@@ -24,8 +24,63 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 
+import TextareaAutosize from '@mui/base/TextareaAutosize';
+
 import api from '../services/api';
 import './common.css';
+import { styled } from '@mui/material/styles';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import { TextField } from '@mui/material';
+
+/**
+ * add manual question starts
+ */
+const BpIcon = styled('span')(({ theme }) => ({
+    borderRadius: '50%',
+    width: 16,
+    height: 16,
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? '0 0 0 1px rgb(16 22 26 / 40%)'
+            : 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
+    backgroundColor: theme.palette.mode === 'dark' ? '#394b59' : '#f5f8fa',
+    backgroundImage:
+        theme.palette.mode === 'dark'
+            ? 'linear-gradient(180deg,hsla(0,0%,100%,.05),hsla(0,0%,100%,0))'
+            : 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
+    '.Mui-focusVisible &': {
+        outline: '2px auto rgba(19,124,189,.6)',
+        outlineOffset: 2,
+    },
+    'input:hover ~ &': {
+        backgroundColor: theme.palette.mode === 'dark' ? '#30404d' : '#ebf1f5',
+    },
+    'input:disabled ~ &': {
+        boxShadow: 'none',
+        background:
+            theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
+    },
+}));
+
+const BpCheckedIcon = styled(BpIcon)({
+    backgroundColor: '#137cbd',
+    backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
+    '&:before': {
+        display: 'block',
+        width: 16,
+        height: 16,
+        backgroundImage: 'radial-gradient(#fff,#fff 28%,transparent 32%)',
+        content: '""',
+    },
+    'input:hover ~ &': {
+        backgroundColor: '#106ba3',
+    },
+});
+/**
+ * add manual question ends
+ */
 const style = {
     position: 'absolute',
     top: '50%',
@@ -118,6 +173,9 @@ export default function CustomPaginationActionsTable() {
     const [selectedIndex, setSelectedIndex] = React.useState(null);
     const [selectedRow, setSelectedRow] = React.useState(null)
 
+    const [showForm, setShowForm] = React.useState(false);
+    const [options, setOptions] = React.useState([]);
+    const [questionValue, setQuestionValue] = React.useState("");
     React.useEffect(() => {
         async function fetchData() {
             // You can await here  
@@ -335,10 +393,59 @@ export default function CustomPaginationActionsTable() {
         row.isChecked = false;
         setSelectedRow(row);
     }
+    const onClickAddOptions = () => {
+        if (options.length === 4) {
+            alert("You can choose maximum four options only!")
+        } else {
+            options.push({ checked: false, value: '', label: '' });
+            setOptions([...options]);
+        }
+    }
+    function BpRadio(props) {
+        return (
+            <Radio
+                disableRipple
+                color="default"
+                checkedIcon={<BpCheckedIcon />}
+                icon={<BpIcon />}
+                {...props}
+            />
+        );
+    }
+    const onClickRadio = (i) => {
+        options.map(op => op.checked = false);
+        options[i].checked = true;
+        setOptions([...options])
+    }
+    const onChangeOption = (i, value) => {
+        options[i].value = value;
+        setOptions([...options])
 
+    }
+    const onClickAddQuestion = async () => {
+        if (!questionValue) {
+            alert('Please enter question value');
+        } else if (options?.length < 4) {
+            alert('Please provide 4 options');
+        } else {
+            const response = await api({ title: questionValue, options }, serverUrl + 'create/question/manual', 'post');
+            if (response.status === 200) {
+                alert(`${questionValue} added succesfully`);
+                setQuestionValue('');
+                setOptions([]);
+                setShowForm(false);
+            } else {
+                alert(`Something wenr wrong!`)
+            }
+        }
+    }
     return (
         <div>
-            {questionData?.length > 0 && <div>
+            <div style={{ paddingBottom: '20px', textAlign: 'end' }}>
+                <Button variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
+
+            </div>
+            {!showForm && questionData?.length > 0 && <div>
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                         <TableHead>
@@ -438,6 +545,38 @@ export default function CustomPaginationActionsTable() {
             {questionData?.length === 0 && <div>
                 <p>No Questions available</p>
             </div>}
+            {showForm && <div>
+                <TextareaAutosize
+                    value={questionValue}
+                    onChange={(e) => setQuestionValue(e.target?.value)}
+                    aria-label="Question"
+                    placeholder="Create a Question"
+                    style={{ width: 500, height: 100 }}
+                />
+                <div style={{ textAlign: 'center' }}>
+                    <Button onClick={() => onClickAddOptions()} variant="contained">Add options</Button>
+
+                </div>
+                {options?.length > 0 && <div>
+                    <RadioGroup
+                        defaultValue="female"
+                        aria-labelledby="demo-customized-radios"
+                        name="customized-radios"
+                        sx={{ display: 'inline' }}
+                    >
+                        {options?.map((op, i) => {
+                            return (<><FormControlLabel value={op.value} onClick={() => onClickRadio(i)} control={<BpRadio />} />
+                                <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} /> <br /></>)
+                        })}
+                    </RadioGroup>
+                    <div style={{ paddingTop: '20px' }}>
+                        <Button onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
+                    </div>
+                </div>
+
+                }
+            </div>
+            }
         </div>
     );
 }
