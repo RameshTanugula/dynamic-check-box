@@ -176,6 +176,8 @@ export default function CustomPaginationActionsTable() {
     const [showForm, setShowForm] = React.useState(false);
     const [options, setOptions] = React.useState([]);
     const [questionValue, setQuestionValue] = React.useState("");
+    const [selectedFile, setSelectedFile] = React.useState([]);
+    const [previewImgSrc, setPreviewImgSrc] = React.useState(null);
     React.useEffect(() => {
         async function fetchData() {
             // You can await here  
@@ -393,6 +395,18 @@ export default function CustomPaginationActionsTable() {
         row.isChecked = false;
         setSelectedRow(row);
     }
+    const onFileChange = event => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        var url = reader.readAsDataURL(file);
+
+        reader.onloadend = function (e) {
+            console.log(e)
+            setPreviewImgSrc([reader.result]);
+
+        }
+        setSelectedFile(event.target.files);
+    };
     const onClickAddOptions = () => {
         if (options.length === 4) {
             alert("You can choose maximum four options only!")
@@ -423,17 +437,29 @@ export default function CustomPaginationActionsTable() {
 
     }
     const onClickAddQuestion = async () => {
-        if (!questionValue) {
-            alert('Please enter question value');
+
+        if (!questionValue && (selectedFile.length === 0)) {
+            alert('Please enter question value or choose an image');
         } else if (options?.length < 4) {
             alert('Please provide 4 options');
         } else {
-            const response = await api({ title: questionValue, options }, serverUrl + 'create/question/manual', 'post');
+            const formData = new FormData();
+            if (selectedFile && selectedFile.length > 0) {
+                formData.append(
+                    "files", selectedFile[0],
+                );
+            }
+            formData.append("title", questionValue);
+            formData.append("options", JSON.stringify(options));
+
+            const response = await api(formData, serverUrl + 'create/question/manual', 'post');
             if (response.status === 200) {
                 alert(`${questionValue} added succesfully`);
                 setQuestionValue('');
                 setOptions([]);
                 setShowForm(false);
+                setSelectedFile([]);
+                setPreviewImgSrc("")
             } else {
                 alert(`Something wenr wrong!`)
             }
@@ -553,6 +579,13 @@ export default function CustomPaginationActionsTable() {
                     placeholder="Create a Question"
                     style={{ width: 500, height: 100 }}
                 />
+                <div style={{ paddingTop: '2rem' }}>
+                    <input type="file" onChange={onFileChange} />
+
+                </div>
+                <div>
+                    <img src={previewImgSrc} style={{ width: '40%', paddingTop: '15px' }} />
+                </div>
                 <div style={{ textAlign: 'center' }}>
                     <Button onClick={() => onClickAddOptions()} variant="contained">Add options</Button>
 
