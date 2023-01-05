@@ -24,6 +24,7 @@ import FlashCard from './components/flashCard';
 import LearningCard from './components/learningCard';
 import QuestionCreation from './components/questionCreation';
 import Categories from './components/categories';
+import CreatePairs from './components/pairsCreation';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -124,7 +125,7 @@ console.log(comp, '####')
         </DrawerHeader>
         <Divider />
         <List>
-          {['Categories', 'Mapping', 'Create Question', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards'].map((text, index) => (
+          {['Categories', 'Mapping', 'Create Question', 'Create Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemText primary={text} onClick={() => setComp(text)} />
@@ -138,6 +139,7 @@ console.log(comp, '####')
         {comp?.toLowerCase() === 'categories' && <Categories />}
         {comp?.toLowerCase() === 'mapping' && <Mapping />}
         {comp?.toLowerCase() === 'create question' && <QuestionCreation />}
+        {comp?.toLowerCase() === 'create pairs' && <CreatePairs />}
         {comp?.toLowerCase() === 'create a test' && <TestCreation />}
         {comp?.toLowerCase() === 'upload files' && <FileUpload />}
 
