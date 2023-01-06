@@ -3,7 +3,90 @@ import api from '../services/api';
 import './flashCard.css';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+/**
+ * 
+ * @returns table
+ */
+import PropTypes from 'prop-types';
+import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableFooter from '@mui/material/TableFooter';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import TableHead from '@mui/material/TableHead';
 
+function TablePaginationActions(props) {
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
+
+    const handleFirstPageButtonClick = (event) => {
+        onPageChange(event, 0);
+    };
+
+    const handleBackButtonClick = (event) => {
+        onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event) => {
+        onPageChange(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event) => {
+        onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+
+    return (
+        <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+            <IconButton
+                onClick={handleFirstPageButtonClick}
+                disabled={page === 0}
+                aria-label="first page"
+            >
+                {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+            </IconButton>
+            <IconButton
+                onClick={handleBackButtonClick}
+                disabled={page === 0}
+                aria-label="previous page"
+            >
+                {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+            </IconButton>
+            <IconButton
+                onClick={handleNextButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="next page"
+            >
+                {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+            </IconButton>
+            <IconButton
+                onClick={handleLastPageButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="last page"
+            >
+                {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+            </IconButton>
+        </Box>
+    );
+}
+
+TablePaginationActions.propTypes = {
+    count: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
+};
 
 export default function CreatePairs() {
     // const serverUrl = `http://localhost:8080/pairs/`;
@@ -16,17 +99,44 @@ export default function CreatePairs() {
     const [part_a, setPart_a] = React.useState("");
     const [part_b, setPart_b] = React.useState("");
     const [pairList, setPairList] = React.useState([]);
+    const [pairsData, setPairsData] = React.useState([]);
     const [selectedId, setSelectedId] = React.useState("");
     const [tags, setTags] = React.useState("");
+    const [showTable, setShowTable] = React.useState(false);
+    const [from, setFrom] = React.useState(null);
+    const [to, setTo] = React.useState(null);
+
+
+    /**
+     * table
+     */
+
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+    const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     React.useEffect(() => {
         async function fetchData() {
-            const response = await api(null, serverUrl + 'get/list/' + type, 'get');
+            const response = await api(null, serverUrl + 'get/list/' + type + '/' + from + '/' + to, 'get');
             if (response.status === 200) {
                 setData(response.data)
             }
+            const pairsRes = await api(null, serverUrl + 'get/data', 'get');
+            if (pairsRes.status === 200) {
+                pairsRes.data.map(p => p.checked = false)
+                setPairsData(pairsRes.data)
+            }
         }
         fetchData();
-    }, [type])
+    }, [type]);
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     const renderSelect = () => {
         return (
@@ -66,7 +176,7 @@ export default function CreatePairs() {
     const renderPairContent = () => {
         return (
             <div>
-                <span><input type="text" value={part_a} /> <input type="text" value={part_b} /></span>
+                <span><TextField label="Part A" value={part_a} /> <TextField label="Part B" value={part_b} /></span>
             </div>
         )
     }
@@ -98,68 +208,155 @@ export default function CreatePairs() {
                 }
 
             </table>
-                <button type="button" onClick={savePairs}>
+                <Button variant="contained" onClick={savePairs}>
                     Save Pairs
-                </button>
+                </Button>
             </>
         )
+    }
+    const onClickCheckBox = (id, index) => {
+        if (id && index >= 0) {
+            setAllCheckBoxValue(false);
+            pairsData[index]['checked'] = !pairsData[index]['checked'];
+        } else {
+            setAllCheckBoxValue(!allCheckBoxValue)
+            pairsData.map(p => p.checked = !allCheckBoxValue)
+        }
+        setPairsData([...pairsData]);
+    }
+    const renderTable = () => {
+        return (
+            <><div style={{ textAlign: 'right', paddingBottom: '2rem' }}>
+                <Button variant="contained" onClick={() => setShowTable(false)}>Back To Screen</Button>
+            </div><TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>
+                                    <input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" />
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Part A</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Part B</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {(rowsPerPage > 0
+                                ? pairsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : pairsData
+                            ).map((row, i) => (
+                                <TableRow key={i}>
+                                    <TableCell component="th" scope="row">
+                                        <input checked={row.checked} onClick={() => onClickCheckBox(row.id, i)} type="checkbox" />
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        {row.parts_a}
+                                    </TableCell>
+                                    <TableCell style={{ width: 160 }} align="right">
+                                        {row.parts_b}
+                                    </TableCell>
+
+                                </TableRow>
+                            ))}
+
+
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TablePagination
+                                    rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
+                                    colSpan={5}
+                                    count={pairsData.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    SelectProps={{
+                                        inputProps: {
+                                            'aria-label': 'questionData per page',
+                                        },
+                                        native: true,
+                                    }}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                    ActionsComponent={TablePaginationActions} />
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </TableContainer></>)
     }
     const savePairs = async () => {
         if (pairList && pairList.length > 0) {
             const response = await api(pairList, serverUrl + 'save', 'post');
             if (response.status === 200) {
-
-                const responseList = await api(null, serverUrl + 'get/list/' + type, 'get');
+                const responseList = await api(null, serverUrl + 'get/list/' + type + '/' + from + '/' + to, 'get');
                 if (responseList.status === 200) {
                     setData(responseList.data)
                 }
                 setPairList([]);
                 setPart_a("");
                 setPart_b("");
-                alert("Pairs Saved!")
+                setShowTable(true);
+                alert("Pairs Saved!");
             }
         } else {
             alert('Please Generate Pairs')
         }
     }
+    const getData = async () => {
+        const responseList = await api(null, serverUrl + 'get/list/' + type + '/' + from + '/' + to, 'get');
+        if (responseList.status === 200) {
+            setData(responseList.data)
+            setFrom(null);
+            setTo(null);
+        }
+    }
     return (
-        <div >
-            <div>
-                {renderSelect()}
-            </div>
+        <div>
+            {showTable && pairsData?.length > 0 && <div>{renderTable()}</div>}
+            {!showTable &&
+                <div >
+                    <div>
+                        {renderSelect()}
 
-            <div style={{ width: '100%' }}>
-                <div style={{ textAlign: 'end' }}>
-                    <div>
-                        <button type="button" onClick={getSelectionHandler}>
-                            Copy Selection
-                        </button>
-                        <br />
-                        <br />
+                        &nbsp; &nbsp;<TextField label="From" value={from} onChange={(e) => setFrom(e.target.value)} placeholder='From' />
+                        &nbsp; &nbsp;<TextField label="To" value={to} placeholder='To' onChange={(e) => setTo(e.target.value)} />
+                        &nbsp; &nbsp;<Button variant="contained" onClick={getData}>
+                            Get Data
+                        </Button>
                     </div>
-                    {renderPairContent()}
-                    <div>
-                        <br />
-                        <button type="button" onClick={addToPairBox}>
-                            Add
-                        </button>
-                        <br />
-                        <br />
+
+                    <div style={{ width: '100%' }}>
+                        <div style={{ textAlign: 'end' }}>
+                            <div>
+                                <Button variant="contained" onClick={getSelectionHandler}>
+                                    Copy Selection
+                                </Button>
+                                <br />
+                                <br />
+                            </div>
+                            {renderPairContent()}
+                            <div>
+                                <br />
+                                <Button variant="contained" onClick={addToPairBox}>
+                                    Add
+                                </Button>
+                                <br />
+                                <br />
+                            </div>
+                            <div style={{ width: '50%', float: 'right' }}>
+                                {pairList?.length > 0 && getPairedContent()}
+                            </div>
+                            <div>
+                                <br />
+                            </div>
+                        </div>
+                        <div style={{ marginTop: '-20%', width: '50%', height: '30rem', overflow: 'auto' }}>
+                            {data?.length > 0 && renderContent()}
+                        </div>
+
+
                     </div>
-                    <div style={{ width: '50%', float: 'right' }}>
-                        {pairList?.length > 0 && getPairedContent()}
-                    </div>
-                    <div>
-                        <br />
-                    </div>
+
                 </div>
-                <div style={{ width: '50%', height: '30rem', overflow: 'auto' }}>
-                    {data?.length > 0 && renderContent()}
-                </div>
-
-
-            </div>
-
+            }
         </div>
     )
 }

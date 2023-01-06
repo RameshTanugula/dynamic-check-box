@@ -479,10 +479,6 @@ export default function CustomPaginationActionsTable() {
                                 <TableCell>S.No</TableCell>
                                 <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">Option1</TableCell>
-                                {/* <TableCell align="right">Option2</TableCell>
-                                <TableCell align="right">Option3</TableCell>
-                                <TableCell align="right">Option4</TableCell>
-                                <TableCell align="right">Option5</TableCell> */}
                                 <TableCell align="right">Apply Options</TableCell>
                             </TableRow>
                         </TableHead>
@@ -501,40 +497,9 @@ export default function CustomPaginationActionsTable() {
                                     <TableCell style={{ width: 160 }} align="right">
                                         {row.B_Q_ANS}
                                     </TableCell>
-                                    {/* <TableCell style={{ width: 160 }} align="right">
-                                        {row?.option2}
-                                   </TableCell> */}
-                                    {/* <TableCell style={{ width: 160 }} align="right">
-                                    {row?.option3}
-                                    </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
-                                  {row.option4}
-                                   </TableCell>
-                                    <TableCell style={{ width: 160 }} align="right">
-                                  {row?.option5}
-                                  </TableCell> */}
-                                    <TableCell style={{ width: 160 }} align="right">
-                                        {/* <Button variant='primary' onClick={()=>setOpen(true)}>Create Question</Button> */}
-
                                         <Button onClick={() => openModalHandler(row, i)}>Create Question</Button>
                                         {open && renderModal()}
-                                        {/* {allotOptions(row, i)}
-                                    { getOptionNumberInputBox(row, i)}
-                                    <br />
-                                    {!row.isChecked && getInputBox(row, i)}
-                                    <br />
-                                    {row.isChecked && getTitles(row, i)}
-                                    <br />
-                                   
-                                    {(row.isChecked && row.selectedTitle && titleOptionsList) && getTitleOptions(row, i)} */}
-
-                                        {/* {!row.option2 && !row.option3 && !row.option4 && !row.option5 && allotOptions(row, i)}
-                                        {!row.isChecked &&!row.option2 && !row.option3 && !row.option4 && !row.option5 && getOptionNumberInputBox(row, i)}
-                                        {!row.isChecked &&!row.option2 && !row.option3 && !row.option4 && !row.option5 && getInputBox(row, i)}
-                                         {!(row.option2 && row.option3 && row.option4 && row.option5) && getTitles(row, i)} 
-                                        {(!row.option2 && row.isChecked && row.selectedTitle && titleOptionsList) && getTitleOptions(row, i)}
-                                        {(!row.option2 && row.isChecked && row.selectedTitle && row.selectedTitleOption) && getSetButton(row, i)} */}
-
                                     </TableCell>
                                 </TableRow>
                             ))}
