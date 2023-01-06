@@ -4,6 +4,7 @@ import './flashCard.css';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 /**
  * 
@@ -224,11 +225,28 @@ export default function CreatePairs() {
         }
         setPairsData([...pairsData]);
     }
+    const createGroup = async () => {
+        const selectedIds = pairsData.filter(p => p.checked)?.map(pm=>pm.id);
+        const postResponse = await api(selectedIds, serverUrl + 'save/groups', 'post');
+
+        if (postResponse.status === 200) {
+            const getRes = await api(null, serverUrl + 'get/data', 'get');
+            if (getRes.status === 200) {
+                setPairsData(getRes.data);
+            }
+            alert('Pair Group Created Successfully!');
+        }
+    }
     const renderTable = () => {
         return (
-            <><div style={{ textAlign: 'right', paddingBottom: '2rem' }}>
-                <Button variant="contained" onClick={() => setShowTable(false)}>Back To Screen</Button>
-            </div><TableContainer component={Paper}>
+            <>
+                <div style={{ float: 'right', paddingBottom: '2rem' }}>
+                    <Stack spacing={2} direction="row" sx={{ textAlign: 'right' }}>
+                        {pairsData.filter(pp=>pp.checked)?.length > 0 && 
+                        <Button variant="contained" onClick={createGroup}>Create as a Group</Button>}
+                        <Button variant="contained" sx={{ paddingLeft: '2rem' }} onClick={() => setShowTable(false)}>Back To Screen</Button>
+                    </Stack>
+                </div><TableContainer component={Paper}>
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                         <TableHead>
                             <TableRow>
