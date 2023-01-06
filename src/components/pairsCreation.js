@@ -108,9 +108,14 @@ export default function CreatePairs() {
         if (pairList && pairList.length > 0) {
             const response = await api(pairList, serverUrl + 'save', 'post');
             if (response.status === 200) {
+
+                const responseList = await api(null, serverUrl + 'get/list/' + type, 'get');
+                if (responseList.status === 200) {
+                    setData(responseList.data)
+                }
                 setPairList([]);
-                part_a("");
-                part_b("");
+                setPart_a("");
+                setPart_b("");
                 alert("Pairs Saved!")
             }
         } else {
