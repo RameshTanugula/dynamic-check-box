@@ -48,7 +48,7 @@ export default function TestCreation() {
     React.useEffect(() => {
         async function getData() {
             const catIds = prepareCatIds();
-            const data = await api({ catIds: catIds }, serverUrl + 'get/data/bycategory', 'post');
+            const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
             if (data.status === 200) {
                 setQuestionData(data.data?.res)
             }
