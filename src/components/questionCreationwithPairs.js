@@ -90,7 +90,7 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreationFromPairs() {
     // const serverUrl = `http://localhost:8080/question/`
-      const serverUrl = `http://3.111.29.120:8080/question/`
+    const serverUrl = `http://3.111.29.120:8080/question/`
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
     const [pairsData, setPairsData] = useState([]);
@@ -158,6 +158,20 @@ export default function QuestionCreationFromPairs() {
         }
         fetchData();
     }, [checked]);
+    const createQuestions = async () => {
+        const qList = generatedData.filter(g => g.checked);
+        const response = await api({ list: qList }, serverUrl + 'create/questions/pairs', 'post');
+        if (response.status === 200) {
+            const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
+
+            if (pairsData.status === 200) {
+                setPairsData(pairsData.data);
+            }
+            setGeneratedData([]);
+            setShowContent(true);
+            alert('Question Created successfully!');
+        }
+    }
     const generateQuestions = async () => {
         const ids = pairsData.filter(p => p.checked)?.map(pp => pp.pair_id);
         const response = await api({ pairids: ids }, serverUrl + 'generate/questions', 'post');
@@ -177,6 +191,16 @@ export default function QuestionCreationFromPairs() {
         }
         setPairsData(pairsData);
     }
+    const onClickCheckBoxQuestion = (id, index) => {
+        if (id && index >= 0) {
+            setAllCheckBoxValue(false);
+            generatedData[index]['checked'] = !generatedData[index]['checked'];
+        } else {
+            setAllCheckBoxValue(!allCheckBoxValue)
+            generatedData.map(q => q.checked = !allCheckBoxValue)
+        }
+        setGeneratedData(generatedData);
+    }
     const renderGeneratedData = () => {
         return (
             <div>
@@ -184,7 +208,9 @@ export default function QuestionCreationFromPairs() {
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>S.No</TableCell>
+                                <TableCell align="center"><span>
+                                    <input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBoxQuestion()} type="checkbox" />
+                                </span></TableCell>
                                 <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">PART A</TableCell>
                                 <TableCell align="right">PART B</TableCell>
@@ -197,7 +223,9 @@ export default function QuestionCreationFromPairs() {
                             ).map((row, i) => (
                                 <TableRow key={i}>
                                     <TableCell component="th" scope="row">
-                                        {i + 1}
+                                        <span>
+                                            <input checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
+                                        </span>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         Match the following
@@ -244,7 +272,9 @@ export default function QuestionCreationFromPairs() {
             {<div>
                 <div style={{ float: 'right' }}>
                     <Stack spacing={2} direction="row">
-                        <Button variant="contained" onClick={() => generateQuestions()}>Generate Questions</Button>
+                        {showContent && (generatedData.length === 0) && <Button variant="contained" onClick={() => generateQuestions()}>Generate Questions</Button>}
+                        {!showContent && (generatedData.length > 0) && <Button variant="contained" onClick={() => createQuestions()}>Create Questions</Button>}
+
                     </Stack>
                 </div>
                 {!showContent && <div style={{ height: '30rem', overflow: 'auto', width: '65%', float: 'left', paddingLeft: '5%', marginTop: '5%' }}>
@@ -254,7 +284,7 @@ export default function QuestionCreationFromPairs() {
                     {pairsData && pairsData.length > 0 && renderPairsData()}
                 </div>}
                 <div style={{ height: '30rem', width: '20%', float: 'right', paddingRight: '5%', overflow: 'auto', paddingTop: '5%' }}>
-                    {catagoryData?.length > 0 && <CheckboxTree
+                    {showContent && catagoryData?.length > 0 && <CheckboxTree
                         nodes={catagoryData}
                         checked={checked}
                         onCheck={checked => setChecked(checked)}
