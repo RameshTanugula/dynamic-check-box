@@ -278,7 +278,7 @@ const getExpandedKeys=()=> {
       </div>
       {/* <button onClick={() => { applyTags() }}>Apply Tags</button> */}
 
-      <div style={{ height: '30rem', overflow: 'auto', marginTop: '5%', width: '65%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
+      <div style={{ height: '30rem', overflow: 'auto', width: '65%', float: 'left' }}>
 
         {/* <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
           <span>From:</span><input type="text" value={qFrom} onChange={(e) => setQFrom(e.target.value)} />
@@ -317,7 +317,7 @@ const getExpandedKeys=()=> {
           })
         }
       </div>
-      <div style={{height:'30rem', width: '20%', float: 'right', paddingRight: '5%', marginTop:'5%', paddingTop: '5%', overflow: 'auto' }}>
+      <div style={{height:'30rem', width: '20%', float: 'right', paddingRight: '5%', overflow: 'auto' }}>
         {catagoryData?.length > 0 && <CheckboxTree
           // nodes={treeViewData}
           nodes={catagoryData}
