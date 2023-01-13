@@ -9,56 +9,58 @@ import api from '../services/api';
 export default function Statements() {
     // const serverUrl = `http://localhost:8080/statements/`;
     const serverUrl = `http://3.111.29.120:8080/statements/`;
-    const [trueValue, setTrueValue] = React.useState('');
-    const [falseValue1, setFalseValue1] = React.useState('');
-    const [falseValue2, setFalseValue2] = React.useState('');
-    const [falseValue3, setFalseValue3] = React.useState('');
-    const [showFalse, setShowFalse] = React.useState(false)
-    const addFalseStatements = () => {
-        if(!trueValue){
-            alert('please provide True statement')
-        } else{
-        setFalseValue1(trueValue);
-        setFalseValue2(trueValue);
-        setFalseValue3(trueValue);
-        setShowFalse(true);
+    const [trueValue, setTrueValue] = React.useState(['']);
+    const addRow = () => {
+        setTrueValue([...trueValue.concat([''])])
+    }
+    const removeRow = (i) => {
+        trueValue.splice(i, 1);
+        setTrueValue([...trueValue])
+    }
+    const saveStatements = async () => {
+        const duplicates = findDuplicates(trueValue);
+        if (!trueValue || trueValue.length === 0) {
+            alert('No statements to save')
+        } else if (duplicates && duplicates.length > 0) {
+            alert('Duplicates found!')
+        } else {
+            const saveData = await api(trueValue, serverUrl + 'save', 'post');
+            if (saveData.status === 200) {
+                alert('Statements Added!');
+                setTrueValue(['']);
+            } else {
+                alert('something went wrong!');
+            }
         }
     }
-    const saveStatements=async()=>{
-        if(!trueValue || !falseValue1 || !falseValue2 || !falseValue3){
-            alert('please provide all the statements')
-        } else if(!trueValue.includes('-')){
-            alert('please sepearate statement with "-"')
-        }else{
-        const saveData = await api({ trueValue, falseValue1, falseValue2, falseValue3 }, serverUrl + 'save', 'post');
-        if (saveData.status === 200) {
-            alert('Statements Added!');
-            setShowFalse(false);
-            setTrueValue("");
-            setFalseValue1("");
-            setFalseValue2("");
-            setFalseValue3("");
+    const findDuplicates = (arr) => {
+        let sorted_arr = arr.slice().sort();
+        let results = [];
+        for (let i = 0; i < sorted_arr.length - 1; i++) {
+            if (sorted_arr[i + 1] === sorted_arr[i]) {
+                results.push(sorted_arr[i]);
+            }
         }
+        return results;
     }
+    const onChangeTrueValue = (value, i) => {
+        trueValue[i] = value;
+        setTrueValue([...trueValue])
     }
     return (
         <div>
-            <div style={{ paddingBottom: '2rem' }}>
+            {trueValue && trueValue.length > 0 && trueValue?.map((t, i) => {
+                return (<div style={{ paddingBottom: '2rem' }}>
 
-                <TextField sx={{ width: '25%' }} id="outlined-basic" value={trueValue} onChange={(e) => setTrueValue(e.target?.value)} label="True Statement" variant="outlined" />
-            </div>
-            {showFalse && <div style={{ paddingBottom: '2rem' }}>
+                    <TextField sx={{ width: '50%' }} id="outlined-basic" value={t} onChange={(e) => onChangeTrueValue(e.target?.value, i)} label="True Statement" variant="outlined" />
+                    &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeRow(i)}>Delete</Button>
 
-                <TextField sx={{ width: '25%', paddingBottom: '2rem' }} id="outlined-basic" value={falseValue1} onChange={(e) => setFalseValue1(e.target?.value)} label="False Statement1" variant="outlined" /> <br />
-                <TextField sx={{ width: '25%', paddingBottom: '2rem' }} id="outlined-basic" value={falseValue2} onChange={(e) => setFalseValue2(e.target?.value)} label="False Statement2" variant="outlined" /> <br />
-                <TextField sx={{ width: '25%', paddingBottom: '2rem' }} id="outlined-basic" value={falseValue3} onChange={(e) => setFalseValue3(e.target?.value)} label="False Statement3" variant="outlined" /> <br />
-
-            </div>
-            }
+                </div>)
+            })}
             <div>
                 <Stack spacing={2} direction="row">
-                    {!showFalse && <Button variant="contained" onClick={() => addFalseStatements()}>Add False Statements</Button>}
-                    {showFalse && <Button variant="contained" onClick={() => saveStatements()}>Save Statements</Button>}
+                    {<Button variant="contained" onClick={() => addRow()}>Add Row</Button>}
+                    {<Button variant="contained" onClick={() => saveStatements()}>Save Statements</Button>}
                 </Stack>
             </div>
         </div>
