@@ -142,7 +142,7 @@ export default function Statements() {
             {!showTable && !showFalse && trueValue && trueValue.length > 0 && trueValue?.map((t, i) => {
                 return (<div style={{ paddingBottom: '2rem' }}>
 
-                    <TextField sx={{ width: '50%' }} id="outlined-basic" value={t} onChange={(e) => onChangeTrueValue(e.target?.value, i)} label="True Statement" variant="outlined" />
+                    <TextField sx={{ width: '75%' }} id="outlined-basic" value={t} onChange={(e) => onChangeTrueValue(e.target?.value, i)} label="True Statement" variant="outlined" />
                     &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeRow(i)}>Delete</Button>
 
                 </div>)
