@@ -30,7 +30,7 @@ export default function Statements() {
         setTrueValue([...trueValue.concat([''])])
     }
     const addFalseRow = () => {
-        setFalseValue([...falseValue.concat([''])])
+        setFalseValue([...falseValue.concat([parentStatementName])])
     }
     const removeRow = (i) => {
         trueValue.splice(i, 1);
