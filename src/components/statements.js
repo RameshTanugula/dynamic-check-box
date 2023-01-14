@@ -16,7 +16,8 @@ export default function Statements() {
     const [false1, setFalse1] = React.useState('');
     const [false2, setFalse2] = React.useState('');
     const [false3, setFalse3] = React.useState('');
-    const [parentStatementId, setParentStatementId] = React.useState('')
+    const [parentStatementId, setParentStatementId] = React.useState('');
+    const [parentStatementName, setParentStatementName] = React.useState('');
     React.useEffect(() => {
         async function fetchData() {
             const response = await api(null, serverUrl + 'list', 'get');
@@ -59,6 +60,8 @@ export default function Statements() {
         const duplicates = findDuplicates([false1, false2, false3]);
         if (!false1 || !false2 || !false3) {
             alert('No statements to save')
+        } else if ([false1, false2, false3].includes(parentStatementName)){
+            alert('False statement should not be same as Parent statement');
         } else if (duplicates && duplicates.length > 0) {
             alert('Duplicates found!')
         } else {
@@ -76,6 +79,7 @@ export default function Statements() {
                 setShowFalse(false);
                 setShowTable(true);
                 setParentStatementId('');
+                setParentStatementName('')
             } else {
                 alert('something went wrong!');
             }
@@ -97,6 +101,10 @@ export default function Statements() {
     }
     const onClickCreate = (row) => {
         setParentStatementId(row.StatementId);
+        setFalse1(row.Complete_Statement);
+        setFalse2(row.Complete_Statement);
+        setFalse3(row.Complete_Statement);
+        setParentStatementName(row.Complete_Statement);
         setShowFalse(true);
         setShowTable(false);
     }
