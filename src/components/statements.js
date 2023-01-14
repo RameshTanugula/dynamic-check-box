@@ -10,12 +10,10 @@ export default function Statements() {
     // const serverUrl = `http://localhost:8080/statements/`;
     const serverUrl = `http://3.111.29.120:8080/statements/`;
     const [trueValue, setTrueValue] = React.useState(['']);
+    const [falseValue, setFalseValue] = React.useState([]);
     const [data, setData] = React.useState([]);
     const [showTable, setShowTable] = React.useState(true);
     const [showFalse, setShowFalse] = React.useState(false);
-    const [false1, setFalse1] = React.useState('');
-    const [false2, setFalse2] = React.useState('');
-    const [false3, setFalse3] = React.useState('');
     const [parentStatementId, setParentStatementId] = React.useState('');
     const [parentStatementName, setParentStatementName] = React.useState('');
     React.useEffect(() => {
@@ -31,9 +29,16 @@ export default function Statements() {
     const addRow = () => {
         setTrueValue([...trueValue.concat([''])])
     }
+    const addFalseRow = () => {
+        setFalseValue([...falseValue.concat([''])])
+    }
     const removeRow = (i) => {
         trueValue.splice(i, 1);
         setTrueValue([...trueValue])
+    }
+    const removeFalseRow = (i) => {
+        falseValue.splice(i, 1);
+        setFalseValue([...falseValue])
     }
     const saveStatements = async () => {
         const duplicates = findDuplicates(trueValue);
@@ -57,15 +62,15 @@ export default function Statements() {
         }
     }
     const saveFalseStatements = async () => {
-        const duplicates = findDuplicates([false1, false2, false3]);
-        if (!false1 || !false2 || !false3) {
+        const duplicates = findDuplicates(falseValue);
+        if (!falseValue || falseValue.length===0) {
             alert('No statements to save')
-        } else if ([false1, false2, false3].includes(parentStatementName)){
+        } else if (falseValue.includes(parentStatementName)){
             alert('False statement should not be same as Parent statement');
         } else if (duplicates && duplicates.length > 0) {
             alert('Duplicates found!')
         } else {
-            const saveData = await api({ false1, false2, false3, parentStatementId }, serverUrl + 'false/save', 'post');
+            const saveData = await api({ falseValue, parentStatementId }, serverUrl + 'false/save', 'post');
             if (saveData.status === 200) {
                 alert('False Statements Added!');
                 const response = await api(null, serverUrl + 'list', 'get');
@@ -73,9 +78,7 @@ export default function Statements() {
                     setData(response.data)
                 }
                 setTrueValue(['']);
-                setFalse1('');
-                setFalse2('');
-                setFalse3('');
+                setFalseValue(['']);
                 setShowFalse(false);
                 setShowTable(true);
                 setParentStatementId('');
@@ -97,14 +100,16 @@ export default function Statements() {
     }
     const onChangeTrueValue = (value, i) => {
         trueValue[i] = value;
-        setTrueValue([...trueValue])
+        setTrueValue([...trueValue]);
+    }
+    const onChangeFalseValue=(value, i)=>{
+        falseValue[i] = value;
+        setTrueValue([...falseValue]);
     }
     const onClickCreate = (row) => {
         setParentStatementId(row.StatementId);
-        setFalse1(row.Complete_Statement);
-        setFalse2(row.Complete_Statement);
-        setFalse3(row.Complete_Statement);
         setParentStatementName(row.Complete_Statement);
+        setFalseValue([row.Complete_Statement]);
         setShowFalse(true);
         setShowTable(false);
     }
@@ -112,10 +117,16 @@ export default function Statements() {
         return (
 
             <div>
-                <TextField sx={{ width: '50%', paddingBottom: '1rem' }} id="outlined-basic" value={false1} onChange={(e) => setFalse1(e.target?.value)} label="False Statement 1" variant="outlined" /> <br />
-                <TextField sx={{ width: '50%', paddingBottom: '1rem' }} id="outlined-basic" value={false2} onChange={(e) => setFalse2(e.target?.value)} label="False Statement 2" variant="outlined" /> <br />
-                <TextField sx={{ width: '50%', paddingBottom: '1rem' }} id="outlined-basic" value={false3} onChange={(e) => setFalse3(e.target?.value)} label="False Statement 3" variant="outlined" /> <br />
+               {falseValue && falseValue.length > 0 && falseValue?.map((f, i) => {
+                return (<div style={{ paddingBottom: '2rem' }}>
+
+                    <TextField sx={{ width: '75%' }} id="outlined-basic" value={f} onChange={(e) => onChangeFalseValue(e.target?.value, i)} label={`False Statement - `+(i+1)} variant="outlined" />
+                    &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeFalseRow(i)}>Delete</Button> <br/><br/>
+           
+                </div>)
+            })}
                 <Stack spacing={2} direction="row">
+                &nbsp;&nbsp;<Button  variant="contained" onClick={() => addFalseRow()}>Add Row</Button> <br/> <br />
                     {<Button variant="contained" onClick={() => { setShowTable(true); setShowFalse(false) }}>Cancel</Button>}
                     {<Button variant="contained" onClick={() => saveFalseStatements()}>Save False Statements</Button>}
                 </Stack>
