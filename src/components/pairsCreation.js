@@ -95,6 +95,7 @@ export default function CreatePairs() {
     const initTypes = [{ value: 'bitbank', label: 'BitBank' },
     { value: 'statements', label: 'Statements' }];
     const [data, setData] = React.useState([]);
+    const [usersList, setUsersList] = React.useState([]);
     const [typeList, setTypeList] = React.useState([...initTypes]);
     const [type, setType] = React.useState(initTypes[0].value);
     const [part_a, setPart_a] = React.useState("");
@@ -113,15 +114,23 @@ export default function CreatePairs() {
      */
 
     const [page, setPage] = React.useState(0);
+    const [user, setUser] = React.useState("");
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     React.useEffect(() => {
         async function fetchData() {
-            const response = await api(null, serverUrl + 'get/list/' + type + '/' + from + '/' + to, 'get');
+            const userRes = await api(null, 'http://3.111.29.120:8080/get/users/'+type, 'get');
+            if(userRes.status === 200){
+                setUsersList(userRes.data.res);
+                if(userRes?.data?.res[0]?.user && type){
+                    setUser(userRes?.data?.res[0]?.user);
+            const response = await api(null, serverUrl + 'get/list/' + userRes?.data?.res[0]?.user +'/' + type + '/' + from + '/' + to, 'get');
             if (response.status === 200) {
                 setData(response.data)
             }
+        }
+        }
             const pairsRes = await api(null, serverUrl + 'get/data', 'get');
             if (pairsRes.status === 200) {
                 pairsRes.data.map(p => p.checked = false)
@@ -149,6 +158,25 @@ export default function CreatePairs() {
             >
 
                 {typeList.map((tl) => { return (<MenuItem value={tl.value}>{tl.label}</MenuItem>) })}
+            </Select>
+        )
+    }
+    const onChangeUser=async(user)=>{
+        setUser(user);
+        const response = await api(null, serverUrl + 'get/list/' + user +'/' + type + '/' + from + '/' + to, 'get');
+            if (response.status === 200) {
+                setData(response.data)
+            }
+    }
+    const renderUsers = () => {
+        return (
+            <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={user}
+                onChange={(e) => onChangeUser(e.target.value)}
+            >
+                {usersList.map((tl) => { return (<MenuItem value={tl.user}>{tl.user}</MenuItem>) })}
             </Select>
         )
     }
@@ -333,7 +361,7 @@ export default function CreatePairs() {
                 <div >
                     <div>
                         {renderSelect()}
-
+                        &nbsp;&nbsp;{renderUsers()}
                         &nbsp; &nbsp;<TextField label="From" value={from} onChange={(e) => setFrom(e.target.value)} placeholder='From' />
                         &nbsp; &nbsp;<TextField label="To" value={to} placeholder='To' onChange={(e) => setTo(e.target.value)} />
                         &nbsp; &nbsp;<Button variant="contained" onClick={getData}>
