@@ -33,6 +33,22 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { TextField } from '@mui/material';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
 
 /**
  * add manual question starts
@@ -163,9 +179,11 @@ export default function CustomPaginationActionsTable() {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [selectedTitle, setSelectedTitle] = React.useState("");
     const [titleOptionsList, setTitleOptionsList] = React.useState("");
-    const [selectedTitleOption, setSelectedTitleOption] = React.useState("");
     const [inputOptionValue, setInputOptionValue] = React.useState("");
     const [inputOptionNumber, setInputOptionNumber] = React.useState("");
+    const [inputOptionValue1, setInputOptionValue1] = React.useState("");
+    const [inputOptionValue2, setInputOptionValue2] = React.useState("");
+    const [inputOptionValue3, setInputOptionValue3] = React.useState("");
     const [open, setOpen] = React.useState(false);
     const handleClose = () => setOpen(false);
 
@@ -178,6 +196,17 @@ export default function CustomPaginationActionsTable() {
     const [questionValue, setQuestionValue] = React.useState("");
     const [selectedFile, setSelectedFile] = React.useState([]);
     const [previewImgSrc, setPreviewImgSrc] = React.useState(null);
+    const [selectedTitles, setSelectedTitles] = React.useState([]);
+
+    const handleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setSelectedTitles(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
     React.useEffect(() => {
         async function fetchData() {
             // You can await here  
@@ -204,54 +233,43 @@ export default function CustomPaginationActionsTable() {
         setPage(0);
     };
     const SetOption = (row, i) => {
-        const isExistOption = selectedOptions.find(so => so.inputOptionNumber === inputOptionNumber);
-        const isExistValue = selectedOptions.find(so => so.inputOptionValue === inputOptionValue);
-
-        if ((inputOptionNumber < 2) || (inputOptionNumber > 4)) {
-            alert('please start selecting between Option 2 and Option 4')
-        } else if (isExistOption) {
-            alert('Option ' + inputOptionNumber + ' is already added');
-        } else if (isExistValue) {
-            alert('This value already configured to another Option')
-        } else if (selectedOptions && selectedOptions.length <= 3) {
-            if (!row.isChecked) {
-                if (!inputOptionValue) {
-                    alert('please select the option value for ' + inputOptionNumber)
-                } else {
-                    selectedOptions.push({ inputOptionNumber: inputOptionNumber, inputOptionValue: inputOptionValue });
-
-                    setSelectedTitle("");
-                    setTitleOptionsList([]);
-                    setSelectedTitleOption("");
-                    setInputOptionValue("");
-                    setInputOptionNumber("");
-                    setSelectedOptions([...selectedOptions]);
-                }
+        let isHavingOptions = true;
+        if (row.isChecked) {
+            if (selectedTitles?.length !== 3) {
+                isHavingOptions = false;
+                alert("Please choose 3 options");
             }
-            if (row.isChecked) {
-                const optionValue = titleOptionsList.find(to => to.OptionListId === selectedTitleOption)?.OptionNames;
-                if (!optionValue) {
-                    alert('please select the option value for ' + inputOptionNumber)
-
-                } else {
-                    selectedOptions.push({ inputOptionNumber: inputOptionNumber, inputOptionValue: optionValue });
-
-                    setSelectedTitle("");
-                    setTitleOptionsList([]);
-                    setSelectedTitleOption("");
-                    setInputOptionValue("");
-                    setInputOptionNumber("");
-                    setSelectedOptions([...selectedOptions]);
-                }
-            }
-        } else {
-            alert("Maximum options generated!, please Create question");
         }
+        if (!row.isChecked) {
+            if (!inputOptionValue1 || !inputOptionValue2 || !inputOptionValue3) {
+                isHavingOptions = false;
+                alert('Please choose options')
+            } else if (inputOptionValue1 == inputOptionValue2 == inputOptionValue3) {
+                alert('Inputs should be different')
+            }
+        }
+        if (isHavingOptions) {
+            let selectedList = [];
+            if (row.isChecked) {
+                selectedList = selectedTitles;
+                setSelectedOptions([...selectedTitles]);
+                // selectedOptions.push({ inputOptionNumber: inputOptionNumber, inputOptionValue: inputOptionValue });
+            } else {
+
+                selectedList = [inputOptionValue1, inputOptionValue2, inputOptionValue3];
+            }
+            setInputOptionValue1("");
+            setInputOptionValue2("");
+            setInputOptionValue3("");
+            setSelectedTitles([]);
+            setSelectedOptions([...selectedList]);
+        }
+        
     }
     const onCloseHandler = () => {
         setSelectedTitle("");
         setTitleOptionsList([]);
-        setSelectedTitleOption("");
+        setSelectedTitles([])
         setInputOptionValue("");
         setInputOptionNumber("");
         setSelectedOptions([]);
@@ -275,7 +293,7 @@ export default function CustomPaginationActionsTable() {
                 alert('Question Created Succesfully!');
                 setSelectedTitle("");
                 setTitleOptionsList([]);
-                setSelectedTitleOption("");
+                setSelectedTitles([])
                 setInputOptionValue("");
                 setInputOptionNumber("");
                 setSelectedOptions([]);
@@ -307,11 +325,10 @@ export default function CustomPaginationActionsTable() {
                     <Box sx={style}>
                         {selectedOptions?.length > 0 && <div className='selected-options'>
                             {selectedOptions && selectedOptions.map((so, i) => {
-                                return (<><span>Option{so.inputOptionNumber}: <b>{so.inputOptionValue}</b></span> <br /></>)
+                                return (<><span>Option{i + 1}: <b>{so}</b></span> <br /></>)
                             })}
                         </div>}
                         {allotOptions(selectedRow, selectedIndex)}
-                        {getOptionNumberInputBox(selectedRow, selectedIndex)}
                         <br />
                         {!selectedRow.isChecked && getInputBox(selectedRow, selectedIndex)}
                         <br />
@@ -334,6 +351,7 @@ export default function CustomPaginationActionsTable() {
     }
     const onChangeTitle = async (value, row, i) => {
         setSelectedTitle(value)
+        setSelectedTitles([]);
         if (value) {
             const titleOptionData = await api(null, serverUrl + 'get/title/options/' + value, 'get');
             if (titleOptionData.status === 200) {
@@ -358,36 +376,48 @@ export default function CustomPaginationActionsTable() {
     }
     const getTitleOptions = (row, i) => {
         return (<div>
-            <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedTitleOption}
-                onChange={(e) => setSelectedTitleOption(e?.target?.value)}
-            >
-                <MenuItem value="">
-                    <em>None</em>
-                </MenuItem>
-                {titleOptionsList?.map((tl) => { return (<MenuItem value={tl.OptionListId}>{tl.OptionNames}</MenuItem>) })}
-            </Select>
+            <FormControl sx={{ m: 1, width: 300 }}>
+                <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+                <Select
+                    labelId="demo-multiple-checkbox-label"
+                    id="demo-multiple-checkbox"
+                    multiple
+                    value={selectedTitles}
+                    onChange={handleChange}
+                    input={<OutlinedInput label="Tag" />}
+                    renderValue={(selected) => selected.join(', ')}
+                    MenuProps={MenuProps}
+                >
+
+                    {titleOptionsList && titleOptionsList.map((name) => (
+                        <MenuItem key={name.OptionNames} value={name.OptionNames}>
+                            <Checkbox checked={selectedTitles.indexOf(name.OptionNames) > -1} />
+                            <ListItemText primary={name.OptionNames} />
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
         </div>)
     }
     const checkBoxHandler = (row, i) => {
         questionData[i].isChecked = !questionData[i].isChecked;
         setQuestionData([...questionData]);
         setSelectedTitle("");
+        setSelectedTitles([]);
+        setInputOptionValue1("")
+        setInputOptionValue2("")
+        setInputOptionValue3("")
         setTitleOptionsList([]);
-        setSelectedTitleOption("");
-        setInputOptionValue("");
-        setInputOptionNumber("");
     }
     const allotOptions = (row, i) => {
         return (<div>Titles:<input type="checkbox" checked={row?.isChecked} onClick={() => checkBoxHandler(row, i)} /></div>)
     }
     const getInputBox = (row, i) => {
-        return (<div>Option Value &nbsp;&nbsp;<input type="text" value={inputOptionValue} onChange={(e) => setInputOptionValue(e.target?.value)} /></div>)
-    }
-    const getOptionNumberInputBox = (row, i) => {
-        return (<div>Option Number &nbsp;&nbsp;<input type="text" value={inputOptionNumber} onChange={(e) => setInputOptionNumber(e.target?.value)} /></div>)
+        return (<div>
+            <span>Option Value 1 &nbsp;&nbsp;<input type="text" value={inputOptionValue1} onChange={(e) => setInputOptionValue1(e.target?.value)} /></span><br />
+            <span>Option Value 2 &nbsp;&nbsp;<input type="text" value={inputOptionValue2} onChange={(e) => setInputOptionValue2(e.target?.value)} /></span><br />
+            <span>Option Value 3 &nbsp;&nbsp;<input type="text" value={inputOptionValue3} onChange={(e) => setInputOptionValue3(e.target?.value)} /></span><br />
+        </div>)
     }
     const openModalHandler = (row, i) => {
         setOpen(true);
@@ -401,7 +431,6 @@ export default function CustomPaginationActionsTable() {
         var url = reader.readAsDataURL(file);
 
         reader.onloadend = function (e) {
-            console.log(e)
             setPreviewImgSrc([reader.result]);
 
         }
@@ -434,14 +463,25 @@ export default function CustomPaginationActionsTable() {
     const onChangeOption = (i, value) => {
         options[i].value = value;
         setOptions([...options])
-
+    }
+    const validateOptions = () => {
+        for (let i = 0; i < options.length; i++) {
+            if (!options[i].value) {
+                return false;
+            }
+        }
+        return true;
     }
     const onClickAddQuestion = async () => {
-
+        const isOptSelected = options.find(o => o.checked);
         if (!questionValue && (selectedFile.length === 0)) {
             alert('Please enter question value or choose an image');
         } else if (options?.length < 4) {
             alert('Please provide 4 options');
+        } else if (!validateOptions()) {
+            alert('Please enter option value');
+        } else if (!isOptSelected) {
+            alert('Please select correct answer');
         } else {
             const formData = new FormData();
             if (selectedFile && selectedFile.length > 0) {
