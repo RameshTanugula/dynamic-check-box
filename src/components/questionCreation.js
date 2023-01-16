@@ -197,6 +197,7 @@ export default function CustomPaginationActionsTable() {
     const [selectedFile, setSelectedFile] = React.useState([]);
     const [previewImgSrc, setPreviewImgSrc] = React.useState(null);
     const [selectedTitles, setSelectedTitles] = React.useState([]);
+    const [solutionValue, setSolutionValue] = React.useState("");
 
     const handleChange = (event) => {
         const {
@@ -490,6 +491,7 @@ export default function CustomPaginationActionsTable() {
                 );
             }
             formData.append("title", questionValue);
+            formData.append("solution", solutionValue);
             formData.append("options", JSON.stringify(options));
 
             const response = await api(formData, serverUrl + 'create/question/manual', 'post');
@@ -607,6 +609,13 @@ export default function CustomPaginationActionsTable() {
                                 <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} /> <br /></>)
                         })}
                     </RadioGroup>
+                   {options?.length === 4 && <TextareaAutosize
+                    value={solutionValue}
+                    onChange={(e) => setSolutionValue(e.target?.value)}
+                    aria-label="Question"
+                    placeholder="Explain the answer"
+                    style={{ width: 500, height: 100 }}
+                />}
                     <div style={{ paddingTop: '20px' }}>
                         <Button onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
                     </div>
