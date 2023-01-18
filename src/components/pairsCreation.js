@@ -197,7 +197,7 @@ export default function CreatePairs() {
         return (
             <div>
                 {data.map((d => {
-                    return <span onClick={() => onClickHandler(d)} style={{ display: 'flex' }}><p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span>
+                    return <span onClick={() => onClickHandler(d)} style={{ display: 'flex' }}><p style={{"fontWeight":"bold"}}>{d.id}:</p>&nbsp;<p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span>
                 }))}
             </div>
         )
