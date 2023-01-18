@@ -214,8 +214,10 @@ export default function CreatePairs() {
             alert('please select the values');
         } else {
             pairList.push({ part_a: part_a, part_b: part_b, selectedId: selectedId, type: type, tags: tags });
+            setSelectedId("");
             setPart_a("");
             setPart_b("");
+            setTags("");
             setPairList([...pairList]);
         }
     }
