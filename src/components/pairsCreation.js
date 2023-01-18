@@ -332,7 +332,7 @@ export default function CreatePairs() {
         if (pairList && pairList.length > 0) {
             const response = await api(pairList, serverUrl + 'save', 'post');
             if (response.status === 200) {
-                const responseList = await api(null, serverUrl + 'get/list/' + type + '/' + from + '/' + to, 'get');
+                const responseList = await api(null, serverUrl + 'get/list/' + user +'/' + type + '/' + from + '/' + to, 'get');
                 if (responseList.status === 200) {
                     setData(responseList.data)
                 }
@@ -347,7 +347,7 @@ export default function CreatePairs() {
         }
     }
     const getData = async () => {
-        const responseList = await api(null, serverUrl + 'get/list/' + type + '/' + from + '/' + to, 'get');
+        const responseList = await api(null, serverUrl + 'get/list/'  + user +'/' + type + '/' + from + '/' + to, 'get');
         if (responseList.status === 200) {
             setData(responseList.data)
             setFrom(null);
