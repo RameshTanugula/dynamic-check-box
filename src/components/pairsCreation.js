@@ -221,6 +221,10 @@ export default function CreatePairs() {
             setPairList([...pairList]);
         }
     }
+    const removeRow = (id) => {
+        const tmpList = pairList.filter(pl=>pl.selectedId !== id);
+        setPairList([...tmpList])
+    }
     const getPairedContent = () => {
         return (
             <><table>
@@ -229,6 +233,7 @@ export default function CreatePairs() {
                     <th>Id</th>
                     <th>Part A</th>
                     <th>Part B</th>
+                    <th>Delete</th>
                 </tr>
                 {pairList?.map((p, i) => {
                     return (<tr>
@@ -236,12 +241,14 @@ export default function CreatePairs() {
                         <td>{p.selectedId}</td>
                         <td>{p.part_a}</td>
                         <td>{p.part_b}</td>
+                        <td><Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeRow(p.selectedId)}>Delete</Button>
+</td>
                     </tr>)
                 })
                 }
 
             </table>
-                <Button variant="contained" onClick={savePairs}>
+                <Button sx={{marginTop:"1.5rem"}} variant="contained" onClick={savePairs}>
                     Save Pairs
                 </Button>
             </>
