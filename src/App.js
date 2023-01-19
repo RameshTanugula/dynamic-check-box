@@ -27,6 +27,8 @@ import Categories from './components/categories';
 import CreatePairs from './components/pairsCreation';
 import QuestionCreationFromPairs from './components/questionCreationwithPairs';
 import Statements from './components/statements';
+// import UeserRequestAccess from './components/UserRequestAccess';
+import CoupenCode from './components/CoupenCode';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -86,8 +88,8 @@ export default function App() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
- 
-console.log(comp, '####')
+
+  console.log(comp, '####')
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -103,7 +105,7 @@ console.log(comp, '####')
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-          E Author - Admin - {comp}
+            E Author - Admin - {comp}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -127,7 +129,7 @@ console.log(comp, '####')
         </DrawerHeader>
         <Divider />
         <List>
-          {['Categories', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards'].map((text, index) => (
+          {['Categories', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupen Code'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemText primary={text} onClick={() => setComp(text)} />
@@ -149,6 +151,8 @@ console.log(comp, '####')
 
         {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
         {comp?.toLowerCase() === 'learning cards' && <LearningCard />}
+        {comp?.toLowerCase() === 'coupen code' && <CoupenCode />}
+        {/* {comp?.toLowerCase() === 'user requeat access' && <UeserRequestAccess />} */}
       </Main>
     </Box>
   );
