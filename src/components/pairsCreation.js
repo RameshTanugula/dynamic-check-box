@@ -226,12 +226,14 @@ export default function CreatePairs() {
             <><table>
                 <tr>
                     <th>S.No.</th>
+                    <th>Id</th>
                     <th>Part A</th>
                     <th>Part B</th>
                 </tr>
                 {pairList?.map((p, i) => {
                     return (<tr>
                         <td>{i + 1}.</td>
+                        <td>{p.selectedId}</td>
                         <td>{p.part_a}</td>
                         <td>{p.part_b}</td>
                     </tr>)
