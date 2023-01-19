@@ -21,6 +21,17 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import moment from "moment";
 import api from '../services/api';
+import { DataGrid } from '@mui/x-data-grid';
+
+const columns = [
+    { field: 'coupon_code', headerName: 'Coupen Code', minWidth: 200, },
+    { field: 'course', headerName: 'Course', minWidth: 200, },
+    { field: 'created_by', headerName: 'Created By', minWidth: 200, },
+    { field: 'discount', headerName: 'Discount', minWidth: 200, },
+    { field: 'expiry_date', headerName: 'Expiry Date', minWidth: 200, },
+    { field: 'first_purchase', headerName: 'First Purches', minWidth: 200, },
+];
+
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 0;
@@ -37,7 +48,7 @@ const names = [
     'Java',
     'Node',
 ];
-const serverUrl = `http://3.111.29.120:8080/promocodes/add`;
+const serverUrl = `http://3.111.29.120:8080/promocodes/`;
 
 const modelStyle = {
     position: 'absolute',
@@ -51,8 +62,9 @@ const modelStyle = {
     p: 4,
 }
 
-export default function NewScreen() {
-
+export default function CoupenCode() {
+    const [tableShow, setTableShow] = React.useState(false);
+    const [tableData, settableData] = React.useState([]);
     const [openModel, setOpenModel] = React.useState(false);
     const [submitValid, setSubmitValid] = React.useState(true);
     const [courseNames, setCourseNames] = React.useState([]);
@@ -68,16 +80,12 @@ export default function NewScreen() {
         course: "",
         discount: "",
         expiryDate: "",
-        firstPurches: "",
+        firstPurchase: "",
     });
-
-    const handleChange1 = (newValue) => {
-        setDate(newValue);
-    };
 
     function handleChange(e) {
         let value = e.target.value;
-        if (e.target.name === "firstPurches") {
+        if (e.target.name === "firstPurchase") {
             if (value === "" || value === "false") {
                 value = true
             }
@@ -141,7 +149,7 @@ export default function NewScreen() {
             course: "",
             discount: "",
             expiryDate: "",
-            firstPurches: false,
+            firstPurchase: false,
         })
         setCourseNames([]);
         setDate(null)
@@ -168,7 +176,8 @@ export default function NewScreen() {
                 course = course + ele + ",";
             });
             formFields.course = course;
-            formFields.expiryDate = moment(date).format('DD/MM/YYYY')
+            var date1 = new Date(date);
+            formFields.expiryDate = moment(date1).format('DD/MM/YYYY')
         }
 
     }
@@ -176,19 +185,24 @@ export default function NewScreen() {
     function closeModel() {
         setOpenModel(false);
     }
+
     async function submit() {
         const coupencode = (Math.random() + 1).toString(36).substring(7);
         const payload = {
-            couponCode: formFields.couponCode + coupencode,
+            couponCode: formFields.couponCode + coupencode.substring(0, 3),
             course: formFields.course,
             discount: formFields.discount,
             expiryDate: formFields.expiryDate,
-            firstPurches: formFields.firstPurches
+            firstPurchase: formFields.firstPurchase === "" ? false : formFields.firstPurchase
         }
-        const resp = await api(payload, serverUrl, 'post');
+        setTableShow(true);
+        const resp = await api(payload, serverUrl + "add", 'post');
         if (resp.status == 200) {
             resetForm();
             setOpenModel(false);
+            setTableShow(true);
+            const res = await api(payload, serverUrl + "list", 'post');
+            settableData(res.data)
         }
     }
     React.useEffect(() => {
@@ -198,92 +212,108 @@ export default function NewScreen() {
 
     return (
         <div>
-            <Box sx={{ flexGrow: 1 }}  >
-                <Grid container spacing={1} columns={16}>
-                    <Grid item xs={16}>
-                        <TextField
-                            label="Coupon Code:"
-                            id="outlined-start-adornment"
-                            sx={{ width: '25%' }}
-                            value={formFields.couponCode}
-                            onChange={handleChange}
-                            name="couponCode"
-                            error={errors.couponCode != ""}
-                            helperText={errors.couponCode != "" ? 'Coupon Code is reuired' : ' '}
-                        />
-                    </Grid>
-                    <Grid item xs={16}>
-                        <FormControl sx={{ width: 310 }}>
-                            <InputLabel id="demo-multiple-checkbox-label">Cours</InputLabel>
-                            <Select
-                                labelId="demo-multiple-checkbox-label"
-                                id="demo-multiple-checkbox"
-                                multiple
-                                name="course"
-                                value={courseNames}
+            {
+                (!tableShow) &&
+                <Box sx={{ flexGrow: 1 }}  >
+                    <Grid container spacing={1} columns={16}>
+                        <Grid item xs={16}>
+                            <TextField
+                                label="Coupon Code:"
+                                id="outlined-start-adornment"
+                                sx={{ width: '25%' }}
+                                value={formFields.couponCode}
                                 onChange={handleChange}
-                                label="Course:"
-                                renderValue={(selected) => selected.join(', ')}
-                                error={errors.course != ""}
-                                helperText={errors.course != "" ? 'Please select at least one Course' : ' '}
-                                MenuProps={MenuProps}
-                            >
-                                {names.map((name) => (
-                                    <MenuItem key={name} value={name}>
-                                        <Checkbox checked={courseNames.indexOf(name) > -1} />
-                                        <ListItemText primary={name} />
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={16}></Grid>
-                    <Grid item xs={16} style={{ marginTop: "8px" }}>
-                        <TextField
-                            label="Dicsount:"
-                            id="outlined-start-adornment"
-                            sx={{ width: '25%' }}
-                            value={formFields.discount}
-                            name="discount"
-                            onChange={handleChange}
-                            error={errors.discount != ""}
-                            helperText={errors.discount != "" ? 'Discount is required' : ' '}
-                            InputProps={{
-                                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                            }}
-                        />
-                    </Grid>
-                    <Grid item xs={16}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DesktopDatePicker
-                                label="Expiry Date"
-                                value={date}
-                                name="expiryDate"
-                                onChange={handleChange1}
-                                renderInput={(params) => <TextField {...params} sx={{ width: '25%' }} />}
-                                format="DD/MM/YYYY"
+                                name="couponCode"
+                                error={errors.couponCode != ""}
+                                helperText={errors.couponCode != "" ? 'Coupon Code is reuired' : ' '}
                             />
-                        </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={16}></Grid>
-                    <Grid item xs={16}>
-                        <FormLabel component="legend">New Promo Code</FormLabel>
-                        <FormControlLabel
-                            control={
-                                <Checkbox checked={formFields.firstPurches} value={formFields.firstPurches} onChange={handleChange} name="firstPurches" />
-                            }
-                            label="First Purches Only"
-                        />
-                    </Grid>
-                    <Grid item xs={16}>
-                        <Stack spacing={2} direction="row">
-                            <Button variant="contained" onClick={() => preView()} >Confirm</Button>
-                            <Button variant="outlined" onClick={() => resetForm()}>Reset</Button>
-                        </Stack>
-                    </Grid>
-                </Grid>
-            </Box >
+                        </Grid>
+                        <Grid item xs={16}>
+                            <FormControl sx={{ width: 310 }}>
+                                <InputLabel id="demo-multiple-checkbox-label">Cours</InputLabel>
+                                <Select
+                                    labelId="demo-multiple-checkbox-label"
+                                    id="demo-multiple-checkbox"
+                                    multiple
+                                    name="course"
+                                    value={courseNames}
+                                    onChange={handleChange}
+                                    label="Course:"
+                                    renderValue={(selected) => selected.join(', ')}
+                                    error={errors.course != ""}
+                                    helperText={errors.course != "" ? 'Please select at least one Course' : ' '}
+                                    MenuProps={MenuProps}
+                                >
+                                    {names.map((name) => (
+                                        <MenuItem key={name} value={name}>
+                                            <Checkbox checked={courseNames.indexOf(name) > -1} />
+                                            <ListItemText primary={name} />
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={16}></Grid>
+                        <Grid item xs={16} style={{ marginTop: "8px" }}>
+                            <TextField
+                                label="Dicsount:"
+                                id="outlined-start-adornment"
+                                sx={{ width: '25%' }}
+                                value={formFields.discount}
+                                name="discount"
+                                onChange={handleChange}
+                                error={errors.discount != ""}
+                                helperText={errors.discount != "" ? 'Discount is required' : ' '}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={16}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DesktopDatePicker
+                                    label="Expiry Date"
+                                    value={date}
+                                    name="expiryDate"
+                                    inputFormat="DD/MM/YYYY"
+                                    onChange={(newValue) => {
+                                        setDate(newValue);
+                                    }}
+                                    renderInput={(params) => <TextField {...params} sx={{ width: '25%' }} />}
 
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={16}></Grid>
+                        <Grid item xs={16}>
+                            <FormLabel component="legend">New Promo Code</FormLabel>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox checked={formFields.firstPurchase} value={formFields.firstPurchase} onChange={handleChange} name="firstPurchase" />
+                                }
+                                label="First Purchase Only"
+                            />
+                        </Grid>
+                        <Grid item xs={16}>
+                            <Stack spacing={2} direction="row">
+                                <Button variant="contained" onClick={() => preView()} >Confirm</Button>
+                                <Button variant="outlined" onClick={() => resetForm()}>Reset</Button>
+                            </Stack>
+                        </Grid>
+                    </Grid>
+                </Box >
+            }
+            {
+                (tableShow) &&
+                <div style={{ height: 400, width: '100%' }}>
+                    <DataGrid
+                        rows={tableData}
+                        columns={columns}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                    />
+                </div>
+            }
             <Modal
                 open={openModel}
                 aria-labelledby="modal-modal-title"
@@ -307,7 +337,7 @@ export default function NewScreen() {
                             <span style={{ fontWeight: "bold" }}>Expiry Date:</span> {formFields.expiryDate}
                         </Grid>
                         <Grid item xs={16}>
-                            <span style={{ fontWeight: "bold" }}>First Purches:</span> {` ${formFields.firstPurches}`}
+                            <span style={{ fontWeight: "bold" }}>First Purches:</span> {` ${formFields.firstPurchase}`}
                         </Grid>
                     </Grid>
                     <Stack spacing={2} direction="row" style={{ marginTop: "30px" }}>
