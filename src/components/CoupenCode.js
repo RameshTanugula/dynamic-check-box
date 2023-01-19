@@ -24,12 +24,12 @@ import api from '../services/api';
 import { DataGrid } from '@mui/x-data-grid';
 
 const columns = [
-    { field: 'coupon_code', headerName: 'Coupen Code', minWidth: 200, },
+    { field: 'coupon_code', headerName: 'Coupon Code', minWidth: 200, },
     { field: 'course', headerName: 'Course', minWidth: 200, },
     { field: 'created_by', headerName: 'Created By', minWidth: 200, },
     { field: 'discount', headerName: 'Discount', minWidth: 200, },
     { field: 'expiry_date', headerName: 'Expiry Date', minWidth: 200, },
-    { field: 'first_purchase', headerName: 'First Purches', minWidth: 200, },
+    { field: 'first_purchase', headerName: 'First Purchase', minWidth: 200, },
 ];
 
 
@@ -218,7 +218,7 @@ export default function CoupenCode() {
                     <Grid container spacing={1} columns={16}>
                         <Grid item xs={16}>
                             <TextField
-                                label="Coupon Code:"
+                                label="Coupon Code"
                                 id="outlined-start-adornment"
                                 sx={{ width: '25%' }}
                                 value={formFields.couponCode}
@@ -238,7 +238,7 @@ export default function CoupenCode() {
                                     name="course"
                                     value={courseNames}
                                     onChange={handleChange}
-                                    label="Course:"
+                                    label="Course"
                                     renderValue={(selected) => selected.join(', ')}
                                     error={errors.course != ""}
                                     helperText={errors.course != "" ? 'Please select at least one Course' : ' '}
@@ -256,7 +256,7 @@ export default function CoupenCode() {
                         <Grid item xs={16}></Grid>
                         <Grid item xs={16} style={{ marginTop: "8px" }}>
                             <TextField
-                                label="Dicsount:"
+                                label="Dicsount"
                                 id="outlined-start-adornment"
                                 sx={{ width: '25%' }}
                                 value={formFields.discount}
