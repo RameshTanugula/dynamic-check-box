@@ -97,6 +97,9 @@ export default function CommonTableView(props) {
     const onClickFakeCreate = (row) => {
         props.onClickCreate(row)
     }
+    const hideStatement=(id)=>{
+        props.hideStatement(id)
+    }
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
@@ -118,6 +121,8 @@ export default function CommonTableView(props) {
                             <TableCell style={{ width: 160 }} align="right">
                                 {/* {row.parts_b} */}
                                 <Button variant="contained" onClick={() => onClickFakeCreate(row)}>Add False</Button>
+                                <Button sx={{marginTop:'5px'}} variant="contained" onClick={() => hideStatement(row.StatementId)}>Hide</Button>
+                            
                             </TableCell>
 
                         </TableRow>

@@ -63,9 +63,9 @@ export default function Statements() {
     }
     const saveFalseStatements = async () => {
         const duplicates = findDuplicates(falseValue);
-        if (!falseValue || falseValue.length===0) {
+        if (!falseValue || falseValue.length === 0) {
             alert('No statements to save')
-        } else if (falseValue.includes(parentStatementName)){
+        } else if (falseValue.includes(parentStatementName)) {
             alert('False statement should not be same as Parent statement');
         } else if (duplicates && duplicates.length > 0) {
             alert('Duplicates found!')
@@ -102,9 +102,20 @@ export default function Statements() {
         trueValue[i] = value;
         setTrueValue([...trueValue]);
     }
-    const onChangeFalseValue=(value, i)=>{
+    const onChangeFalseValue = (value, i) => {
         falseValue[i] = value;
         setTrueValue([...falseValue]);
+    }
+    const hideStatement = async (id) => {
+
+        const response = await api(null, serverUrl + 'hide/' + id, 'put');
+        if (response.status === 200) {
+
+            const list = await api(null, serverUrl + 'list', 'get');
+            if (list.status === 200) {
+                setData(list.data)
+            }
+        }
     }
     const onClickCreate = (row) => {
         setParentStatementId(row.StatementId);
@@ -117,16 +128,16 @@ export default function Statements() {
         return (
 
             <div>
-               {falseValue && falseValue.length > 0 && falseValue?.map((f, i) => {
-                return (<div style={{ paddingBottom: '2rem' }}>
+                {falseValue && falseValue.length > 0 && falseValue?.map((f, i) => {
+                    return (<div style={{ paddingBottom: '2rem' }}>
 
-                    <TextField sx={{ width: '75%' }} id="outlined-basic" value={f} onChange={(e) => onChangeFalseValue(e.target?.value, i)} label={`False Statement - `+(i+1)} variant="outlined" />
-                    &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeFalseRow(i)}>Delete</Button> <br/><br/>
-           
-                </div>)
-            })}
+                        <TextField sx={{ width: '75%' }} id="outlined-basic" value={f} onChange={(e) => onChangeFalseValue(e.target?.value, i)} label={`False Statement - ` + (i + 1)} variant="outlined" />
+                        &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeFalseRow(i)}>Delete</Button> <br /><br />
+
+                    </div>)
+                })}
                 <Stack spacing={2} direction="row">
-                &nbsp;&nbsp;<Button  variant="contained" onClick={() => addFalseRow()}>Add Row</Button> <br/> <br />
+                    &nbsp;&nbsp;<Button variant="contained" onClick={() => addFalseRow()}>Add Row</Button> <br /> <br />
                     {<Button variant="contained" onClick={() => { setShowTable(true); setShowFalse(false) }}>Cancel</Button>}
                     {<Button variant="contained" onClick={() => saveFalseStatements()}>Save False Statements</Button>}
                 </Stack>
@@ -138,7 +149,7 @@ export default function Statements() {
             <div style={{ paddingBottom: '1rem', textAlign: 'right' }}>
                 {showTable && <Button variant="contained" onClick={() => setShowTable(!showTable)}>Create New Statements</Button>}
             </div>
-            {showTable && data.length > 0 && <div><CommonTableView onClickCreate={onClickCreate} data={data} /></div>}
+            {showTable && data.length > 0 && <div><CommonTableView hideStatement={hideStatement} onClickCreate={onClickCreate} data={data} /></div>}
             {!showTable && !showFalse && trueValue && trueValue.length > 0 && trueValue?.map((t, i) => {
                 return (<div style={{ paddingBottom: '2rem' }}>
 
