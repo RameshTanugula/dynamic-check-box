@@ -120,17 +120,17 @@ export default function CreatePairs() {
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     React.useEffect(() => {
         async function fetchData() {
-            const userRes = await api(null, 'http://3.111.29.120:8080/get/users/'+type, 'get');
-            if(userRes.status === 200){
+            const userRes = await api(null, 'http://3.111.29.120:8080/get/users/' + type, 'get');
+            if (userRes.status === 200) {
                 setUsersList(userRes.data.res);
-                if(userRes?.data?.res[0]?.user && type){
+                if (userRes?.data?.res[0]?.user && type) {
                     setUser(userRes?.data?.res[0]?.user);
-            const response = await api(null, serverUrl + 'get/list/' + userRes?.data?.res[0]?.user +'/' + type + '/' + from + '/' + to, 'get');
-            if (response.status === 200) {
-                setData(response.data)
+                    const response = await api(null, serverUrl + 'get/list/' + userRes?.data?.res[0]?.user + '/' + type + '/' + from + '/' + to, 'get');
+                    if (response.status === 200) {
+                        setData(response.data)
+                    }
+                }
             }
-        }
-        }
             const pairsRes = await api(null, serverUrl + 'get/data', 'get');
             if (pairsRes.status === 200) {
                 pairsRes.data.map(p => p.checked = false)
@@ -161,12 +161,12 @@ export default function CreatePairs() {
             </Select>
         )
     }
-    const onChangeUser=async(user)=>{
+    const onChangeUser = async (user) => {
         setUser(user);
-        const response = await api(null, serverUrl + 'get/list/' + user +'/' + type + '/' + from + '/' + to, 'get');
-            if (response.status === 200) {
-                setData(response.data)
-            }
+        const response = await api(null, serverUrl + 'get/list/' + user + '/' + type + '/' + from + '/' + to, 'get');
+        if (response.status === 200) {
+            setData(response.data)
+        }
     }
     const renderUsers = () => {
         return (
@@ -196,8 +196,13 @@ export default function CreatePairs() {
     const renderContent = () => {
         return (
             <div>
-                {data.map((d => {
-                    return <span onClick={() => onClickHandler(d)} style={{ display: 'flex' }}><p style={{"fontWeight":"bold"}}>{d.id}:</p>&nbsp;<p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span>
+                {data.map(((d, i) => {
+                    return (<div style={{ display: 'flex' }}>
+                        <span style={{ paddingRight: '1rem', paddingTop: '1rem' }}>    <input checked={d.checked} value={d.checked} onClick={() => onClickPairCheckBox(i)} type="checkbox" />
+                        </span>
+                        <span onClick={() => onClickHandler(d)} style={{ display: 'flex' }}>
+
+                            <p style={{ "fontWeight": "bold" }}>{d.id}:</p>&nbsp;<p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span></div>)
                 }))}
             </div>
         )
@@ -222,7 +227,7 @@ export default function CreatePairs() {
         }
     }
     const removeRow = (id) => {
-        const tmpList = pairList.filter(pl=>pl.selectedId !== id);
+        const tmpList = pairList.filter(pl => pl.selectedId !== id);
         setPairList([...tmpList])
     }
     const getPairedContent = () => {
@@ -242,17 +247,21 @@ export default function CreatePairs() {
                         <td>{p.part_a}</td>
                         <td>{p.part_b}</td>
                         <td><Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeRow(p.selectedId)}>Delete</Button>
-</td>
+                        </td>
                     </tr>)
                 })
                 }
 
             </table>
-                <Button sx={{marginTop:"1.5rem"}} variant="contained" onClick={savePairs}>
+                <Button sx={{ marginTop: "1.5rem" }} variant="contained" onClick={savePairs}>
                     Save Pairs
                 </Button>
             </>
         )
+    }
+    const onClickPairCheckBox = (i) => {
+        data[i].checked = !data[i].checked;
+        setData([...data]);
     }
     const onClickCheckBox = (id, index) => {
         if (id && index >= 0) {
@@ -265,7 +274,7 @@ export default function CreatePairs() {
         setPairsData([...pairsData]);
     }
     const createGroup = async () => {
-        const selectedIds = pairsData.filter(p => p.checked)?.map(pm=>pm.id);
+        const selectedIds = pairsData.filter(p => p.checked)?.map(pm => pm.id);
         const postResponse = await api(selectedIds, serverUrl + 'save/groups', 'post');
 
         if (postResponse.status === 200) {
@@ -281,8 +290,8 @@ export default function CreatePairs() {
             <>
                 <div style={{ float: 'right', paddingBottom: '2rem' }}>
                     <Stack spacing={2} direction="row" sx={{ textAlign: 'right' }}>
-                        {pairsData.filter(pp=>pp.checked)?.length > 0 && 
-                        <Button variant="contained" onClick={createGroup}>Create as a Group</Button>}
+                        {pairsData.filter(pp => pp.checked)?.length > 0 &&
+                            <Button variant="contained" onClick={createGroup}>Create as a Group</Button>}
                         <Button variant="contained" sx={{ paddingLeft: '2rem' }} onClick={() => setShowTable(false)}>Back To Screen</Button>
                     </Stack>
                 </div><TableContainer component={Paper}>
@@ -343,7 +352,7 @@ export default function CreatePairs() {
         if (pairList && pairList.length > 0) {
             const response = await api(pairList, serverUrl + 'save', 'post');
             if (response.status === 200) {
-                const responseList = await api(null, serverUrl + 'get/list/' + user +'/' + type + '/' + from + '/' + to, 'get');
+                const responseList = await api(null, serverUrl + 'get/list/' + user + '/' + type + '/' + from + '/' + to, 'get');
                 if (responseList.status === 200) {
                     setData(responseList.data)
                 }
@@ -357,8 +366,18 @@ export default function CreatePairs() {
             alert('Please Generate Pairs')
         }
     }
+    const hidePairs = async () => {
+        const selectedIds = data?.filter(df => df.checked)?.map(d => d.id)
+        const hideResponse = await api({ selectedIds, type }, serverUrl + 'hide', 'post');
+        if (hideResponse.status === 200) {
+            const response = await api(null, serverUrl + 'get/list/' + user + '/' + type + '/' + from + '/' + to, 'get');
+            if (response.status === 200) {
+                setData(response.data)
+            }
+        }
+    }
     const getData = async () => {
-        const responseList = await api(null, serverUrl + 'get/list/'  + user +'/' + type + '/' + from + '/' + to, 'get');
+        const responseList = await api(null, serverUrl + 'get/list/' + user + '/' + type + '/' + from + '/' + to, 'get');
         if (responseList.status === 200) {
             setData(responseList.data)
             setFrom(null);
@@ -378,6 +397,9 @@ export default function CreatePairs() {
                         &nbsp; &nbsp;<Button variant="contained" onClick={getData}>
                             Get Data
                         </Button>
+                        &nbsp; &nbsp; {data?.filter(d => d.checked)?.length > 0 && <Button variant="contained" onClick={hidePairs}>
+                            Hide Pairs
+                        </Button>}
                     </div>
 
                     <div style={{ width: '100%' }}>
