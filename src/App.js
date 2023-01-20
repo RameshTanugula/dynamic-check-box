@@ -27,8 +27,9 @@ import Categories from './components/categories';
 import CreatePairs from './components/pairsCreation';
 import QuestionCreationFromPairs from './components/questionCreationwithPairs';
 import Statements from './components/statements';
-// import UeserRequestAccess from './components/UserRequestAccess';
 import CoupenCode from './components/CoupenCode';
+import UserRequestAccess from './components/UserRequestAccess';
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -129,7 +130,7 @@ export default function App() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Categories', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupen Code'].map((text, index) => (
+          {['Categories', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupen Code', 'User Request Access'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemText primary={text} onClick={() => setComp(text)} />
@@ -152,7 +153,7 @@ export default function App() {
         {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
         {comp?.toLowerCase() === 'learning cards' && <LearningCard />}
         {comp?.toLowerCase() === 'coupen code' && <CoupenCode />}
-        {/* {comp?.toLowerCase() === 'user requeat access' && <UeserRequestAccess />} */}
+        {comp?.toLowerCase() === 'user request access' && <UserRequestAccess />}
       </Main>
     </Box>
   );
