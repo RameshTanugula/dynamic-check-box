@@ -27,7 +27,12 @@ const columns = [
     { field: 'coupon_code', headerName: 'Coupon Code', minWidth: 200, },
     { field: 'course', headerName: 'Course', minWidth: 200, },
     { field: 'created_by', headerName: 'Created By', minWidth: 200, },
-    { field: 'discount', headerName: 'Discount', minWidth: 200, },
+    {
+        field: 'discount', headerName: 'Discount', minWidth: 200,
+        valueGetter: (params) =>
+            `${params.row.discount}%`,
+
+    },
     { field: 'expiry_date', headerName: 'Expiry Date', minWidth: 200, },
     { field: 'first_purchase', headerName: 'First Purchase', minWidth: 200, },
 ];
@@ -45,8 +50,8 @@ const MenuProps = {
 };
 
 const names = [
-    'Java',
-    'Node',
+    'DSC',
+    'GROUPS',
 ];
 const serverUrl = `http://3.111.29.120:8080/promocodes/`;
 
@@ -62,7 +67,7 @@ const modelStyle = {
     p: 4,
 }
 
-export default function CoupenCode() {
+export default function CouponCode() {
     const [tableShow, setTableShow] = React.useState(false);
     const [tableData, settableData] = React.useState([]);
     const [openModel, setOpenModel] = React.useState(false);
@@ -168,7 +173,7 @@ export default function CoupenCode() {
             errors.discount = "error";
             setSubmitValid(false)
         }
-        if (formFields.couponCode != "" && formFields.course != "" && formFields.discount != "") {
+        if (formFields.couponCode !== "" && formFields.course !== "" && formFields.discount !== "") {
             setSubmitValid(true);
             setOpenModel(true)
             var course = ""
@@ -197,7 +202,7 @@ export default function CoupenCode() {
         }
         setTableShow(true);
         const resp = await api(payload, serverUrl + "add", 'post');
-        if (resp.status == 200) {
+        if (resp.status === 200) {
             resetForm();
             setOpenModel(false);
             setTableShow(true);
@@ -224,13 +229,13 @@ export default function CoupenCode() {
                                 value={formFields.couponCode}
                                 onChange={handleChange}
                                 name="couponCode"
-                                error={errors.couponCode != ""}
-                                helperText={errors.couponCode != "" ? 'Coupon Code is reuired' : ' '}
+                                error={errors.couponCode !== ""}
+                                helperText={errors.couponCode !== "" ? 'Coupon Code is reuired' : ' '}
                             />
                         </Grid>
                         <Grid item xs={16}>
                             <FormControl sx={{ width: 310 }}>
-                                <InputLabel id="demo-multiple-checkbox-label">Cours</InputLabel>
+                                <InputLabel id="demo-multiple-checkbox-label">Course</InputLabel>
                                 <Select
                                     labelId="demo-multiple-checkbox-label"
                                     id="demo-multiple-checkbox"
@@ -240,8 +245,8 @@ export default function CoupenCode() {
                                     onChange={handleChange}
                                     label="Course"
                                     renderValue={(selected) => selected.join(', ')}
-                                    error={errors.course != ""}
-                                    helperText={errors.course != "" ? 'Please select at least one Course' : ' '}
+                                    error={errors.course !== ""}
+                                    helperText={errors.course !== "" ? 'Please select at least one Course' : ' '}
                                     MenuProps={MenuProps}
                                 >
                                     {names.map((name) => (
@@ -262,8 +267,8 @@ export default function CoupenCode() {
                                 value={formFields.discount}
                                 name="discount"
                                 onChange={handleChange}
-                                error={errors.discount != ""}
-                                helperText={errors.discount != "" ? 'Discount is required' : ' '}
+                                error={errors.discount !== ""}
+                                helperText={errors.discount !== "" ? 'Discount is required' : ' '}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">%</InputAdornment>,
                                 }}
