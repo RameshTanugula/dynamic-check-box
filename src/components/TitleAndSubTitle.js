@@ -23,7 +23,7 @@ export default function TitleAndSubTitle() {
     const [errorMessage, setErrorMessage] = React.useState("");
 
     function addRow(screen) {
-        if (screen === "tittle") {
+        if (screen === "title") {
             setTitles([...titles.concat([''])])
         }
         else {
