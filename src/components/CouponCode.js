@@ -50,8 +50,8 @@ const MenuProps = {
 };
 
 const names = [
-    'Java',
-    'Node',
+    'DSC',
+    'GROUPS',
 ];
 const serverUrl = `http://3.111.29.120:8080/promocodes/`;
 
@@ -67,7 +67,7 @@ const modelStyle = {
     p: 4,
 }
 
-export default function CoupenCode() {
+export default function CouponCode() {
     const [tableShow, setTableShow] = React.useState(false);
     const [tableData, settableData] = React.useState([]);
     const [openModel, setOpenModel] = React.useState(false);
@@ -235,7 +235,7 @@ export default function CoupenCode() {
                         </Grid>
                         <Grid item xs={16}>
                             <FormControl sx={{ width: 310 }}>
-                                <InputLabel id="demo-multiple-checkbox-label">Cours</InputLabel>
+                                <InputLabel id="demo-multiple-checkbox-label">Course</InputLabel>
                                 <Select
                                     labelId="demo-multiple-checkbox-label"
                                     id="demo-multiple-checkbox"
