@@ -32,6 +32,8 @@ import UserRequestAccess from './components/UserRequestAccess';
 import TitleAndSubTitle from './components/TitleAndSubTitle';
 // import QuestionCreationFromStatements from './components/questionCreationFromStatements'
 import Questions from './components/questions';
+import CreateCourse from './components/CreateCourse';
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -132,7 +134,7 @@ export default function App() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Categories', 'Questions','Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle'].map((text, index) => (
+          {['Categories', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemText primary={text} onClick={() => setComp(text)} />
@@ -158,6 +160,8 @@ export default function App() {
         {comp?.toLowerCase() === 'coupon code' && <CoupenCode />}
         {comp?.toLowerCase() === 'user request access' && <UserRequestAccess />}
         {comp?.toLowerCase() === 'title and subtitle' && <TitleAndSubTitle />}
+        {comp?.toLowerCase() === 'create course' && <CreateCourse />}
+
       </Main>
     </Box>
   );
