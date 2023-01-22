@@ -1,4 +1,5 @@
 import * as React from 'react';
+import CheckboxTree from 'react-dynamic-checkbox-tree';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -179,8 +180,6 @@ export default function CustomPaginationActionsTable() {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [selectedTitle, setSelectedTitle] = React.useState("");
     const [titleOptionsList, setTitleOptionsList] = React.useState("");
-    const [inputOptionValue, setInputOptionValue] = React.useState("");
-    const [inputOptionNumber, setInputOptionNumber] = React.useState("");
     const [inputOptionValue1, setInputOptionValue1] = React.useState("");
     const [inputOptionValue2, setInputOptionValue2] = React.useState("");
     const [inputOptionValue3, setInputOptionValue3] = React.useState("");
@@ -192,13 +191,15 @@ export default function CustomPaginationActionsTable() {
     const [selectedRow, setSelectedRow] = React.useState(null)
 
     const [showForm, setShowForm] = React.useState(false);
+    const [checked, setChecked] = React.useState([]);
+    const [showTree, setShowTree] = React.useState(true)
     const [options, setOptions] = React.useState([]);
     const [questionValue, setQuestionValue] = React.useState("");
     const [selectedFile, setSelectedFile] = React.useState([]);
     const [previewImgSrc, setPreviewImgSrc] = React.useState(null);
     const [selectedTitles, setSelectedTitles] = React.useState([]);
     const [solutionValue, setSolutionValue] = React.useState("");
-
+    const [categoryData, setCategoryData] = React.useState([]);
     const handleChange = (event) => {
         const {
             target: { value },
@@ -210,14 +211,25 @@ export default function CustomPaginationActionsTable() {
     };
     React.useEffect(() => {
         async function fetchData() {
+            const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
+
+            if (data.status === 200) {
+                setQuestionData(data.data?.res)
+            }
+        }
+        fetchData()
+    }, [showTree])
+    React.useEffect(() => {
+        async function fetchData() {
             // You can await here  
-            const data = await api(null, serverUrl + 'get/data', 'get');
+            const catData = await api(null, 'http://3.111.29.120:8080/get/categories', 'get');
+            if (catData.status === 200) {
+                setCategoryData(catData.data);
+            }
+            // const data = await api(checked, serverUrl + 'get/data', 'post');
             const titleData = await api(null, serverUrl + 'get/titles', 'get');
             if (titleData.status === 200) {
                 setTitlesList(titleData.data?.res)
-            }
-            if (data.status === 200) {
-                setQuestionData(data.data?.res)
             }
         }
         fetchData();
@@ -265,14 +277,12 @@ export default function CustomPaginationActionsTable() {
             setSelectedTitles([]);
             setSelectedOptions([...selectedList]);
         }
-        
+
     }
     const onCloseHandler = () => {
         setSelectedTitle("");
         setTitleOptionsList([]);
         setSelectedTitles([])
-        setInputOptionValue("");
-        setInputOptionNumber("");
         setSelectedOptions([]);
         setOpen(false);
     }
@@ -295,11 +305,9 @@ export default function CustomPaginationActionsTable() {
                 setSelectedTitle("");
                 setTitleOptionsList([]);
                 setSelectedTitles([])
-                setInputOptionValue("");
-                setInputOptionNumber("");
                 setSelectedOptions([]);
                 setOpen(false);
-                const data = await api(null, serverUrl + 'get/data', 'get');
+                const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
                 if (data.status === 200) {
                     setQuestionData(data.data?.res)
                 }
@@ -513,7 +521,19 @@ export default function CustomPaginationActionsTable() {
                 <Button variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
 
             </div>
-            {!showForm && questionData?.length > 0 && <div>
+            {showTree && <div >
+                {categoryData?.length > 0 && <CheckboxTree
+                    // nodes={treeViewData}
+                    nodes={categoryData}
+                    checked={checked}
+                    onCheck={checked => setChecked(checked)}
+                //   onClick={(e) => onClickCheckBox(e)}
+                />}
+                <Button variant="contained" onClick={() => setShowTree(!showTree)}>Get Questions</Button>
+
+            </div>
+            }
+            {!showForm && !showTree && questionData?.length > 0 && <div>
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                         <TableHead>
@@ -575,10 +595,10 @@ export default function CustomPaginationActionsTable() {
                     </Table>
                 </TableContainer>
             </div>}
-            {questionData?.length === 0 && <div>
+            {!showTree && questionData?.length === 0 && <div>
                 <p>No Questions available</p>
             </div>}
-            {showForm && <div>
+            {showForm && !showTree && <div>
                 <TextareaAutosize
                     value={questionValue}
                     onChange={(e) => setQuestionValue(e.target?.value)}
@@ -609,13 +629,13 @@ export default function CustomPaginationActionsTable() {
                                 <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} /> <br /></>)
                         })}
                     </RadioGroup>
-                   {options?.length === 4 && <TextareaAutosize
-                    value={solutionValue}
-                    onChange={(e) => setSolutionValue(e.target?.value)}
-                    aria-label="Question"
-                    placeholder="Explain the answer"
-                    style={{ width: 500, height: 100 }}
-                />}
+                    {options?.length === 4 && <TextareaAutosize
+                        value={solutionValue}
+                        onChange={(e) => setSolutionValue(e.target?.value)}
+                        aria-label="Question"
+                        placeholder="Explain the answer"
+                        style={{ width: 500, height: 100 }}
+                    />}
                     <div style={{ paddingTop: '20px' }}>
                         <Button onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
                     </div>
@@ -623,6 +643,10 @@ export default function CustomPaginationActionsTable() {
 
                 }
             </div>
+            }
+            {!showTree &&
+                <Button sx={{ marginTop: '1rem' }} variant="contained" onClick={() => setShowTree(!showTree)}>Back to Filters</Button>
+
             }
         </div>
     );
