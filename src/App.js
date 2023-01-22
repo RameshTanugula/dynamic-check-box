@@ -30,7 +30,7 @@ import Statements from './components/statements';
 import CoupenCode from './components/CouponCode';
 import UserRequestAccess from './components/UserRequestAccess';
 import TitleAndSubTitle from './components/TitleAndSubTitle';
-import QuestionCreationFromStatements from './components/questionCreationFromStatements'
+// import QuestionCreationFromStatements from './components/questionCreationFromStatements'
 
 const drawerWidth = 240;
 
