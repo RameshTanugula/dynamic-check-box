@@ -171,7 +171,7 @@ TablePaginationActions.propTypes = {
     rowsPerPage: PropTypes.number.isRequired,
 };
 
-export default function CustomPaginationActionsTable() {
+export default function QuestionCreation() {
     // const serverUrl = `http://localhost:8080/question/`
     const serverUrl = `http://3.111.29.120:8080/question/`
     const [questionData, setQuestionData] = React.useState([]);
