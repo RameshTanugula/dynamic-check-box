@@ -1,6 +1,7 @@
 import React, { Component, useState } from 'react';
 import api from '../services/api';
 import './flashCard.css';
+import TextField from '@mui/material/TextField';
 
 export default function FileUpload() {
 
@@ -10,7 +11,8 @@ export default function FileUpload() {
 	const [subjects, setSubjects] = useState([]);
 	const [list, setList] = useState([]);
 	const [showTable, setShowTable] = useState(true);
-	const [selectedSubject, setSelectedSubject] = useState()
+	const [selectedSubject, setSelectedSubject] = useState("");
+	const [title, setTitle]=useState("")
 	React.useEffect(() => {
 		async function fetchData() {
 			const subData = await api(null, serverUrl + 'get/subjects', 'get');
@@ -39,6 +41,9 @@ export default function FileUpload() {
 	const onFileUpload = async () => {
 
 		// Create an object of formData
+		if(!title){
+			alert("please enter title");
+		} else
 		if (selectedFile?.length > 0) {
 			const formData = new FormData();
 
@@ -49,6 +54,8 @@ export default function FileUpload() {
 			}
 			formData.append('selectedSubject',
 				selectedSubject)
+				formData.append('title',
+				title)
 			const data = await api(formData, serverUrl + 'upload', 'post');
 			if (data.status === 200) {
 				const data = await api(null, serverUrl + 'get/subjects', 'get');
@@ -60,6 +67,7 @@ export default function FileUpload() {
 				if (data.status === 200) {
 					setSelectedSubject(data.data[0].id)
 					setSubjects(data.data)
+					setTitle("");
 				}
 				alert('File uploaded!')
 				setSelectedFile([])
@@ -108,9 +116,23 @@ export default function FileUpload() {
 							{subjects.map(s => {
 								return <option value={s.id}>{s.name}</option>
 							})}</select>
+							<br />
+							<br />
+							<TextField
+                                label="Title"
+                                id="outlined-start-adornment"
+                                sx={{ width: '20%' }}
+                                value={title}
+                                onChange={(e)=> setTitle(e.target.value)}
+                                name="Title"
+                                // error={title === ""}
+                                // helperText={title === "" ? 'Title is reuired' : ' '}
+                            />
 					</div>
 					<div style={{ paddingTop: '2rem' }}>
 						<input type="file" multiple onChange={onFileChange} />
+						<br/>
+						<br/>
 						<button onClick={onFileUpload}>
 							Upload
 						</button>

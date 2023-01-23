@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useState } from 'react';
-import CheckboxTree from 'react-dynamic-checkbox-tree';
+import FormControl from '@mui/material/FormControl';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import uniqid from 'uniqid';
 import api from '../services/api';
 import './flashCard.css';
@@ -13,6 +16,8 @@ export default function FlashCard() {
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);
     const [title, setTitle] = useState("");
+    const [selectedSubject, setSelectedSubject] = useState("");
+    const [subjects, setSubjects] = useState([]);
     const [cardData, setCardData] = useState([]);
     const [showTable, setShowTable] = useState(true);
     const validateList = () => {
@@ -26,15 +31,22 @@ export default function FlashCard() {
     React.useEffect(() => {
         async function fetchData() {
             const cardData = await api(null, serverUrl + 'titles', 'get');
+            const subData = await api(null, 'http://3.111.29.120:8080/files/get/subjects', 'get');
+            if (subData.status === 200) {
+                setSelectedSubject(subData.data[0].id)
+                setSubjects(subData.data)
+            }
             if (cardData.status === 200) {
                 setCardData(cardData.data)
             }
         }
         fetchData();
-    })
+    }, [])
     const onSubmitHandler = async () => {
         if (title === '') {
             alert('please enter title')
+        } if (selectedSubject === '') {
+            alert('please choose subject')
         } else if (validateList()) {
             alert('please fill required fields')
         } else {
@@ -46,6 +58,8 @@ export default function FlashCard() {
             }
             formData.append('title',
                 title)
+            formData.append('subject',
+                selectedSubject)
             formData.append('list',
                 JSON.stringify(list))
             const data = await api(formData, serverUrl + 'upload/flashcard', 'post');
@@ -53,6 +67,7 @@ export default function FlashCard() {
                 setList([]);
                 setTitle("");
                 setFileList([]);
+                setSelectedSubject(subjects[0].id);
                 const cardData = await api(null, serverUrl + 'titles', 'get');
                 if (cardData.status === 200) {
                     setCardData(cardData.data);
@@ -115,11 +130,13 @@ export default function FlashCard() {
             {showTable && <table>
                 <tr>
                     <th>S.No.</th>
+                    <th>Subject</th>
                     <th>Title</th>
                 </tr>
                 {cardData?.map((c, i) => {
                     return (<tr>
                         <td>{i + 1}</td>
+                        <td>{c.subject}</td>
                         <td>{c.title}</td>
                     </tr>)
                 })
@@ -130,8 +147,37 @@ export default function FlashCard() {
                 <div className="App">
                     <header className="App-header">
                         <label >
-                            Title:<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+                            {/* Title:<TextField type="text" value={title} onChange={(e) => setTitle(e.target.value)} /> */}
+                            <TextField
+                                label="Title"
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                name="Title"
+                            // error={errors.courseTitle !== ""}
+                            // helperText={errors.courseTitle !== "" ? 'Title is reuired' : ' '}
+                            />
                         </label><br />
+                        <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "16px", marginTop: "15px" }}>
+                            {/* <InputLabel id="demo-simple-select-label">Subject</InputLabel> */}
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={selectedSubject}
+                                name="Subject"
+                                onChange={(e) => { setSelectedSubject(e.target.value) }}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                {subjects.map((data, i) => (
+                                    <MenuItem key={i} value={data.id}>
+                                        {data.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         <div>
                             <table>
                                 <th>S.No</th>
