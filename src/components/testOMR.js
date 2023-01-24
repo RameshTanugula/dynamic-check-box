@@ -20,29 +20,27 @@ export default function TestOMR() {
     const [isRollNumMatched, setIsRollNumMatched] = useState(false);
     const [testIdMatched, setTestIdMatched] = useState(false);
 
-
-    React.useEffect(() => {
-        // 		async function fetchData() {
-        //             const payload = {
-        //                 "file": "https://prepareiq-omr.s3.ap-south-1.amazonaws.com/Omr.jpg",
-        //                     "key": [1,2,3,4],
-        //                     "testId": "10",
-        //                     "rollNo": "123456789"
-
-        //             }
-        // 			const response = await api(payload,  'http://3.110.197.70/submit', 'post');
-        // console.log(response, '&&&')
-
-        // 		}
-        // fetchData();
-    }, []);
     // On file select (from the pop up)
     const onFileChange = event => {
 
         setSelectedFile(event.target.files);
 
     };
-
+    const formatKey = () => {
+        return key?.split(",")?.map(k => parseInt(k));
+    }
+    const formatAnswerdKey = (ansKey) => {
+        let resKey = ``;
+        ansKey?.map((k) => {
+            if (k) {
+                resKey = resKey + `'${k}',`
+            } else {
+                resKey = resKey + `'null',`
+            }
+            return k;
+        });
+        return resKey;
+    }
     // On file upload (click the upload button)
     const onFileUpload = async () => {
 
@@ -62,28 +60,22 @@ export default function TestOMR() {
                         "files", selectedFile[i],
                     );
                 }
-                // formData.append('selectedSubject',
-                // 	selectedSubject)
-                // 	formData.append('title',
-                // 	title)
                 setLoaded(false);
                 const data = await api(formData, serverUrl + 'upload', 'post');
                 if (data.status === 200) {
-                    console.log(data, '****data***')
                     const inputFile = data.data[0].location;
                     const payload = {
                         "file": inputFile,
-                        "key": key,
-                        "testId": testId,
-                        "rollNo": studentId
+                        "key": formatKey(),
+                        "testId": parseInt(testId),
+                        "rollNo": parseInt(studentId)
 
                     }
                     const response = await api(payload, 'http://3.110.197.70/submit', 'post');
-                    console.log(response.data.Answered, '&&&')
                     if (response?.data) {
                         setLoaded(true);
                         setIsTestSubmitted(true);
-                        setAnswered(response.data.Answered.join(","));
+                        setAnswered(formatAnswerdKey(response.data.Answered));
                         setInvalid(response.data.Count_None_values);
                         setTotalMarks(response.data.Total_marks);
                         setTotalWrong(response.data.Total_worng);
@@ -137,8 +129,6 @@ export default function TestOMR() {
                             value={key}
                             onChange={(e) => setKey(e.target.value)}
                             name="Key"
-                        // error={title === ""}
-                        // helperText={title === "" ? 'Title is reuired' : ' '}
                         /><br />
 
                         <TextField
@@ -148,8 +138,6 @@ export default function TestOMR() {
                             value={studentId}
                             onChange={(e) => setStudentId(e.target.value)}
                             name="Roll Number"
-                        // error={title === ""}
-                        // helperText={title === "" ? 'Title is reuired' : ' '}
                         /><br />
                     </div>
                     <div style={{ paddingTop: '2rem' }}>
@@ -157,7 +145,7 @@ export default function TestOMR() {
                         <br />
                         <br />
                         <button onClick={onFileUpload}>
-                            Upload
+                            Get Results
                         </button>
                     </div>
                     {fileData()}
