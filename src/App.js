@@ -33,6 +33,7 @@ import TitleAndSubTitle from './components/TitleAndSubTitle';
 // import QuestionCreationFromStatements from './components/questionCreationFromStatements'
 import Questions from './components/questions';
 import CreateCourse from './components/CreateCourse';
+import TestOMR from './components/testOMR'
 
 const drawerWidth = 240;
 
@@ -134,7 +135,7 @@ export default function App() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Categories', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
+          {['Categories','TestOMR', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemText primary={text} onClick={() => setComp(text)} />
@@ -154,6 +155,7 @@ export default function App() {
         {comp?.toLowerCase() === 'create statements' && <Statements />}
         {comp?.toLowerCase() === 'create a test' && <TestCreation />}
         {comp?.toLowerCase() === 'upload files' && <FileUpload />}
+        {comp?.toLowerCase() === 'testomr' && <TestOMR />}
 
         {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
         {comp?.toLowerCase() === 'learning cards' && <LearningCard />}
