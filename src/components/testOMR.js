@@ -145,12 +145,12 @@ export default function TestOMR() {
                         /><br />
 
                         <TextField
-                            label="TestId"
+                            label="Roll Number"
                             id="outlined-start-adornment"
                             sx={{ width: '20%', marginTop: '2rem' }}
                             value={studentId}
                             onChange={(e) => setStudentId(e.target.value)}
-                            name="TestId"
+                            name="Roll Number"
                         // error={title === ""}
                         // helperText={title === "" ? 'Title is reuired' : ' '}
                         /><br />
