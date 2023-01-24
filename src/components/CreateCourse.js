@@ -822,8 +822,9 @@ export default function CeateCourse() {
                                                                                                                     key={row.id}
                                                                                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                                                                                 >
-                                                                                                                    <TableCell >{findNameById(row.topicType, "topicType")}</TableCell>
+
                                                                                                                     <TableCell >{findNameById(row.topicName, "")}</TableCell>
+                                                                                                                    <TableCell >{findNameById(row.topicType, "topicType")}</TableCell>
                                                                                                                     <TableCell >{row.selectedDataShow}</TableCell>
                                                                                                                     <TableCell >
                                                                                                                         <Button variant="contained" onClick={() => deleData(i, j, k, index)}>Delete</Button>
