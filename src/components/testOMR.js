@@ -2,11 +2,12 @@ import React, { Component, useState } from 'react';
 import api from '../services/api';
 import './flashCard.css';
 import TextField from '@mui/material/TextField';
-
+import Loader from './circularProgress';
 export default function TestOMR() {
 
     // const serverUrl = `http://localhost:8080/omr/`
-      const serverUrl = `http://3.111.29.120:8080/omr/`
+    const serverUrl = `http://3.111.29.120:8080/omr/`
+    const [loaded, setLoaded] = useState(true);
     const [selectedFile, setSelectedFile] = useState([]);
     const [testId, setTestId] = useState("");
     const [studentId, setStudentId] = useState("");
@@ -65,6 +66,7 @@ export default function TestOMR() {
                 // 	selectedSubject)
                 // 	formData.append('title',
                 // 	title)
+                setLoaded(false);
                 const data = await api(formData, serverUrl + 'upload', 'post');
                 if (data.status === 200) {
                     console.log(data, '****data***')
@@ -79,6 +81,7 @@ export default function TestOMR() {
                     const response = await api(payload, 'http://3.110.197.70/submit', 'post');
                     console.log(response.data.Answered, '&&&')
                     if (response?.data) {
+                        setLoaded(true);
                         setIsTestSubmitted(true);
                         setAnswered(response.data.Answered.join(","));
                         setInvalid(response.data.Count_None_values);
@@ -87,12 +90,6 @@ export default function TestOMR() {
                         setIsRollNumMatched(response.data.Rollno_matched);
                         setTestIdMatched(response.data.TestId_matched);
                     }
-                    // const data = await api(null, serverUrl + 'get/subjects', 'get');
-                    // const listData = await api(null, serverUrl + 'get/file/list', 'get');
-
-                    // if (listData.status === 200) {
-                    // 	setList(listData.data)
-                    // }
                     if (data.status === 200) {
                         setKey("");
                         setStudentId("");
@@ -120,7 +117,7 @@ export default function TestOMR() {
 
             {
                 <div style={{ paddingTop: '2rem', textAlign: 'center' }}>
-
+                    {!loaded && <Loader />}
                     <div>
                         <TextField
                             label="TestId"
