@@ -208,7 +208,7 @@ export default function Questions() {
     }
     const hideQuestions = async () => {
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.QuestionId);
-        const data = await api({ selectedIds: selectedIds, type:'bitbank' }, serverUrl + 'hide', 'post');
+        const data = await api({ selectedIds: selectedIds, type:'questions' }, serverUrl + 'hide', 'post');
 
         if (data.status === 200) {
             const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
