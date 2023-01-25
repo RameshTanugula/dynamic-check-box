@@ -546,6 +546,10 @@ export default function QuestionCreation() {
             }
         }
     }
+    const onClickCheckBox = (index) => {
+        questionData[index]['checked'] = !questionData[index]['checked'];
+        setQuestionData([...questionData]);
+    }
     const getQuestions = async () => {
         setShowTree(!showTree)
         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
@@ -553,10 +557,24 @@ export default function QuestionCreation() {
             setQuestionData(data.data?.res)
         }
     }
+    const hideQuestions = async () => {
+        const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.BitBankDetailId);
+        const data = await api({ selectedIds: selectedIds, type:'bitbank' }, serverUrl + 'hide', 'post');
+
+        if (data.status === 200) {
+            const qData = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
+            if (qData.status === 200) {
+                setQuestionData(qData.data?.res);
+            }
+        }
+    }
     return (
         <div>
             <div style={{ paddingBottom: '20px', textAlign: 'end' }}>
-                <Button variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
+            &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
+                    <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
+                }
+                &nbsp;&nbsp;<Button variant="contained"  onClick={() => setShowForm(!showForm)}>Add New Question</Button>
 
             </div>
             {showTree && <div >
@@ -577,6 +595,7 @@ export default function QuestionCreation() {
                         <TableHead>
                             <TableRow>
                                 <TableCell>S.No</TableCell>
+                                <TableCell></TableCell>
                                 <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">Option1</TableCell>
                                 <TableCell align="right">Apply Options</TableCell>
@@ -590,6 +609,9 @@ export default function QuestionCreation() {
                                 <TableRow key={i}>
                                     <TableCell component="th" scope="row">
                                         {i + 1}
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        <input checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.B_QUESTION}

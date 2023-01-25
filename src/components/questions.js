@@ -17,6 +17,8 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 
 import api from '../services/api';
@@ -162,12 +164,18 @@ export default function Questions() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [from, setFrom] = React.useState(null);
+    const [selectedSubject, setSelectedSubject] = React.useState(null);
     const [to, setTo] = React.useState(null);
-
-
+    const [subjects, setSubjects] = React.useState([]);
 
     React.useEffect(() => {
         async function fetchData() {
+            const subData = await api(null, 'http://3.111.29.120:8080/files/get/subjects', 'get');
+
+            if (subData.status === 200) {
+                setSelectedSubject(subData.data[0].id)
+                setSubjects(subData.data)
+            }
             const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
 
             if (data.status === 200) {
@@ -200,7 +208,7 @@ export default function Questions() {
     }
     const hideQuestions = async () => {
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.QuestionId);
-        const data = await api({ selectedIds: selectedIds }, serverUrl + 'hide', 'post');
+        const data = await api({ selectedIds: selectedIds, type:'bitbank' }, serverUrl + 'hide', 'post');
 
         if (data.status === 200) {
             const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
@@ -215,11 +223,19 @@ export default function Questions() {
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <TextField placeholder='From' sx={{ paddingBottom: '20px' }} onChange={(e) => setFrom(e.target.value)} value={from} />
                 &nbsp;&nbsp;&nbsp;&nbsp;<TextField placeholder='To' sx={{ paddingBottom: '20px' }} onChange={(e) => setTo(e.target.value)} value={to} />
-                       
+                &nbsp;&nbsp;<Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                >
+                    {subjects.map((tl) => { return (<MenuItem value={tl.id}>{tl.name}</MenuItem>) })}
+                </Select>
                 &nbsp;&nbsp;{<Button variant="contained" onClick={() => { getQuestions() }}>Get Questions</Button>}
-                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 && 
-                <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
-            }
+
+                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
+                    <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
+                }
             </div>
 
             {questionData?.length > 0 && <div>
