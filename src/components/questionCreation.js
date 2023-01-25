@@ -39,7 +39,9 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
+import Autocomplete from '@mui/material/Autocomplete';
 
+const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -176,6 +178,7 @@ export default function QuestionCreation() {
     const serverUrl = `http://3.111.29.120:8080/question/`
     const [questionData, setQuestionData] = React.useState([]);
     const [titlesList, setTitlesList] = React.useState([]);
+    const [searchValue, setSearchValue] = React.useState("")
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [selectedTitle, setSelectedTitle] = React.useState("");
@@ -209,16 +212,16 @@ export default function QuestionCreation() {
             typeof value === 'string' ? value.split(',') : value,
         );
     };
-    React.useEffect(() => {
-        async function fetchData() {
-            const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
+    // React.useEffect(() => {
+    //     async function fetchData() {
+    //         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
 
-            if (data.status === 200) {
-                setQuestionData(data.data?.res)
-            }
-        }
-        fetchData()
-    }, [showTree])
+    //         if (data.status === 200) {
+    //             setQuestionData(data.data?.res)
+    //         }
+    //     }
+    //     fetchData()
+    // }, [showTree])
     React.useEffect(() => {
         async function fetchData() {
             // You can await here  
@@ -358,11 +361,13 @@ export default function QuestionCreation() {
         );
 
     }
-    const onChangeTitle = async (value, row, i) => {
-        setSelectedTitle(value)
+
+    const onChangeTitle = async (event, value) => {
+        const selValue = titlesList.filter(tl => tl.Title === value)[0]?.OptionTitleId;
+        setSelectedTitle(selValue)
         setSelectedTitles([]);
         if (value) {
-            const titleOptionData = await api(null, serverUrl + 'get/title/options/' + value, 'get');
+            const titleOptionData = await api(null, serverUrl + 'get/title/options/' + selValue, 'get');
             if (titleOptionData.status === 200) {
                 setTitleOptionsList(titleOptionData.data?.res)
             }
@@ -370,17 +375,36 @@ export default function QuestionCreation() {
     };
     const getTitles = (row, i) => {
         return (<div>
-            <Select
+            <Autocomplete
+                freeSolo
+                id="free-solo-2-demo"
+                disableClearable
+                onChange={onChangeTitle}
+                options={titlesList.map((option) => option.Title)}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label="Search input"
+                        InputProps={{
+                            ...params.InputProps,
+                            type: 'search',
+                        }}
+                    />
+                )}
+            />
+            {/* <Select
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
                 value={selectedTitle}
                 onChange={(e) => onChangeTitle(e?.target?.value)}
             >
+                         <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onSearch(e.target.value)} value={""} />
+                       
                 <MenuItem value="">
                     <em>None</em>
                 </MenuItem>
                 {titlesList.map((tl) => { return (<MenuItem value={tl.OptionTitleId}>{tl.Title}</MenuItem>) })}
-            </Select>
+            </Select> */}
         </div>)
     }
     const getTitleOptions = (row, i) => {
@@ -419,7 +443,14 @@ export default function QuestionCreation() {
         setTitleOptionsList([]);
     }
     const allotOptions = (row, i) => {
-        return (<div>Titles:<input type="checkbox" checked={row?.isChecked} onClick={() => checkBoxHandler(row, i)} /></div>)
+        return (<div>
+            <Checkbox
+                {...label}
+                checked={row?.isChecked}
+                onClick={() => checkBoxHandler(row, i)}
+                sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+            />
+        </div>)
     }
     const getInputBox = (row, i) => {
         return (<div>
@@ -515,6 +546,13 @@ export default function QuestionCreation() {
             }
         }
     }
+    const getQuestions = async () => {
+        setShowTree(!showTree)
+        const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
+        if (data.status === 200) {
+            setQuestionData(data.data?.res)
+        }
+    }
     return (
         <div>
             <div style={{ paddingBottom: '20px', textAlign: 'end' }}>
@@ -529,7 +567,7 @@ export default function QuestionCreation() {
                     onCheck={checked => setChecked(checked)}
                 //   onClick={(e) => onClickCheckBox(e)}
                 />}
-                <Button variant="contained" onClick={() => setShowTree(!showTree)}>Get Questions</Button>
+                <Button variant="contained" onClick={() => getQuestions()}>Get Questions</Button>
 
             </div>
             }
