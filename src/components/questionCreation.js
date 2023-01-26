@@ -17,7 +17,8 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
-
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
@@ -52,6 +53,18 @@ const MenuProps = {
         },
     },
 };
+
+const modelStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: "100 %",
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+}
 
 /**
  * add manual question starts
@@ -203,6 +216,7 @@ export default function QuestionCreation() {
     const [selectedTitles, setSelectedTitles] = React.useState([]);
     const [solutionValue, setSolutionValue] = React.useState("");
     const [categoryData, setCategoryData] = React.useState([]);
+    const [editData, setEditData] = React.useState("");
     const handleChange = (event) => {
         const {
             target: { value },
@@ -224,7 +238,7 @@ export default function QuestionCreation() {
     // }, [showTree])
     React.useEffect(() => {
         async function fetchData() {
-            // You can await here  
+            // You can await here
             const catData = await api(null, 'http://3.111.29.120:8080/get/categories', 'get');
             if (catData.status === 200) {
                 setCategoryData(catData.data);
@@ -290,9 +304,9 @@ export default function QuestionCreation() {
         setOpen(false);
     }
     /**
-     * 
-     * @param {modal PopUp} event 
-     * @param {*} i 
+     *
+     * @param {modal PopUp} event
+     * @param {*} i
      */
     const openModal = (i) => {
         setOpen(true);
@@ -399,7 +413,7 @@ export default function QuestionCreation() {
                 onChange={(e) => onChangeTitle(e?.target?.value)}
             >
                          <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onSearch(e.target.value)} value={""} />
-                       
+
                 <MenuItem value="">
                     <em>None</em>
                 </MenuItem>
@@ -559,7 +573,7 @@ export default function QuestionCreation() {
     }
     const hideQuestions = async () => {
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.BitBankDetailId);
-        const data = await api({ selectedIds: selectedIds, type:'bitbank' }, serverUrl + 'hide', 'post');
+        const data = await api({ selectedIds: selectedIds, type: 'bitbank' }, serverUrl + 'hide', 'post');
 
         if (data.status === 200) {
             const qData = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
@@ -568,13 +582,37 @@ export default function QuestionCreation() {
             }
         }
     }
+    function handleChangeEdit(e) {
+        const newData = {
+            ...editData,
+            [e.target.name]: e.target.value
+
+        }
+        setEditData(newData);
+    }
+
+    function upDateQuestionData() {
+        console.log(editData);
+    }
+
     return (
         <div>
             <div style={{ paddingBottom: '20px', textAlign: 'end' }}>
-            &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
+                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length === 1 &&
+                    <Button variant="contained" onClick={() => {
+                        var item = questionData.find(item => item.checked === true);
+                        setEditData({
+                            id: item.BitBankDetailId,
+                            type: "Bit bank",
+                            question: item.B_QUESTION,
+                            answer: item.B_Q_ANS,
+                        });
+                    }}>Edit</Button>
+                }
+                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
                     <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
                 }
-                &nbsp;&nbsp;<Button variant="contained"  onClick={() => setShowForm(!showForm)}>Add New Question</Button>
+                &nbsp;&nbsp;<Button variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
 
             </div>
             {showTree && <div >
@@ -708,6 +746,42 @@ export default function QuestionCreation() {
                 <Button sx={{ marginTop: '1rem' }} variant="contained" onClick={() => setShowTree(!showTree)}>Back to Filters</Button>
 
             }
+            <Modal
+                open={editData !== ""}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={modelStyle}>
+                    <h4 style={{ marginTop: "-10px" }}>Edit Question</h4>
+                    <Grid container spacing={1} >
+                        <Grid item xs={10}>
+                            <TextField
+                                label="Question"
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={editData.question}
+                                onChange={handleChangeEdit}
+                                name="question"
+                            />
+                        </Grid>
+                        <Grid item xs={10}>
+                            <TextField
+                                label="Aswer"
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={editData.answer}
+                                onChange={handleChangeEdit}
+                                name="answer"
+                            />
+                        </Grid>
+                    </Grid>
+                    <Stack spacing={2} direction="row" style={{ marginTop: "30px" }}>
+                        <Button variant="outlined" onClick={() => setEditData("")}>Close</Button>
+                        <Button variant="contained" onClick={() => upDateQuestionData()}  >submit</Button>
+
+                    </Stack>
+                </Box>
+            </Modal>
         </div>
     );
 }
