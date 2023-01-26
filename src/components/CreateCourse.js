@@ -29,12 +29,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
+import InputAdornment from '@mui/material/InputAdornment';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CloseIcon from '@mui/icons-material/Close';
-
-
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import moment from "moment";
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -106,6 +108,11 @@ export default function CeateCourse() {
     const [editData, setEditData] = React.useState("");
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarMsg, setSnackBarMsg] = React.useState("");
+    const [selectedFile, setSelectedFile] = React.useState([]);
+
+    const [publishedDate, setPublishedDate] = React.useState(null);
+    const [expiryDate, setExpiryDate] = React.useState(null);
+
     const [topicTypesList, setTopicTypesList] = React.useState(
         [
             { id: 1, type: "PDF" },
@@ -123,7 +130,9 @@ export default function CeateCourse() {
         tags: "",
         academy: "",
         category: "",
-        description: ""
+        description: "",
+        listPrice: "",
+        offerPrice: "",
     });
     const [errors, setErrors] = React.useState({
         courseTitle: "",
@@ -131,8 +140,15 @@ export default function CeateCourse() {
         tags: "",
         // academy: "",
         category: "",
-        description: ""
+        description: "",
+        listPrice: "",
+        offerPrice: "",
     });
+
+
+    const [expiryDateError, setExpiryDateError] = React.useState("");
+    const [publishedDateError, setPublishedDateError] = React.useState("")
+    const [coverPageError, setCoverPageError] = React.useState("")
 
     const [selctForm, setSelctForm] = React.useState({
         topicName: "",
@@ -412,13 +428,38 @@ export default function CeateCourse() {
             }
             retunValue = false;
         }
+
+        if (publishedDate === null || publishedDate === "") {
+            retunValue = false;
+            setPublishedDateError("error");
+        }
+
+        if (expiryDate === null || expiryDate === "") {
+            retunValue = false;
+            setExpiryDateError("error")
+        }
+        if (selectedFile.length === 0) {
+            retunValue = false;
+            setCoverPageError("error")
+        }
+
         return retunValue;
 
     }
 
-    const submit = async () => {
+    const createCourse = async () => {
         if (valid()) {
-            const resp = await api(createCourseForm, serverUrl + "add", 'post');
+            const formData = new FormData();
+            createCourseForm.publishedDate = moment(new Date(publishedDate)).format('DD/MM/YYYY');
+            createCourseForm.expiryDate = moment(new Date(expiryDate)).format('DD/MM/YYYY');
+            for (let i = 0; i < selectedFile?.length; i++) {
+                formData.append(
+                    "files", selectedFile[i],
+                );
+            }
+            formData.append('createCourseObj',
+                createCourseForm)
+            const resp = await api(formData, serverUrl + "add", 'post');
             if (resp.status === 200) {
                 setShowSreen("Grid");
                 setOpenSnackBar(true);
@@ -510,6 +551,11 @@ export default function CeateCourse() {
         setOpenSnackBar(false)
     }
 
+    const onFileChange = event => {
+        setSelectedFile(event.target.files);
+        setCoverPageError("");
+    };
+
     React.useEffect(() => {
         setErrors(errors);
     }, [isValid]);
@@ -549,11 +595,12 @@ export default function CeateCourse() {
             <span>
                 {(showSreen === "Create") &&
                     <Grid container spacing={1} >
-                        <Grid item xs={12} >
+                        <Grid item xs={.5} ></Grid>
+                        <Grid item xs={11} >
                             <span style={{ fontWeight: "bold", fontSize: "30px" }}>Create Course</span>
                         </Grid>
-                        <Grid item xs={1} >
-                        </Grid>
+
+                        <Grid item xs={1} ></Grid>
                         <Grid item xs={3} >
                             <TextField
                                 label="Course Title"
@@ -578,9 +625,6 @@ export default function CeateCourse() {
                                 helperText={errors.instructor !== "" ? 'Instructor is reuired' : ' '}
                             />
                         </Grid>
-                        <Grid item xs={5} >
-                        </Grid>
-                        <Grid item xs={1} ></Grid>
                         <Grid item xs={3} >
                             <TextField
                                 label="Tags"
@@ -593,6 +637,7 @@ export default function CeateCourse() {
                                 helperText={errors.tags !== "" ? 'Tags is reuired' : ' '}
                             />
                         </Grid>
+                        <Grid item xs={2} ></Grid>
                         {/* <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "16px", marginTop: "15px" }}>
                 <InputLabel id="demo-simple-select-label">Academy</InputLabel>
                 <Select
@@ -616,33 +661,108 @@ export default function CeateCourse() {
             </Grid>
             <Grid item xs={1} >
             </Grid> */}
-                        <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "8px", marginTop: "8px" }}>
-                            <InputLabel id="demo-simple-select-label">Category</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={createCourseForm.category}
-                                name="category"
-                                onChange={handleChange}
-                                error={errors.category !== ""}
-                                helperText={errors.category !== "" ? 'Category is reuired' : ' '}
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                {categoryList.map((data, i) => (
-                                    <MenuItem key={i} value={data}>
-                                        {data}
+
+                        <Grid item xs={1} ></Grid>
+                        <Grid item xs={3} >
+                            <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-5px" }}>
+                                <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={createCourseForm.category}
+                                    name="category"
+                                    onChange={handleChange}
+                                    error={errors.category !== ""}
+                                    helperText={errors.category !== "" ? 'Category is reuired' : ' '}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
                                     </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        {/* <Grid item xs={7} >
-            </Grid> */}
-                        <Grid item xs={4} >
+                                    {categoryList.map((data, i) => (
+                                        <MenuItem key={i} value={data}>
+                                            {data}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
-                        <Grid item xs={1} >
+                        <Grid item xs={3} >
+                            <span>Cover Page</span>
+                            <div >
+                                <input type="file" multiple onChange={onFileChange} />
+                            </div>
+                            {coverPageError !== "" ? <span style={{ color: "#d32f2f" }}> Cover Page is reuired </span> : ""}
+
                         </Grid>
+                        <Grid item xs={3} style={{ marginTop: "-2px" }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DesktopDatePicker
+                                    label="Published Date"
+                                    value={publishedDate}
+                                    inputFormat="DD/MM/YYYY"
+                                    onChange={(newValue) => {
+                                        setPublishedDate(newValue);
+                                        setPublishedDateError("");
+                                    }}
+                                    renderInput={(params) => <TextField {...params} sx={{ width: '100%' }} />}
+
+                                />
+                            </LocalizationProvider>
+                            {publishedDateError !== "" ? <span style={{ color: "#d32f2f" }}> Publishe dDate is reuired </span> : ""}
+                        </Grid>
+                        <Grid item xs={2} ></Grid>
+                        <Grid item xs={1} ></Grid>
+                        <Grid item xs={3} style={{ marginTop: "5px" }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DesktopDatePicker
+                                    label="Expiry Date"
+                                    value={expiryDate}
+                                    inputFormat="DD/MM/YYYY"
+
+                                    onChange={(newValue) => {
+                                        setExpiryDate(newValue);
+                                        setExpiryDateError("");
+                                    }}
+                                    renderInput={(params) => <TextField {...params} sx={{ width: '100%' }} />}
+
+                                />
+                            </LocalizationProvider>
+                            {expiryDateError !== "" ? <span style={{ color: "#d32f2f" }}> Expiry Date is reuired </span> : ""}
+
+                        </Grid>
+                        <Grid item xs={3} style={{ marginTop: "5px" }}>
+                            <TextField
+                                label="List Price"
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={createCourseForm.listPrice}
+                                name="listPrice"
+                                onChange={handleChange}
+                                error={errors.listPrice !== ""}
+                                helperText={errors.listPrice !== "" ? 'ListPrice is required' : ' '}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">$</InputAdornment>,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={3} style={{ marginTop: "5px" }}>
+                            <TextField
+                                label="Offer Price"
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={createCourseForm.offerPrice}
+                                name="offerPrice"
+                                onChange={handleChange}
+                                error={errors.offerPrice !== ""}
+                                helperText={errors.offerPrice !== "" ? 'OfferPrice is required' : ' '}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">$</InputAdornment>,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={2} >
+                        </Grid>
+                        <Grid item xs={1} ></Grid>
                         <Grid item xs={11} >
                             <TextField
                                 id="outlined-multiline-static"
@@ -663,7 +783,7 @@ export default function CeateCourse() {
                             <Stack spacing={2} direction="row" >
                                 <Button variant="contained" onClick={() => setShowSreen("Grid")}>Back</Button>
                                 <Button variant="contained" onClick={() => resetForm()}>reset</Button>
-                                <Button variant="contained" onClick={() => submit()}>Submit</Button>
+                                <Button variant="contained" onClick={() => createCourse()}>Submit</Button>
                             </Stack>
                         </Grid>
                     </Grid>
