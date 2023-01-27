@@ -6,7 +6,7 @@ import './common.css';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
-      const serverUrl = `http://3.111.29.120:8080/test/`
+      const serverUrl = `http://3.110.42.205:8080/test/`
     const [checked, setChecked] = React.useState([]);
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     const [questionData, setQuestionData] = React.useState([]);

@@ -90,7 +90,7 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreationFromStatements() {
     const serverUrl = `http://localhost:8080/statements/`
-    // const serverUrl = `http://3.111.29.120:8080/statements/`
+    // const serverUrl = `http://3.110.42.205:8080/statements/`
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
     const [pairsData, setPairsData] = useState([]);
@@ -116,7 +116,7 @@ export default function QuestionCreationFromStatements() {
             const response = await api({ catIds: checked }, serverUrl + 'list/all', 'post');
             console.log(response.data, '1****')
             setStatementsList(response.data)
-            const catData = await api(null, 'http://3.111.29.120:8080/get/categories', 'get');
+            const catData = await api(null, 'http://3.110.42.205:8080/get/categories', 'get');
             // const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
             if (catData.status === 200) {
                 setCategoryData(catData.data);

@@ -8,7 +8,7 @@ import api from '../services/api';
 import CommonTableView from './TableView';
 export default function Statements() {
     // const serverUrl = `http://localhost:8080/statements/`;
-    const serverUrl = `http://3.111.29.120:8080/statements/`;
+    const serverUrl = `http://3.110.42.205:8080/statements/`;
     const [trueValue, setTrueValue] = React.useState(['']);
     const [falseValue, setFalseValue] = React.useState([]);
     const [data, setData] = React.useState([]);

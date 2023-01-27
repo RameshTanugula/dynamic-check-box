@@ -12,7 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import api from '../services/api';
 
 export default function TitleAndSubTitle() {
-    const serverUrl = `http://3.111.29.120:8080/question/`;
+    const serverUrl = `http://3.110.42.205:8080/question/`;
 
     const [showTitleScreen, setShowTitleScreen] = React.useState(false);
     const [subTitle, setSubTitle] = React.useState([""]);

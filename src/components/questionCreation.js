@@ -189,8 +189,8 @@ TablePaginationActions.propTypes = {
 };
 
 export default function QuestionCreation() {
-    const serverUrl1 = `http://3.111.29.120:8080/`
-    const serverUrl = `http://3.111.29.120:8080/question/`
+    const serverUrl1 = `http://3.110.42.205:8080/`
+    const serverUrl = `http://3.110.42.205:8080/question/`
     const [questionData, setQuestionData] = React.useState([]);
     const [titlesList, setTitlesList] = React.useState([]);
     const [searchValue, setSearchValue] = React.useState("")
@@ -244,7 +244,7 @@ export default function QuestionCreation() {
     React.useEffect(() => {
         async function fetchData() {
             // You can await here
-            const catData = await api(null, 'http://3.111.29.120:8080/get/categories', 'get');
+            const catData = await api(null, 'http://3.110.42.205:8080/get/categories', 'get');
             if (catData.status === 200) {
                 setCategoryData(catData.data);
             }

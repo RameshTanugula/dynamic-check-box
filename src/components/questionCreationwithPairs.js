@@ -90,7 +90,7 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreationFromPairs() {
     // const serverUrl = `http://localhost:8080/question/`
-    const serverUrl = `http://3.111.29.120:8080/question/`
+    const serverUrl = `http://3.110.42.205:8080/question/`
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
     const [pairsData, setPairsData] = useState([]);
@@ -113,7 +113,7 @@ export default function QuestionCreationFromPairs() {
         async function fetchData() {
             // You can await here 
 
-            const catData = await api(null, 'http://3.111.29.120:8080/get/categories', 'get');
+            const catData = await api(null, 'http://3.110.42.205:8080/get/categories', 'get');
             const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
             if (catData.status === 200) {
                 setCategoryData(catData.data);

@@ -53,7 +53,7 @@ const names = [
     'DSC',
     'GROUPS',
 ];
-const serverUrl = `http://3.111.29.120:8080/promocodes/`;
+const serverUrl = `http://3.110.42.205:8080/promocodes/`;
 
 const modelStyle = {
     position: 'absolute',

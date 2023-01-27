@@ -91,7 +91,7 @@ TablePaginationActions.propTypes = {
 
 export default function CreatePairs() {
     // const serverUrl = `http://localhost:8080/pairs/`;
-    const serverUrl = `http://3.111.29.120:8080/pairs/`;
+    const serverUrl = `http://3.110.42.205:8080/pairs/`;
     const initTypes = [{ value: 'bitbank', label: 'BitBank' },
     { value: 'statements', label: 'Statements' }];
     const [data, setData] = React.useState([]);
@@ -120,7 +120,7 @@ export default function CreatePairs() {
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     React.useEffect(() => {
         async function fetchData() {
-            const userRes = await api(null, 'http://3.111.29.120:8080/get/users/' + type, 'get');
+            const userRes = await api(null, 'http://3.110.42.205:8080/get/users/' + type, 'get');
             if (userRes.status === 200) {
                 setUsersList(userRes.data.res);
                 if (userRes?.data?.res[0]?.user && type) {

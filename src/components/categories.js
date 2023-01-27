@@ -11,7 +11,7 @@ import api from '../services/api';
 
 export default function Categories() {
     // const serverUrl = `http://localhost:8080/categories/`
-    const serverUrl = `http://3.111.29.120:8080/categories/`
+    const serverUrl = `http://3.110.42.205:8080/categories/`
     // const [checked, setChecked] = useState([]);
     const [categoryMainData, setMainCategoryData] = React.useState([]);
     const [subCategoryData, setSubCategoryData] = React.useState([]);

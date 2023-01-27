@@ -6,7 +6,7 @@ import Loader from './circularProgress';
 export default function TestOMR() {
 
     // const serverUrl = `http://localhost:8080/omr/`
-    const serverUrl = `http://3.111.29.120:8080/omr/`
+    const serverUrl = `http://3.110.42.205:8080/omr/`
     const [loaded, setLoaded] = useState(true);
     const [selectedFile, setSelectedFile] = useState([]);
     const [testId, setTestId] = useState("");

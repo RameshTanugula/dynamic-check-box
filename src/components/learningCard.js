@@ -8,7 +8,7 @@ import './flashCard.css';
 
 export default function LearningCard() {
     // const serverUrl = `http://localhost:8080/learning/`
-    const serverUrl = `http://3.111.29.120:8080/learning/`
+    const serverUrl = `http://3.110.42.205:8080/learning/`
     const initialValue = [{ id: 1, frontValue: '', backValue: '', frontImgValue: "", backImgValue: "" }]
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);

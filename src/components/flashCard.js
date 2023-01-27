@@ -11,7 +11,7 @@ import './flashCard.css';
 
 export default function FlashCard() {
     // const serverUrl = `http://localhost:8080/flashcard/`
-    const serverUrl = `http://3.111.29.120:8080/flashcard/`
+    const serverUrl = `http://3.110.42.205:8080/flashcard/`
     const initialValue = [{ id: 1, frontValue: '', backValue: '', frontImgValue: "", backImgValue: "" }]
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);
@@ -31,7 +31,7 @@ export default function FlashCard() {
     React.useEffect(() => {
         async function fetchData() {
             const cardData = await api(null, serverUrl + 'titles', 'get');
-            const subData = await api(null, 'http://3.111.29.120:8080/files/get/subjects', 'get');
+            const subData = await api(null, 'http://3.110.42.205:8080/files/get/subjects', 'get');
             if (subData.status === 200) {
                 setSelectedSubject(subData.data[0].id)
                 setSubjects(subData.data)
