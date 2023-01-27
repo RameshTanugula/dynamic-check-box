@@ -30,16 +30,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import InputAdornment from '@mui/material/InputAdornment';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import CloseIcon from '@mui/icons-material/Close';
+
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import moment from "moment";
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import SnackBar from './SnackBar';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 0;
@@ -107,7 +103,7 @@ export default function CeateCourse() {
 
     const [editData, setEditData] = React.useState("");
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
-    const [snackBarMsg, setSnackBarMsg] = React.useState("");
+    const [snackBarData, setSnackBarData] = React.useState();
     const [selectedFile, setSelectedFile] = React.useState([]);
 
     const [publishedDate, setPublishedDate] = React.useState(null);
@@ -155,20 +151,6 @@ export default function CeateCourse() {
         topicType: "",
         selectedData: ""
     });
-
-    const snackBarAction = (
-        <React.Fragment>
-            <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={closeSnakBar}
-            >
-                <CloseIcon fontSize="small" />
-            </IconButton>
-        </React.Fragment>
-    );
-
 
     const defaultCourseSection = [
         {
@@ -463,12 +445,16 @@ export default function CeateCourse() {
             if (resp.status === 200) {
                 setShowSreen("Grid");
                 setOpenSnackBar(true);
-                setSnackBarMsg("Course created successfully!...")
-                setTimeout(() => {
-                    setOpenSnackBar(false);
-                }, 5000);
+                const data = {
+                    type: "success",
+                    message: "Course Created Sucessfully!...."
+                }
+                setSnackBarData(data);
             }
         }
+    }
+    function CloseSnakBar() {
+        setOpenSnackBar(false);
     }
 
     async function editCourse(row) {
@@ -498,10 +484,11 @@ export default function CeateCourse() {
         if (resp.status == 200) {
             setShowSreen("Grid");
             setOpenSnackBar(true);
-            setSnackBarMsg("Course updated successfully!...")
-            setTimeout(() => {
-                setOpenSnackBar(false);
-            }, 5000);
+            const data = {
+                type: "success",
+                message: "Course updated successfully!..."
+            }
+            setSnackBarData(data)
         }
     }
 
@@ -1010,12 +997,9 @@ export default function CeateCourse() {
                 }
             </span >
 
-            <Snackbar open={openSnackBar} autoHideDuration={6000} onClose={closeSnakBar} anchorOrigin={{ vertical, horizontal }} key={vertical + horizontal}>
-                <Alert onClose={closeSnakBar} severity="success" sx={{ width: '100%' }}>
-                    {snackBarMsg}
-                </Alert>
-            </Snackbar>
-
+            {openSnackBar &&
+                <SnackBar data={snackBarData} CloseSnakBar={CloseSnakBar} />
+            }
         </div >
     )
 }

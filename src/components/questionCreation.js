@@ -42,6 +42,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import Autocomplete from '@mui/material/Autocomplete';
 
+import SnackBar from './SnackBar';
+
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -187,7 +189,7 @@ TablePaginationActions.propTypes = {
 };
 
 export default function QuestionCreation() {
-    // const serverUrl = `http://localhost:8080/question/`
+    const serverUrl1 = `http://3.111.29.120:8080/`
     const serverUrl = `http://3.111.29.120:8080/question/`
     const [questionData, setQuestionData] = React.useState([]);
     const [titlesList, setTitlesList] = React.useState([]);
@@ -217,6 +219,9 @@ export default function QuestionCreation() {
     const [solutionValue, setSolutionValue] = React.useState("");
     const [categoryData, setCategoryData] = React.useState([]);
     const [editData, setEditData] = React.useState("");
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const [snackBarData, setSnackBarData] = React.useState();
+
     const handleChange = (event) => {
         const {
             target: { value },
@@ -591,8 +596,22 @@ export default function QuestionCreation() {
         setEditData(newData);
     }
 
-    function upDateQuestionData() {
-        console.log(editData);
+    async function upDateQuestionData() {
+        const data = await api(editData, serverUrl1 + 'common/update', 'post');
+        if (data.status === 200) {
+            const data = {
+                type: "success",
+                message: "Updated Sucessfully!...."
+            }
+            setEditData("");
+            setOpenSnackBar(true);
+            setSnackBarData(data);
+            var index = questionData.findIndex(item => item.checked === true);
+            questionData[index].checked = false;
+        }
+    }
+    function CloseSnakBar() {
+        setOpenSnackBar(false);
     }
 
     return (
@@ -603,7 +622,7 @@ export default function QuestionCreation() {
                         var item = questionData.find(item => item.checked === true);
                         setEditData({
                             id: item.BitBankDetailId,
-                            type: "Bit bank",
+                            type: "bitbank",
                             question: item.B_QUESTION,
                             answer: item.B_Q_ANS,
                         });
@@ -782,6 +801,9 @@ export default function QuestionCreation() {
                     </Stack>
                 </Box>
             </Modal>
+            {openSnackBar &&
+                <SnackBar data={snackBarData} CloseSnakBar={CloseSnakBar} />
+            }
         </div>
     );
 }

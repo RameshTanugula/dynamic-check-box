@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+a:-webkit-any-link {
+  color: black;
+  cursor: pointer;
+  /* text-decoration: underline; */
+  text-decoration: none;
+}

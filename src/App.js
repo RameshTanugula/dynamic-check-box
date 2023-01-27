@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -98,73 +99,99 @@ export default function App() {
   console.log(comp, '####')
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            E Author - Admin - {comp}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
+      <BrowserRouter>
+        <CssBaseline />
+        <AppBar position="fixed" open={open}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(open && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              E Author - Admin - {comp}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          sx={{
             width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {['Categories','TestOMR', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemText primary={text} onClick={() => setComp(text)} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <Main open={open}>
-        <DrawerHeader />
-        {comp?.toLowerCase() === 'categories' && <Categories />}
-        {comp?.toLowerCase() === 'questions' && <Questions />}
-        {comp?.toLowerCase() === 'mapping' && <Mapping />}
-        {comp?.toLowerCase() === 'create question' && <QuestionCreation />}
-        {comp?.toLowerCase() === 'create question from pairs' && <QuestionCreationFromPairs />}
-        {comp?.toLowerCase() === 'create pairs' && <CreatePairs />}
-        {comp?.toLowerCase() === 'create statements' && <Statements />}
-        {comp?.toLowerCase() === 'create a test' && <TestCreation />}
-        {comp?.toLowerCase() === 'upload files' && <FileUpload />}
-        {comp?.toLowerCase() === 'testomr' && <TestOMR />}
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {['Categories', 'TestOMR', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  {/* <ListItemText primary={text} onClick={() => setComp(text)} /> */}
+                  <Link to={text}>
+                    <span>{text}</span>
+                  </Link>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+        <Main open={open}>
+          <DrawerHeader />
 
-        {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
-        {comp?.toLowerCase() === 'learning cards' && <LearningCard />}
-        {comp?.toLowerCase() === 'coupon code' && <CoupenCode />}
-        {comp?.toLowerCase() === 'user request access' && <UserRequestAccess />}
-        {comp?.toLowerCase() === 'title and subtitle' && <TitleAndSubTitle />}
-        {comp?.toLowerCase() === 'create course' && <CreateCourse />}
+          {/* {comp?.toLowerCase() === 'categories' && <Categories />}
+          {comp?.toLowerCase() === 'questions' && <Questions />}
+          {comp?.toLowerCase() === 'mapping' && <Mapping />}
+          {comp?.toLowerCase() === 'create question' && <QuestionCreation />}
+          {comp?.toLowerCase() === 'create question from pairs' && <QuestionCreationFromPairs />}
+          {comp?.toLowerCase() === 'create pairs' && <CreatePairs />}
+          {comp?.toLowerCase() === 'create statements' && <Statements />}
+          {comp?.toLowerCase() === 'create a test' && <TestCreation />}
+          {comp?.toLowerCase() === 'upload files' && <FileUpload />}
+          {comp?.toLowerCase() === 'testomr' && <TestOMR />}
 
-      </Main>
-    </Box>
+          {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
+          {comp?.toLowerCase() === 'learning cards' && <LearningCard />}
+          {comp?.toLowerCase() === 'coupon code' && <CoupenCode />}
+          {comp?.toLowerCase() === 'user request access' && <UserRequestAccess />}
+          {comp?.toLowerCase() === 'title and subtitle' && <TitleAndSubTitle />}
+          {comp?.toLowerCase() === 'create course' && <CreateCourse />} */}
+          <Routes>
+
+            <Route exact path="/Categories" element={<Categories />} />
+            <Route exact path="/Questions" element={<Questions />} />
+            <Route exact path="/Mapping" element={<Mapping />} />
+            <Route exact path="/Create Question" element={<QuestionCreation />} />
+
+            <Route exact path="/Create Question From Pairs" element={<QuestionCreationFromPairs />} />
+            <Route exact path="/Create Pairs" element={<CreatePairs />} />
+            <Route exact path="/Create Statements" element={<Statements />} />
+            <Route exact path="/create a test" element={<TestCreation />} />
+            <Route exact path="/Upload Files" element={<FileUpload />} />
+            <Route exact path="/TestOMR" element={<TestOMR />} />
+            <Route exact path="/Flash Cards" element={<FlashCard />} />
+            <Route exact path="/Learning Cards" element={<LearningCard />} />
+            <Route exact path="/Coupon Code" element={<CoupenCode />} />
+            <Route exact path="/User Request Access" element={<UserRequestAccess />} />
+            <Route exact path="/Title And SubTitle" element={<TitleAndSubTitle />} />
+            <Route exact path="/Create Course" element={<CreateCourse />} />
+          </Routes>
+
+        </Main>
+      </BrowserRouter>
+    </Box >
   );
 }
