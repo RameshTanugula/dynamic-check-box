@@ -93,9 +93,8 @@ export default function CeateCourse() {
     const vertical = "bottom";
     const horizontal = "center";
     const serverUrl = `http://3.111.29.120:8080/course/`;
-    // const serverUrl = `http://localhost:8080/course/`;
     // const academyList = ["g"];
-    const categoryList = ["DSC","GROUPS"];
+    const categoryList = ["h"];
     const [isValid, setIsValid] = React.useState(false);
     const [showSreen, setShowSreen] = React.useState("Grid");
     const [courseList, setCourseList] = React.useState([]);
@@ -459,7 +458,7 @@ export default function CeateCourse() {
                 );
             }
             formData.append('createCourseObj',
-                JSON.stringify(createCourseForm));
+                createCourseForm)
             const resp = await api(formData, serverUrl + "add", 'post');
             if (resp.status === 200) {
                 setShowSreen("Grid");
@@ -672,7 +671,6 @@ export default function CeateCourse() {
                                     id="demo-simple-select"
                                     value={createCourseForm.category}
                                     name="category"
-                                    label="Category"
                                     onChange={handleChange}
                                     error={errors.category !== ""}
                                     helperText={errors.category !== "" ? 'Category is reuired' : ' '}
