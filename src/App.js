@@ -142,7 +142,7 @@ export default function App() {
                 <ListItemButton>
                   {/* <ListItemText primary={text} onClick={() => setComp(text)} /> */}
                   <Link to={text}>
-                    <span>{text}</span>
+                    <span onClick={()=>setComp(text)}>{text}</span>
                   </Link>
                 </ListItemButton>
               </ListItem>

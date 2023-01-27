@@ -728,7 +728,7 @@ export default function CeateCourse() {
                                 error={errors.listPrice !== ""}
                                 helperText={errors.listPrice !== "" ? 'ListPrice is required' : ' '}
                                 InputProps={{
-                                    endAdornment: <InputAdornment position="end">$</InputAdornment>,
+                                    endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
                             />
                         </Grid>
@@ -743,7 +743,7 @@ export default function CeateCourse() {
                                 error={errors.offerPrice !== ""}
                                 helperText={errors.offerPrice !== "" ? 'OfferPrice is required' : ' '}
                                 InputProps={{
-                                    endAdornment: <InputAdornment position="end">$</InputAdornment>,
+                                    endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
                             />
                         </Grid>
