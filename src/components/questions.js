@@ -168,6 +168,7 @@ export default function Questions() {
     const [to, setTo] = React.useState(null);
     const [subjects, setSubjects] = React.useState([]);
 
+
     React.useEffect(() => {
         async function fetchData() {
             const subData = await api(null, 'http://3.111.29.120:8080/files/get/subjects', 'get');
@@ -197,6 +198,7 @@ export default function Questions() {
         setPage(0);
     };
     const onClickCheckBox = (index) => {
+        console.log("hi")
         questionData[index]['checked'] = !questionData[index]['checked'];
         setQuestionData([...questionData]);
     }
@@ -208,7 +210,7 @@ export default function Questions() {
     }
     const hideQuestions = async () => {
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.QuestionId);
-        const data = await api({ selectedIds: selectedIds, type:'questions' }, serverUrl + 'hide', 'post');
+        const data = await api({ selectedIds: selectedIds, type: 'questions' }, serverUrl + 'hide', 'post');
 
         if (data.status === 200) {
             const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
@@ -236,6 +238,7 @@ export default function Questions() {
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
                     <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
                 }
+
             </div>
 
             {questionData?.length > 0 && <div>
