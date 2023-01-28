@@ -91,7 +91,7 @@ export default function CeateCourse() {
     const serverUrl = `http://3.110.42.205:8080/course/`;
     // const academyList = ["g"];
     const categoryList = ["DSC", "GROUPS"];
-    const validityList = ["3 Months", "6 Months", "9 Months", "12 Months"];
+    const validityList = [{ id: "3", value: "3 Months" }, { id: "6", value: "6 Months" }, { id: "9", value: "9 Months" }, { id: "12", value: "12 Months" }];
     const [isValid, setIsValid] = React.useState(false);
     const [showSreen, setShowSreen] = React.useState("Grid");
     const [courseList, setCourseList] = React.useState([]);
@@ -448,6 +448,7 @@ export default function CeateCourse() {
                     message: "Course Created Sucessfully!...."
                 }
                 setSnackBarData(data);
+                getCourseList();
             }
         }
     }
@@ -461,7 +462,6 @@ export default function CeateCourse() {
         const url = serverUrl + "get/data/bycourse/" + row.id;
         const resp = await api(null, url, 'get');
         if (resp.status == 200) {
-            console.log(resp.data)
             if (resp?.data?.courseList.length > 0) {
                 setCourseSection(resp?.data?.courseList)
             }
@@ -486,7 +486,8 @@ export default function CeateCourse() {
                 type: "success",
                 message: "Course updated successfully!..."
             }
-            setSnackBarData(data)
+            setSnackBarData(data);
+            getCourseList();
         }
     }
 
@@ -713,8 +714,8 @@ export default function CeateCourse() {
                                         <em>None</em>
                                     </MenuItem>
                                     {validityList.map((data, i) => (
-                                        <MenuItem key={i} value={data}>
-                                            {data}
+                                        <MenuItem key={i} value={data.id}>
+                                            {data.value}
                                         </MenuItem>
                                     ))}
                                 </Select>
