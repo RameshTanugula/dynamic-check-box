@@ -92,7 +92,7 @@ export default function App(props) {
             if (resp.status === 200) {
                 resetForms();
                 securedLocalStorage.set("token", resp.data.userToken);
-                props.loginData();
+                props.loginData(true);
             }
             else {
                 setLoginFiledMsg("Invalid Credentials..!");
