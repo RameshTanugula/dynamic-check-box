@@ -4,8 +4,9 @@ import CheckboxTree from 'react-dynamic-checkbox-tree';
 import api from '../services/api';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 /**
- * 
+ *
  * @returns table data
  */
 
@@ -89,8 +90,8 @@ TablePaginationActions.propTypes = {
 };
 
 export default function QuestionCreationFromStatements() {
-    const serverUrl = `http://localhost:8080/statements/`
-    // const serverUrl = `http://3.110.42.205:8080/statements/`
+    // const serverUrl = `http://localhost:8080/statements/`
+    const serverUrl = securedLocalStorage.basUrl + 'statements/'
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
     const [pairsData, setPairsData] = useState([]);
@@ -112,7 +113,7 @@ export default function QuestionCreationFromStatements() {
     };
     React.useEffect(() => {
         async function fetchData() {
-            // You can await here 
+            // You can await here
             const response = await api({ catIds: checked }, serverUrl + 'list/all', 'post');
             console.log(response.data, '1****')
             setStatementsList(response.data)
@@ -131,10 +132,10 @@ export default function QuestionCreationFromStatements() {
         return (<div>
             {falseList?.map((fl, i) => {
                 return (
-                <div>
-                                <span>{fl.statement}.</span>
-                                <input checked={fl.checked} onClick={() => onClickCheckBox(fl.q_id, i, 2)} type="checkbox" />
-                                </div>
+                    <div>
+                        <span>{fl.statement}.</span>
+                        <input checked={fl.checked} onClick={() => onClickCheckBox(fl.q_id, i, 2)} type="checkbox" />
+                    </div>
                 )
             })}
         </div>)
@@ -148,8 +149,8 @@ export default function QuestionCreationFromStatements() {
                         <div style={{ display: 'flex' }}>
                             <div>
                                 <span>{qData.q_id}.</span>
-                                <input checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i,1)} type="checkbox" />
-                                </div>
+                                <input checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i, 1)} type="checkbox" />
+                            </div>
                             <div style={{
                                 paddingTop: '5px',
                                 border: '1px solid blue'

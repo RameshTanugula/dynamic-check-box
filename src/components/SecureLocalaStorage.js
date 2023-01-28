@@ -14,4 +14,6 @@ export const remove = (key) => {
     ls.remove(key)
 }
 
+export const basUrl = "http://65.2.161.219:8080/"
+
 

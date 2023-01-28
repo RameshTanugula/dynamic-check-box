@@ -36,6 +36,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import moment from "moment";
 import SnackBar from './SnackBar';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 0;
@@ -88,7 +89,7 @@ export default function CeateCourse() {
 
     const vertical = "bottom";
     const horizontal = "center";
-    const serverUrl = `http://3.110.42.205:8080/course/`;
+    const serverUrl = securedLocalStorage.basUrl + 'course/';
     // const academyList = ["g"];
     const categoryList = ["DSC", "GROUPS"];
     const validityList = [{ id: "3", value: "3 Months" }, { id: "6", value: "6 Months" }, { id: "9", value: "9 Months" }, { id: "12", value: "12 Months" }];

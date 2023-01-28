@@ -3,10 +3,12 @@ import api from '../services/api';
 import './flashCard.css';
 import TextField from '@mui/material/TextField';
 import Loader from './circularProgress';
+import * as securedLocalStorage from "./SecureLocalaStorage";
+
 export default function TestOMR() {
 
     // const serverUrl = `http://localhost:8080/omr/`
-    const serverUrl = `http://3.110.42.205:8080/omr/`
+    const serverUrl = securedLocalStorage.basUrl + 'omr/'
     const [loaded, setLoaded] = useState(true);
     const [selectedFile, setSelectedFile] = useState([]);
     const [testId, setTestId] = useState("");

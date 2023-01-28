@@ -2,17 +2,18 @@ import React, { Component, useState } from 'react';
 import api from '../services/api';
 import './flashCard.css';
 import TextField from '@mui/material/TextField';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function FileUpload() {
 
 	// const serverUrl = `http://localhost:8080/files/`
-	  const serverUrl = `http://3.110.42.205:8080/files/`
+	const serverUrl = securedLocalStorage.basUrl + 'files/'
 	const [selectedFile, setSelectedFile] = useState([]);
 	const [subjects, setSubjects] = useState([]);
 	const [list, setList] = useState([]);
 	const [showTable, setShowTable] = useState(true);
 	const [selectedSubject, setSelectedSubject] = useState("");
-	const [title, setTitle]=useState("")
+	const [title, setTitle] = useState("")
 	React.useEffect(() => {
 		async function fetchData() {
 			const subData = await api(null, serverUrl + 'get/subjects', 'get');
@@ -41,41 +42,41 @@ export default function FileUpload() {
 	const onFileUpload = async () => {
 
 		// Create an object of formData
-		if(!title){
+		if (!title) {
 			alert("please enter title");
 		} else
-		if (selectedFile?.length > 0) {
-			const formData = new FormData();
+			if (selectedFile?.length > 0) {
+				const formData = new FormData();
 
-			for (let i = 0; i < selectedFile?.length; i++) {
-				formData.append(
-					"files", selectedFile[i],
-				);
-			}
-			formData.append('selectedSubject',
-				selectedSubject)
+				for (let i = 0; i < selectedFile?.length; i++) {
+					formData.append(
+						"files", selectedFile[i],
+					);
+				}
+				formData.append('selectedSubject',
+					selectedSubject)
 				formData.append('title',
-				title)
-			const data = await api(formData, serverUrl + 'upload', 'post');
-			if (data.status === 200) {
-				const data = await api(null, serverUrl + 'get/subjects', 'get');
-				const listData = await api(null, serverUrl + 'get/file/list', 'get');
-
-				if (listData.status === 200) {
-					setList(listData.data)
-				}
+					title)
+				const data = await api(formData, serverUrl + 'upload', 'post');
 				if (data.status === 200) {
-					setSelectedSubject(data.data[0].id)
-					setSubjects(data.data)
-					setTitle("");
+					const data = await api(null, serverUrl + 'get/subjects', 'get');
+					const listData = await api(null, serverUrl + 'get/file/list', 'get');
+
+					if (listData.status === 200) {
+						setList(listData.data)
+					}
+					if (data.status === 200) {
+						setSelectedSubject(data.data[0].id)
+						setSubjects(data.data)
+						setTitle("");
+					}
+					alert('File uploaded!')
+					setSelectedFile([])
+					setShowTable(true);
 				}
-				alert('File uploaded!')
-				setSelectedFile([])
-				setShowTable(true);
+			} else {
+				alert('Please choose file to uplad!')
 			}
-		} else {
-			alert('Please choose file to uplad!')
-		}
 	};
 	const fileData = () => {
 
@@ -116,23 +117,23 @@ export default function FileUpload() {
 							{subjects.map(s => {
 								return <option value={s.id}>{s.name}</option>
 							})}</select>
-							<br />
-							<br />
-							<TextField
-                                label="Title"
-                                id="outlined-start-adornment"
-                                sx={{ width: '20%' }}
-                                value={title}
-                                onChange={(e)=> setTitle(e.target.value)}
-                                name="Title"
-                                // error={title === ""}
-                                // helperText={title === "" ? 'Title is reuired' : ' '}
-                            />
+						<br />
+						<br />
+						<TextField
+							label="Title"
+							id="outlined-start-adornment"
+							sx={{ width: '20%' }}
+							value={title}
+							onChange={(e) => setTitle(e.target.value)}
+							name="Title"
+						// error={title === ""}
+						// helperText={title === "" ? 'Title is reuired' : ' '}
+						/>
 					</div>
 					<div style={{ paddingTop: '2rem' }}>
 						<input type="file" multiple onChange={onFileChange} />
-						<br/>
-						<br/>
+						<br />
+						<br />
 						<button onClick={onFileUpload}>
 							Upload
 						</button>

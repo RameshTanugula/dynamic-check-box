@@ -9,7 +9,7 @@ import api from '../services/api';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function App(props) {
-    const serverUrl = `http://3.110.42.205:8080/`;
+    const serverUrl = securedLocalStorage.basUrl;
     const loginFields = {
         email: "",
         password: ""

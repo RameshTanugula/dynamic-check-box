@@ -2,11 +2,11 @@ import * as React from 'react'
 import CheckboxTree from 'react-dynamic-checkbox-tree';
 import api from '../services/api';
 import './common.css';
-
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
-      const serverUrl = `http://3.110.42.205:8080/test/`
+    const serverUrl = securedLocalStorage.basUrl + 'test/';
     const [checked, setChecked] = React.useState([]);
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     const [questionData, setQuestionData] = React.useState([]);
@@ -17,14 +17,14 @@ export default function TestCreation() {
     const [showForm, setShowForm] = React.useState(true);
     const [catagoryData, setCategoryData] = React.useState([]);
     const [result, setResult] = React.useState([]);
-    
+
 
 
 
 
     React.useEffect(() => {
         async function fetchData() {
-            // You can await here  
+            // You can await here
             const data = await api(null, serverUrl + 'get/data', 'get');
             // const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
 
@@ -126,7 +126,7 @@ export default function TestCreation() {
                 is_active: 1, created_by: 1, update_by: 1
             }
             const data = await api(payload, serverUrl + 'add/test', 'post');
-            if(data.status === 200){
+            if (data.status === 200) {
                 alert(data.data.message);
                 setShowForm(true);
                 setTestName('');
@@ -151,8 +151,8 @@ export default function TestCreation() {
                     />
                     }
                 </div>
-                <br/>
-                
+                <br />
+
                 <div>
                     {questionData?.length > 0 &&
                         questionData?.map((qData, i) => {
@@ -168,7 +168,7 @@ export default function TestCreation() {
                                             <span>Answer: {qData.answer}</span>
                                         </div>
                                     </div>
-                                    
+
                                 </div>)
                         })
                     }
@@ -182,12 +182,12 @@ export default function TestCreation() {
                                 Test Name:
                             </label><br />
                             <input type="text" value={testName} required onChange={(e) => { setTestName(e.target.value) }} /><br />
-                           
+
                             <label >
                                 Test Description:
                             </label><br />
                             <textarea id="dur" name="w3review" rows="4" cols="50" value={testDesc} required onChange={(e) => { setTestDesc(e.target.value) }} ></textarea><br />
-                           
+
                             <label>
                                 Test Duration (in Min):
                             </label><br />

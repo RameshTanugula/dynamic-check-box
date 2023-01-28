@@ -6,8 +6,9 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 /**
- * 
+ *
  * @returns table
  */
 import PropTypes from 'prop-types';
@@ -91,7 +92,7 @@ TablePaginationActions.propTypes = {
 
 export default function CreatePairs() {
     // const serverUrl = `http://localhost:8080/pairs/`;
-    const serverUrl = `http://3.110.42.205:8080/pairs/`;
+    const serverUrl = securedLocalStorage.basUrl + 'pairs/';
     const initTypes = [{ value: 'bitbank', label: 'BitBank' },
     { value: 'statements', label: 'Statements' }];
     const [data, setData] = React.useState([]);

@@ -43,6 +43,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import SnackBar from './SnackBar';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ITEM_HEIGHT = 48;
@@ -189,8 +190,8 @@ TablePaginationActions.propTypes = {
 };
 
 export default function QuestionCreation() {
-    const serverUrl1 = `http://3.110.42.205:8080/`
-    const serverUrl = `http://3.110.42.205:8080/question/`
+    // const serverUrl1 = `http://3.110.42.205:8080/`
+    const serverUrl = securedLocalStorage.basUrl + 'question/'
     const [questionData, setQuestionData] = React.useState([]);
     const [titlesList, setTitlesList] = React.useState([]);
     const [searchValue, setSearchValue] = React.useState("")
@@ -597,7 +598,7 @@ export default function QuestionCreation() {
     }
 
     async function upDateQuestionData() {
-        const data = await api(editData, serverUrl1 + 'common/update', 'post');
+        const data = await api(editData, securedLocalStorage.basUrl + 'common/update', 'post');
         if (data.status === 200) {
             const data = {
                 type: "success",

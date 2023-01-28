@@ -8,10 +8,11 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
 import api from '../services/api';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function Categories() {
     // const serverUrl = `http://localhost:8080/categories/`
-    const serverUrl = `http://3.110.42.205:8080/categories/`
+    const serverUrl = securedLocalStorage.basUrl + 'categories/'
     // const [checked, setChecked] = useState([]);
     const [categoryMainData, setMainCategoryData] = React.useState([]);
     const [subCategoryData, setSubCategoryData] = React.useState([]);
