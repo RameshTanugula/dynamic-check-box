@@ -126,7 +126,6 @@ export default function App() {
   };
 
   function loginData() {
-    console.log(jwt_decode(securedLocalStorage.get("token")))
     setUserData(jwt_decode(securedLocalStorage.get("token")));
     setIsLoggedIn(true);
     setAnchorEl(false);
