@@ -21,14 +21,17 @@
 // }
 
 import axios from "axios";
+import * as securedLocalStorage from "../components/SecureLocalaStorage";
+
 export default async function api(reqObj, url, type) {
     return await axios({
         url: url,
         method: type,
         headers: {
+            "token": securedLocalStorage.get("token"),
             "Authorization": "1",
             "Access-Control-Allow-Origin": "http://treeviewdatamapping-env.eba-jsbuwrm8.us-east-2.elasticbeanstalk.com/",
-            "Access-Control-Allow-Headers" : "Content-Type, Authorization, *",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, *",
             "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
             "Access-Control-Allow-Credentials": true,
         },

@@ -16,7 +16,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 // import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+
 
 import Mapping from './components/mapping';
 import TestCreation from './components/testCreation';
@@ -35,7 +35,15 @@ import TitleAndSubTitle from './components/TitleAndSubTitle';
 import Questions from './components/questions';
 import CreateCourse from './components/CreateCourse';
 import TestOMR from './components/testOMR'
-
+import LoginAndRegister from './components/LoginAndRegister';
+import * as securedLocalStorage from "./components/SecureLocalaStorage";
+import jwt_decode from "jwt-decode";
+import Button from '@mui/material/Button';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -87,6 +95,27 @@ export default function App() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [comp, setComp] = React.useState("Home");
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [userData, setUserData] = React.useState();
+
+  const [anchorEl, setAnchorEl] = React.useState(false);
+
+  // const handleChange = (event) => {
+  //   setAuth(event.target.checked);
+  // };
+
+  const handleMenu = (event) => {
+    setAnchorEl(true);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(false);
+  };
+
+  function logout() {
+    securedLocalStorage.remove("token");
+    setIsLoggedIn(false);
+  }
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -96,63 +125,98 @@ export default function App() {
     setOpen(false);
   };
 
-  console.log(comp, '####')
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <BrowserRouter>
-        <CssBaseline />
-        <AppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(open && { display: 'none' }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              E Author - Admin - {comp}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            {['Categories', 'TestOMR', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  {/* <ListItemText primary={text} onClick={() => setComp(text)} /> */}
-                  <Link to={text}>
-                    <span onClick={()=>setComp(text)}>{text}</span>
-                  </Link>
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-        <Main open={open}>
-          <DrawerHeader />
+  function loginData() {
+    setUserData(jwt_decode(securedLocalStorage.get("token")));
+    setIsLoggedIn(true);
+    setAnchorEl(false);
+  }
+  React.useEffect(() => {
+    setAnchorEl(false);
+    loginData();
+  }, [])
 
-          {/* {comp?.toLowerCase() === 'categories' && <Categories />}
+  return (
+    <div>
+      {!isLoggedIn &&
+        <LoginAndRegister loginData={loginData} />
+      }
+
+      {isLoggedIn &&
+        <Box sx={{ display: 'flex' }}>
+          <BrowserRouter>
+            <CssBaseline />
+            <AppBar position="fixed" open={open}>
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  sx={{ mr: 2, ...(open && { display: 'none' }) }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap component="div">
+                  E Author - Admin - {comp}
+                </Typography>
+                <div style={{ position: "absolute", right: "5px" }}>
+                  <Button style={{ color: "white" }} onClick={handleMenu}><AccountCircleIcon />{userData.userName}<ArrowDropDownIcon /> </Button>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={anchorEl}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={logout}><LogoutIcon />LogOut</MenuItem>
+                  </Menu>
+                </div>
+              </Toolbar>
+            </AppBar>
+            <Drawer
+              sx={{
+                width: drawerWidth,
+                flexShrink: 0,
+                '& .MuiDrawer-paper': {
+                  width: drawerWidth,
+                  boxSizing: 'border-box',
+                },
+              }}
+              variant="persistent"
+              anchor="left"
+              open={open}
+            >
+              <DrawerHeader>
+                <IconButton onClick={handleDrawerClose}>
+                  {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </IconButton>
+              </DrawerHeader>
+              <Divider />
+              <List>
+                {['Categories', 'TestOMR', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
+                  <ListItem key={text} disablePadding>
+                    <ListItemButton>
+                      {/* <ListItemText primary={text} onClick={() => setComp(text)} /> */}
+                      <Link to={text}>
+                        <span onClick={() => setComp(text)}>{text}</span>
+                      </Link>
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Drawer>
+            <Main open={open}>
+              <DrawerHeader />
+
+              {/* {comp?.toLowerCase() === 'categories' && <Categories />}
           {comp?.toLowerCase() === 'questions' && <Questions />}
           {comp?.toLowerCase() === 'mapping' && <Mapping />}
           {comp?.toLowerCase() === 'create question' && <QuestionCreation />}
@@ -169,29 +233,31 @@ export default function App() {
           {comp?.toLowerCase() === 'user request access' && <UserRequestAccess />}
           {comp?.toLowerCase() === 'title and subtitle' && <TitleAndSubTitle />}
           {comp?.toLowerCase() === 'create course' && <CreateCourse />} */}
-          <Routes>
+              <Routes>
 
-            <Route exact path="/Categories" element={<Categories />} />
-            <Route exact path="/Questions" element={<Questions />} />
-            <Route exact path="/Mapping" element={<Mapping />} />
-            <Route exact path="/Create Question" element={<QuestionCreation />} />
+                <Route exact path="/Categories" element={<Categories />} />
+                <Route exact path="/Questions" element={<Questions />} />
+                <Route exact path="/Mapping" element={<Mapping />} />
+                <Route exact path="/Create Question" element={<QuestionCreation />} />
 
-            <Route exact path="/Create Question From Pairs" element={<QuestionCreationFromPairs />} />
-            <Route exact path="/Create Pairs" element={<CreatePairs />} />
-            <Route exact path="/Create Statements" element={<Statements />} />
-            <Route exact path="/create a test" element={<TestCreation />} />
-            <Route exact path="/Upload Files" element={<FileUpload />} />
-            <Route exact path="/TestOMR" element={<TestOMR />} />
-            <Route exact path="/Flash Cards" element={<FlashCard />} />
-            <Route exact path="/Learning Cards" element={<LearningCard />} />
-            <Route exact path="/Coupon Code" element={<CoupenCode />} />
-            <Route exact path="/User Request Access" element={<UserRequestAccess />} />
-            <Route exact path="/Title And SubTitle" element={<TitleAndSubTitle />} />
-            <Route exact path="/Create Course" element={<CreateCourse />} />
-          </Routes>
+                <Route exact path="/Create Question From Pairs" element={<QuestionCreationFromPairs />} />
+                <Route exact path="/Create Pairs" element={<CreatePairs />} />
+                <Route exact path="/Create Statements" element={<Statements />} />
+                <Route exact path="/create a test" element={<TestCreation />} />
+                <Route exact path="/Upload Files" element={<FileUpload />} />
+                <Route exact path="/TestOMR" element={<TestOMR />} />
+                <Route exact path="/Flash Cards" element={<FlashCard />} />
+                <Route exact path="/Learning Cards" element={<LearningCard />} />
+                <Route exact path="/Coupon Code" element={<CoupenCode />} />
+                <Route exact path="/User Request Access" element={<UserRequestAccess />} />
+                <Route exact path="/Title And SubTitle" element={<TitleAndSubTitle />} />
+                <Route exact path="/Create Course" element={<CreateCourse />} />
+              </Routes>
 
-        </Main>
-      </BrowserRouter>
-    </Box >
+            </Main>
+          </BrowserRouter>
+        </Box >
+      }
+    </div>
   );
 }

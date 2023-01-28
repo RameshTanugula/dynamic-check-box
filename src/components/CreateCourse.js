@@ -91,6 +91,7 @@ export default function CeateCourse() {
     const serverUrl = `http://3.110.42.205:8080/course/`;
     // const academyList = ["g"];
     const categoryList = ["DSC", "GROUPS"];
+    const validityList = [{ id: "3", value: "3 Months" }, { id: "6", value: "6 Months" }, { id: "9", value: "9 Months" }, { id: "12", value: "12 Months" }];
     const [isValid, setIsValid] = React.useState(false);
     const [showSreen, setShowSreen] = React.useState("Grid");
     const [courseList, setCourseList] = React.useState([]);
@@ -126,6 +127,7 @@ export default function CeateCourse() {
         tags: "",
         academy: "",
         category: "",
+        validity: "",
         description: "",
         listPrice: "",
         offerPrice: "",
@@ -135,6 +137,7 @@ export default function CeateCourse() {
         instructor: "",
         tags: "",
         // academy: "",
+        validity: "",
         category: "",
         description: "",
         listPrice: "",
@@ -142,7 +145,6 @@ export default function CeateCourse() {
     });
 
 
-    const [expiryDateError, setExpiryDateError] = React.useState("");
     const [publishedDateError, setPublishedDateError] = React.useState("")
     const [coverPageError, setCoverPageError] = React.useState("")
 
@@ -416,10 +418,6 @@ export default function CeateCourse() {
             setPublishedDateError("error");
         }
 
-        if (expiryDate === null || expiryDate === "") {
-            retunValue = false;
-            setExpiryDateError("error")
-        }
         if (selectedFile.length === 0) {
             retunValue = false;
             setCoverPageError("error")
@@ -450,6 +448,7 @@ export default function CeateCourse() {
                     message: "Course Created Sucessfully!...."
                 }
                 setSnackBarData(data);
+                getCourseList();
             }
         }
     }
@@ -463,7 +462,6 @@ export default function CeateCourse() {
         const url = serverUrl + "get/data/bycourse/" + row.id;
         const resp = await api(null, url, 'get');
         if (resp.status == 200) {
-            console.log(resp.data)
             if (resp?.data?.courseList.length > 0) {
                 setCourseSection(resp?.data?.courseList)
             }
@@ -488,7 +486,8 @@ export default function CeateCourse() {
                 type: "success",
                 message: "Course updated successfully!..."
             }
-            setSnackBarData(data)
+            setSnackBarData(data);
+            getCourseList();
         }
     }
 
@@ -700,21 +699,27 @@ export default function CeateCourse() {
                         <Grid item xs={2} ></Grid>
                         <Grid item xs={1} ></Grid>
                         <Grid item xs={3} style={{ marginTop: "5px" }}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DesktopDatePicker
-                                    label="Expiry Date"
-                                    value={expiryDate}
-                                    inputFormat="DD/MM/YYYY"
-
-                                    onChange={(newValue) => {
-                                        setExpiryDate(newValue);
-                                        setExpiryDateError("");
-                                    }}
-                                    renderInput={(params) => <TextField {...params} sx={{ width: '100%' }} />}
-
-                                />
-                            </LocalizationProvider>
-                            {expiryDateError !== "" ? <span style={{ color: "#d32f2f" }}> Expiry Date is reuired </span> : ""}
+                            <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-5px" }}>
+                                <InputLabel id="demo-simple-select-label">Validity</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={createCourseForm.validity}
+                                    name="validity"
+                                    onChange={handleChange}
+                                    error={errors.validity !== ""}
+                                    helperText={errors.validity !== "" ? 'Validity is reuired' : ' '}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    {validityList.map((data, i) => (
+                                        <MenuItem key={i} value={data.id}>
+                                            {data.value}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
                         </Grid>
                         <Grid item xs={3} style={{ marginTop: "5px" }}>
@@ -724,6 +729,7 @@ export default function CeateCourse() {
                                 sx={{ width: '100%' }}
                                 value={createCourseForm.listPrice}
                                 name="listPrice"
+                                type="number"
                                 onChange={handleChange}
                                 error={errors.listPrice !== ""}
                                 helperText={errors.listPrice !== "" ? 'ListPrice is required' : ' '}
@@ -739,6 +745,7 @@ export default function CeateCourse() {
                                 sx={{ width: '100%' }}
                                 value={createCourseForm.offerPrice}
                                 name="offerPrice"
+                                type="number"
                                 onChange={handleChange}
                                 error={errors.offerPrice !== ""}
                                 helperText={errors.offerPrice !== "" ? 'OfferPrice is required' : ' '}
