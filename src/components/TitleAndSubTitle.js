@@ -10,9 +10,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import api from '../services/api';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function TitleAndSubTitle() {
-    const serverUrl = `http://3.110.42.205:8080/question/`;
+    const serverUrl = securedLocalStorage.basUrl + 'question/';
 
     const [showTitleScreen, setShowTitleScreen] = React.useState(false);
     const [subTitle, setSubTitle] = React.useState([""]);

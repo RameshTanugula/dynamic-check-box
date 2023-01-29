@@ -125,10 +125,16 @@ export default function App() {
     setOpen(false);
   };
 
-  function loginData() {
-    setUserData(jwt_decode(securedLocalStorage.get("token")));
-    setIsLoggedIn(true);
-    setAnchorEl(false);
+  function loginData(login) {
+    if (securedLocalStorage.get("token") !== "" || login) {
+      setUserData(jwt_decode(securedLocalStorage.get("token")));
+      setIsLoggedIn(true);
+      setAnchorEl(false);
+    }
+    else {
+      setIsLoggedIn(false);
+    }
+
   }
   React.useEffect(() => {
     setAnchorEl(false);

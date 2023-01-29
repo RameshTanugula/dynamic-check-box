@@ -1,14 +1,14 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
-
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-
 import api from '../services/api';
 import CommonTableView from './TableView';
+import * as securedLocalStorage from "./SecureLocalaStorage";
+
 export default function Statements() {
     // const serverUrl = `http://localhost:8080/statements/`;
-    const serverUrl = `http://3.110.42.205:8080/statements/`;
+    const serverUrl = securedLocalStorage.basUrl + 'statements/';
     const [trueValue, setTrueValue] = React.useState(['']);
     const [falseValue, setFalseValue] = React.useState([]);
     const [data, setData] = React.useState([]);

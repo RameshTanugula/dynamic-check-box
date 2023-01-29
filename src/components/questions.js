@@ -19,7 +19,7 @@ import TableHead from '@mui/material/TableHead';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 import api from '../services/api';
 import './common.css';
@@ -159,7 +159,7 @@ TablePaginationActions.propTypes = {
 
 export default function Questions() {
     // const serverUrl = `http://localhost:8080/question/`
-    const serverUrl = `http://3.110.42.205:8080/question/`
+    const serverUrl = securedLocalStorage.basUrl + 'question/'
     const [questionData, setQuestionData] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);

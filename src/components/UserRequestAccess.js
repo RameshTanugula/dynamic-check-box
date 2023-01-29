@@ -3,10 +3,11 @@ import { DataGrid } from '@mui/x-data-grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import api from '../services/api';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function UserRequestAccess() {
 
-    const serverUrl = `http://3.110.42.205:8080/admin/request/`;
+    const serverUrl = securedLocalStorage.basUrl + "admin/request/";
     const [tableData, settableData] = React.useState([]);
 
     const columns = [

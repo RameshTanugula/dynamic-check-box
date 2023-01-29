@@ -5,7 +5,7 @@ import api from '../services/api';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 /**
- * 
+ *
  * @returns table data
  */
 
@@ -26,6 +26,7 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 function TablePaginationActions(props) {
     const theme = useTheme();
@@ -90,7 +91,7 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreationFromPairs() {
     // const serverUrl = `http://localhost:8080/question/`
-    const serverUrl = `http://3.110.42.205:8080/question/`
+    const serverUrl = securedLocalStorage.basUrl + 'question/'
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
     const [pairsData, setPairsData] = useState([]);
@@ -111,7 +112,7 @@ export default function QuestionCreationFromPairs() {
     };
     React.useEffect(() => {
         async function fetchData() {
-            // You can await here 
+            // You can await here
 
             const catData = await api(null, 'http://3.110.42.205:8080/get/categories', 'get');
             const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');

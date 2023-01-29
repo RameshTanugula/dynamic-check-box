@@ -7,11 +7,11 @@ import Select from '@mui/material/Select';
 import uniqid from 'uniqid';
 import api from '../services/api';
 import './flashCard.css';
-
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function FlashCard() {
     // const serverUrl = `http://localhost:8080/flashcard/`
-    const serverUrl = `http://3.110.42.205:8080/flashcard/`
+    const serverUrl = securedLocalStorage.basUrl + 'flashcard/'
     const initialValue = [{ id: 1, frontValue: '', backValue: '', frontImgValue: "", backImgValue: "" }]
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);
