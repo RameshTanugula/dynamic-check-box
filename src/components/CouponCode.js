@@ -22,6 +22,7 @@ import Typography from '@mui/material/Typography';
 import moment from "moment";
 import api from '../services/api';
 import { DataGrid } from '@mui/x-data-grid';
+import * as securedLocalStorage from "./SecureLocalaStorage";
 
 const columns = [
     { field: 'coupon_code', headerName: 'Coupon Code', minWidth: 200, },
@@ -53,7 +54,7 @@ const names = [
     'DSC',
     'GROUPS',
 ];
-const serverUrl = `http://3.110.42.205:8080/promocodes/`;
+const serverUrl = securedLocalStorage.basUrl +`promocodes/`;
 
 const modelStyle = {
     position: 'absolute',

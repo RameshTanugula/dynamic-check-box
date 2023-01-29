@@ -171,7 +171,7 @@ export default function Questions() {
 
     React.useEffect(() => {
         async function fetchData() {
-            const subData = await api(null, 'http://3.110.42.205:8080/files/get/subjects', 'get');
+            const subData = await api(null, securedLocalStorage.subjectsUrl, 'get');
 
             if (subData.status === 200) {
                 setSelectedSubject(subData.data[0].id)

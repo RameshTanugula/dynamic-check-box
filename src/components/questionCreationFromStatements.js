@@ -115,9 +115,8 @@ export default function QuestionCreationFromStatements() {
         async function fetchData() {
             // You can await here
             const response = await api({ catIds: checked }, serverUrl + 'list/all', 'post');
-            console.log(response.data, '1****')
             setStatementsList(response.data)
-            const catData = await api(null, 'http://3.110.42.205:8080/get/categories', 'get');
+            const catData = await api(null, securedLocalStorage.categoriesUrl, 'get');
             // const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
             if (catData.status === 200) {
                 setCategoryData(catData.data);

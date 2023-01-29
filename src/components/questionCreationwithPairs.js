@@ -114,7 +114,7 @@ export default function QuestionCreationFromPairs() {
         async function fetchData() {
             // You can await here
 
-            const catData = await api(null, 'http://3.110.42.205:8080/get/categories', 'get');
+            const catData = await api(null, securedLocalStorage.categoriesUrl, 'get');
             const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
             if (catData.status === 200) {
                 setCategoryData(catData.data);
