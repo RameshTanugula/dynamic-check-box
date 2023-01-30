@@ -593,11 +593,9 @@ export default function CeateCourse() {
 
     React.useEffect(() => {
         getCourseList();
-        const currentRole = securedLocalStorage.get("currentrole");
-        if (CheckAccess.checkAccess("Create Course", currentRole, 'read') && CheckAccess.checkAccess("Create Course", currentRole, 'write')) {
+        if (CheckAccess.checkAccess("Create Course", 'read') && CheckAccess.checkAccess("Create Course", 'write')) {
             setReadAndWriteAccess(true);
         }
-
     }, []);
     React.useEffect(() => {
         getSubjectsList();
