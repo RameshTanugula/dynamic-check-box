@@ -159,7 +159,7 @@ TablePaginationActions.propTypes = {
 
 export default function Questions() {
     // const serverUrl = `http://localhost:8080/question/`
-    const serverUrl = securedLocalStorage.basUrl + 'question/'
+    const serverUrl = securedLocalStorage.baseUrl + 'question/'
     const [questionData, setQuestionData] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);

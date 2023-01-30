@@ -11,7 +11,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function FlashCard() {
     // const serverUrl = `http://localhost:8080/flashcard/`
-    const serverUrl = securedLocalStorage.basUrl + 'flashcard/'
+    const serverUrl = securedLocalStorage.baseUrl + 'flashcard/'
     const initialValue = [{ id: 1, frontValue: '', backValue: '', frontImgValue: "", backImgValue: "" }]
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);

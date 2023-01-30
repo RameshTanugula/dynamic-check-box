@@ -7,7 +7,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function Mapping() {
   // const serverUrl = `http://localhost:8080/`
-  const serverUrl = securedLocalStorage.basUrl;
+  const serverUrl = securedLocalStorage.baseUrl;
   const [checked, setChecked] = useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
   const [questionData, setQuestionData] = useState([]);

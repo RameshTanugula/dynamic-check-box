@@ -12,7 +12,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function Categories() {
     // const serverUrl = `http://localhost:8080/categories/`
-    const serverUrl = securedLocalStorage.basUrl + 'categories/'
+    const serverUrl = securedLocalStorage.baseUrl + 'categories/'
     // const [checked, setChecked] = useState([]);
     const [categoryMainData, setMainCategoryData] = React.useState([]);
     const [subCategoryData, setSubCategoryData] = React.useState([]);

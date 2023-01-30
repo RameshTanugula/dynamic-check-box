@@ -13,7 +13,7 @@ import api from '../services/api';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function TitleAndSubTitle() {
-    const serverUrl = securedLocalStorage.basUrl + 'question/';
+    const serverUrl = securedLocalStorage.baseUrl + 'question/';
 
     const [showTitleScreen, setShowTitleScreen] = React.useState(false);
     const [subTitle, setSubTitle] = React.useState([""]);

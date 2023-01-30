@@ -191,7 +191,7 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreation() {
     // const serverUrl1 = `http://65.0.6.118:8080/`
-    const serverUrl = securedLocalStorage.basUrl + 'question/'
+    const serverUrl = securedLocalStorage.baseUrl + 'question/'
     const [questionData, setQuestionData] = React.useState([]);
     const [titlesList, setTitlesList] = React.useState([]);
     const [searchValue, setSearchValue] = React.useState("")
@@ -598,7 +598,7 @@ export default function QuestionCreation() {
     }
 
     async function upDateQuestionData() {
-        const data = await api(editData, securedLocalStorage.basUrl + 'common/update', 'post');
+        const data = await api(editData, securedLocalStorage.baseUrl + 'common/update', 'post');
         if (data.status === 200) {
             const data = {
                 type: "success",

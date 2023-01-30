@@ -8,7 +8,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function Statements() {
     // const serverUrl = `http://localhost:8080/statements/`;
-    const serverUrl = securedLocalStorage.basUrl + 'statements/';
+    const serverUrl = securedLocalStorage.baseUrl + 'statements/';
     const [trueValue, setTrueValue] = React.useState(['']);
     const [falseValue, setFalseValue] = React.useState([]);
     const [data, setData] = React.useState([]);

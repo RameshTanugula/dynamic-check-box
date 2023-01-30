@@ -14,10 +14,10 @@ export const remove = (key) => {
     ls.remove(key)
 }
 
-export const basUrl = "http://65.0.6.118:8080/";
-export const subjectsUrl=basUrl + 'files/get/subjects';
+export const baseUrl = "http://65.0.6.118:8080/";
+export const subjectsUrl = baseUrl + 'files/get/subjects';
 
-export const categoriesUrl=basUrl + 'get/categories';
-export const usersUrl=basUrl + 'get/users/';
+export const categoriesUrl = baseUrl + 'get/categories';
+export const usersUrl = baseUrl + 'get/users/';
 
 

@@ -8,7 +8,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 export default function TestOMR() {
 
     // const serverUrl = `http://localhost:8080/omr/`
-    const serverUrl = securedLocalStorage.basUrl + 'omr/'
+    const serverUrl = securedLocalStorage.baseUrl + 'omr/'
     const [loaded, setLoaded] = useState(true);
     const [selectedFile, setSelectedFile] = useState([]);
     const [testId, setTestId] = useState("");

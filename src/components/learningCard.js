@@ -8,7 +8,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function LearningCard() {
     // const serverUrl = `http://localhost:8080/learning/`
-    const serverUrl = securedLocalStorage.basUrl + 'learning/'
+    const serverUrl = securedLocalStorage.baseUrl + 'learning/'
     const initialValue = [{ id: 1, frontValue: '', backValue: '', frontImgValue: "", backImgValue: "" }]
     const [list, setList] = React.useState(initialValue);
     const [fileList, setFileList] = useState([]);

@@ -99,6 +99,7 @@ export default function App() {
   const [userData, setUserData] = React.useState();
 
   const [anchorEl, setAnchorEl] = React.useState(false);
+  const [menuList, setMenuList] = React.useState([]);
 
   // const handleChange = (event) => {
   //   setAuth(event.target.checked);
@@ -113,7 +114,8 @@ export default function App() {
   };
 
   function logout() {
-    securedLocalStorage.remove("token");
+    localStorage.clear();
+    window.location = "";
     setIsLoggedIn(false);
   }
 
@@ -125,9 +127,14 @@ export default function App() {
     setOpen(false);
   };
 
-  function loginData(login) {
-    if (securedLocalStorage.get("token") !== "" || login) {
-      setUserData(jwt_decode(securedLocalStorage.get("token")));
+  function loginData() {
+    if (securedLocalStorage.get("token") !== "") {
+      const userdata = jwt_decode(securedLocalStorage.get("token"));
+      console.log(userdata)
+      securedLocalStorage.set("roles", userdata?.userRoles);
+      securedLocalStorage.set("currentrole", userdata?.userRoleName);
+      setUserData(userdata);
+      setMenuList(userdata.menuList);
       setIsLoggedIn(true);
       setAnchorEl(false);
     }
@@ -207,11 +214,11 @@ export default function App() {
               </DrawerHeader>
               <Divider />
               <List>
-                {['Categories', 'TestOMR', 'Questions', 'Mapping', 'Create Question', 'Create Pairs', 'Create Statements', 'Create Question From Pairs', 'Create a Test', 'Upload Files', 'Flash Cards', 'Learning Cards', 'Coupon Code', 'User Request Access', 'Title And Subtitle', 'Create Course'].map((text, index) => (
+                {menuList?.map((text, index) => (
                   <ListItem key={text} disablePadding>
                     <ListItemButton>
                       {/* <ListItemText primary={text} onClick={() => setComp(text)} /> */}
-                      <Link to={text}>
+                      <Link to={text.toLowerCase()}>
                         <span onClick={() => setComp(text)}>{text}</span>
                       </Link>
                     </ListItemButton>
@@ -241,23 +248,23 @@ export default function App() {
           {comp?.toLowerCase() === 'create course' && <CreateCourse />} */}
               <Routes>
 
-                <Route exact path="/Categories" element={<Categories />} />
-                <Route exact path="/Questions" element={<Questions />} />
-                <Route exact path="/Mapping" element={<Mapping />} />
-                <Route exact path="/Create Question" element={<QuestionCreation />} />
+                <Route exact path="/categories" element={<Categories />} />
+                <Route exact path="/review" element={<Questions />} />
+                <Route exact path="/mapping" element={<Mapping />} />
+                <Route exact path="/create questions" element={<QuestionCreation />} />
 
-                <Route exact path="/Create Question From Pairs" element={<QuestionCreationFromPairs />} />
-                <Route exact path="/Create Pairs" element={<CreatePairs />} />
-                <Route exact path="/Create Statements" element={<Statements />} />
+                <Route exact path="/create questions from pairs" element={<QuestionCreationFromPairs />} />
+                <Route exact path="/create pairs" element={<CreatePairs />} />
+                <Route exact path="/create statements" element={<Statements />} />
                 <Route exact path="/create a test" element={<TestCreation />} />
-                <Route exact path="/Upload Files" element={<FileUpload />} />
-                <Route exact path="/TestOMR" element={<TestOMR />} />
-                <Route exact path="/Flash Cards" element={<FlashCard />} />
-                <Route exact path="/Learning Cards" element={<LearningCard />} />
+                <Route exact path="/upload files" element={<FileUpload />} />
+                <Route exact path="/testOMR" element={<TestOMR />} />
+                <Route exact path="/flash cards" element={<FlashCard />} />
+                <Route exact path="/learning cards" element={<LearningCard />} />
                 <Route exact path="/Coupon Code" element={<CoupenCode />} />
-                <Route exact path="/User Request Access" element={<UserRequestAccess />} />
-                <Route exact path="/Title And SubTitle" element={<TitleAndSubTitle />} />
-                <Route exact path="/Create Course" element={<CreateCourse />} />
+                <Route exact path="/user request access" element={<UserRequestAccess />} />
+                <Route exact path="/titles and sub titles" element={<TitleAndSubTitle />} />
+                <Route exact path="/create course" element={<CreateCourse />} />
               </Routes>
 
             </Main>

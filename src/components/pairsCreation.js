@@ -92,7 +92,7 @@ TablePaginationActions.propTypes = {
 
 export default function CreatePairs() {
     // const serverUrl = `http://localhost:8080/pairs/`;
-    const serverUrl = securedLocalStorage.basUrl + 'pairs/';
+    const serverUrl = securedLocalStorage.baseUrl + 'pairs/';
     const initTypes = [{ value: 'bitbank', label: 'BitBank' },
     { value: 'statements', label: 'Statements' }];
     const [data, setData] = React.useState([]);
@@ -121,7 +121,7 @@ export default function CreatePairs() {
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     React.useEffect(() => {
         async function fetchData() {
-            const userRes = await api(null, securedLocalStorage.usersUrl+ type, 'get');
+            const userRes = await api(null, securedLocalStorage.usersUrl + type, 'get');
             if (userRes.status === 200) {
                 setUsersList(userRes.data.res);
                 if (userRes?.data?.res[0]?.user && type) {
