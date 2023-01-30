@@ -249,7 +249,7 @@ export default function App() {
               <Routes>
 
                 <Route exact path="/categories" element={<Categories />} />
-                <Route exact path="/review" element={<Questions />} />
+                <Route exact path="/review page" element={<Questions />} />
                 <Route exact path="/mapping" element={<Mapping />} />
                 <Route exact path="/create questions" element={<QuestionCreation />} />
 

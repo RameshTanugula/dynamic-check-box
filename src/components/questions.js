@@ -164,27 +164,28 @@ export default function Questions() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [from, setFrom] = React.useState(null);
-    const [selectedSubject, setSelectedSubject] = React.useState(null);
+    const [selectedUser, setSelectedUser] = React.useState(null);
     const [to, setTo] = React.useState(null);
-    const [subjects, setSubjects] = React.useState([]);
+    const [users, setUsers] = React.useState([]);
 
 
     React.useEffect(() => {
         async function fetchData() {
-            const subData = await api(null, securedLocalStorage.subjectsUrl, 'get');
+            const userData = await api(null, securedLocalStorage.allActiveUsersUrl, 'get');
 
-            if (subData.status === 200) {
-                setSelectedSubject(subData.data[0].id)
-                setSubjects(subData.data)
+            if (userData.status === 200) {
+                // setSelectedUser(userData.data[0].id)
+                setUsers(userData.data)
             }
             const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
-
             if (data.status === 200) {
+                setSelectedUser(null);
                 setQuestionData(data.data?.res)
             }
         }
         fetchData()
     }, [])
+
 
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - questionData.length) : 0;
@@ -198,23 +199,31 @@ export default function Questions() {
         setPage(0);
     };
     const onClickCheckBox = (index) => {
-        console.log("hi")
         questionData[index]['checked'] = !questionData[index]['checked'];
         setQuestionData([...questionData]);
     }
     const getQuestions = async () => {
         const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
         if (qData.status === 200) {
+            setSelectedUser(null);
             setQuestionData(qData.data?.res);
         }
     }
-    const hideQuestions = async () => {
+    const getQuestionsByUser = async (value) => {
+        setSelectedUser(value);
+        const qData = await api(null, serverUrl + 'get/data/by/user/' + value, 'get');
+        if (qData.status === 200) {
+            setQuestionData(qData.data?.res);
+        }
+    }
+    const handleQuestions = async (status) => {
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.QuestionId);
-        const data = await api({ selectedIds: selectedIds, type: 'questions' }, serverUrl + 'hide', 'post');
+        const data = await api({ selectedIds: selectedIds, type: 'questions', status }, serverUrl + 'status/change', 'post');
 
         if (data.status === 200) {
             const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
             if (qData.status === 200) {
+                setSelectedUser(null);
                 setQuestionData(qData.data?.res);
             }
         }
@@ -228,17 +237,24 @@ export default function Questions() {
                 &nbsp;&nbsp;<Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
-                    value={selectedSubject}
-                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    value={selectedUser}
+                    onChange={(e) => getQuestionsByUser(e.target.value)}
                 >
-                    {subjects.map((tl) => { return (<MenuItem value={tl.id}>{tl.name}</MenuItem>) })}
+                    <MenuItem value="">Select User</MenuItem>
+                    {users.map((tl) => { return (<MenuItem value={tl.id}>{tl.first_name} {tl.last_name}</MenuItem>) })}
                 </Select>
                 &nbsp;&nbsp;{<Button variant="contained" onClick={() => { getQuestions() }}>Get Questions</Button>}
-
+                <br />
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
+                    <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('1')}>Accept Questions</Button>
                 }
-
+                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
+                    <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('3')}>Reject Questions</Button>
+                }
+                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
+                    <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('2')}>Edit Questions</Button>
+                }
+                {selectedUser && <div><b>No.of Questions:</b>{questionData?.length}</div>}
             </div>
 
             {questionData?.length > 0 && <div>
