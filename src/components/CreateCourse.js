@@ -37,6 +37,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import moment from "moment";
 import SnackBar from './SnackBar';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 0;
@@ -111,6 +112,7 @@ export default function CeateCourse() {
 
     const [publishedDate, setPublishedDate] = React.useState(null);
     const [buttonName, setButtonName] = React.useState("submit");
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     const [topicTypesList, setTopicTypesList] = React.useState(
         [
@@ -358,8 +360,8 @@ export default function CeateCourse() {
             renderCell: (params) => {
                 return (
                     <Stack direction="row" spacing={1}>
-                        <Button variant="outlined" onClick={() => editCourse(params.row)} >Edit Course</Button>
-                        <Button variant="outlined" onClick={() => editCourseDeatails(params.row)} >Edit Course Details</Button>
+                        <Button variant="outlined" onClick={() => editCourse(params.row)} disabled={!readAndWriteAccess}>Edit Course</Button>
+                        <Button variant="outlined" onClick={() => editCourseDeatails(params.row)} disabled={!readAndWriteAccess} >Edit Course Details</Button>
                     </Stack>)
             }
         },
@@ -591,6 +593,11 @@ export default function CeateCourse() {
 
     React.useEffect(() => {
         getCourseList();
+        const currentRole = securedLocalStorage.get("currentrole");
+        if (CheckAccess.checkAccess("Create Course", currentRole, 'read') && CheckAccess.checkAccess("Create Course", currentRole, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+
     }, []);
     React.useEffect(() => {
         getSubjectsList();

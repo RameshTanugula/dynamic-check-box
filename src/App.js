@@ -114,7 +114,7 @@ export default function App() {
   };
 
   function logout() {
-    securedLocalStorage.remove("token");
+    localStorage.clear();
     setIsLoggedIn(false);
   }
 
@@ -128,7 +128,10 @@ export default function App() {
 
   function loginData() {
     if (securedLocalStorage.get("token") !== "") {
-      const userdata = jwt_decode(securedLocalStorage.get("token"))
+      const userdata = jwt_decode(securedLocalStorage.get("token"));
+      console.log(userdata)
+      securedLocalStorage.set("roles", userdata?.userRoles);
+      securedLocalStorage.set("currentrole", userdata?.userRoleName);
       setUserData(userdata);
       setMenuList(userdata.menuList);
       setIsLoggedIn(true);
