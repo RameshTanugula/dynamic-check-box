@@ -115,6 +115,7 @@ export default function App() {
 
   function logout() {
     localStorage.clear();
+    window.location = "";
     setIsLoggedIn(false);
   }
 
