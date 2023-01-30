@@ -91,7 +91,7 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreationFromPairs() {
     // const serverUrl = `http://localhost:8080/question/`
-    const serverUrl = securedLocalStorage.basUrl + 'question/'
+    const serverUrl = securedLocalStorage.baseUrl + 'question/'
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
     const [pairsData, setPairsData] = useState([]);

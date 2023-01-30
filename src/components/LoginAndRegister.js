@@ -9,7 +9,7 @@ import api from '../services/api';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function App(props) {
-    const serverUrl = securedLocalStorage.basUrl;
+    const serverUrl = securedLocalStorage.baseUrl;
     const loginFields = {
         email: "",
         password: ""
@@ -92,7 +92,7 @@ export default function App(props) {
             if (resp.status === 200) {
                 resetForms();
                 securedLocalStorage.set("token", resp.data.userToken);
-                props.loginData(true);
+                props.loginData();
             }
             else {
                 setLoginFiledMsg("Invalid Credentials..!");

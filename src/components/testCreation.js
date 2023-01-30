@@ -6,7 +6,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
-    const serverUrl = securedLocalStorage.basUrl + 'test/';
+    const serverUrl = securedLocalStorage.baseUrl + 'test/';
     const [checked, setChecked] = React.useState([]);
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     const [questionData, setQuestionData] = React.useState([]);

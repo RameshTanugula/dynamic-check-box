@@ -7,7 +7,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 export default function FileUpload() {
 
 	// const serverUrl = `http://localhost:8080/files/`
-	const serverUrl = securedLocalStorage.basUrl + 'files/'
+	const serverUrl = securedLocalStorage.baseUrl + 'files/'
 	const [selectedFile, setSelectedFile] = useState([]);
 	const [subjects, setSubjects] = useState([]);
 	const [list, setList] = useState([]);

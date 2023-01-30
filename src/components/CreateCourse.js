@@ -89,7 +89,7 @@ export default function CeateCourse() {
 
     const vertical = "bottom";
     const horizontal = "center";
-    const serverUrl = securedLocalStorage.basUrl + 'course/';
+    const serverUrl = securedLocalStorage.baseUrl + 'course/';
     // const academyList = ["g"];
     const categoryList = ["DSC", "GROUPS"];
     const validityList = [{ id: "3", value: "3 Months" }, { id: "6", value: "6 Months" }, { id: "9", value: "9 Months" }, { id: "12", value: "12 Months" }];
@@ -103,13 +103,14 @@ export default function CeateCourse() {
     const [multiSelectList, setmultiSelectList] = React.useState([]);
     const [errorMsg, setErrorMsg] = React.useState("");
 
-    const [editData, setEditData] = React.useState("");
+    const [editData, setEditData] = React.useState();
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [selectedFile, setSelectedFile] = React.useState([]);
+    const [previewImgSrc, setPreviewImgSrc] = React.useState(null);
 
     const [publishedDate, setPublishedDate] = React.useState(null);
-    const [expiryDate, setExpiryDate] = React.useState(null);
+    const [buttonName, setButtonName] = React.useState("submit");
 
     const [topicTypesList, setTopicTypesList] = React.useState(
         [
@@ -121,8 +122,7 @@ export default function CeateCourse() {
 
     );
     const [subjectList, setSubjectList] = React.useState([]);
-
-    const [createCourseForm, setCreateCourseForm] = React.useState({
+    const courseFields = {
         courseTitle: "",
         instructor: "",
         tags: "",
@@ -132,8 +132,10 @@ export default function CeateCourse() {
         description: "",
         listPrice: "",
         offerPrice: "",
-    });
-    const [errors, setErrors] = React.useState({
+    }
+
+    const [createCourseForm, setCreateCourseForm] = React.useState(courseFields);
+    const errorseFields = {
         courseTitle: "",
         instructor: "",
         tags: "",
@@ -143,7 +145,8 @@ export default function CeateCourse() {
         description: "",
         listPrice: "",
         offerPrice: "",
-    });
+    }
+    const [errors, setErrors] = React.useState(errorseFields);
 
 
     const [publishedDateError, setPublishedDateError] = React.useState("")
@@ -196,23 +199,14 @@ export default function CeateCourse() {
     }
 
     function resetForm() {
-        setCreateCourseForm({
-            courseTitle: "",
-            instructor: "",
-            tags: "",
-            academy: "",
-            category: "",
-            description: ""
-        });
-        setErrors({
-            courseTitle: "",
-            instructor: "",
-            tags: "",
-            // academy: "",
-            category: "",
-            description: ""
-        });
-        setIsValid(false)
+        setCreateCourseForm(courseFields);
+        setErrors(errorseFields);
+        setSelectedFile([]);
+        setPreviewImgSrc(null)
+        setPublishedDate(null);
+        setPublishedDateError("");
+        setCoverPageError("");
+        setIsValid(false);
     }
     const handleChange1 = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
@@ -357,14 +351,15 @@ export default function CeateCourse() {
         { field: 'instructor', headerName: 'Instructor', minWidth: 200, },
         { field: 'tags', headerName: 'Tags', minWidth: 200, },
         { field: 'academy', headerName: 'Academy', minWidth: 150, },
-        { field: 'category', headerName: 'Category', minWidth: 200, },
-        { field: 'description', headerName: 'Description', minWidth: 150, },
+        { field: 'category', headerName: 'Category', minWidth: 150, },
+        { field: 'description', headerName: 'Description', minWidth: 250, },
         {
-            field: '', headerName: 'Action', minWidth: 150,
+            field: '', headerName: 'Action', minWidth: 370,
             renderCell: (params) => {
                 return (
                     <Stack direction="row" spacing={1}>
-                        <Button variant="outlined" onClick={() => editCourse(params.row)} >Edit</Button>
+                        <Button variant="outlined" onClick={() => editCourse(params.row)} >Edit Course</Button>
+                        <Button variant="outlined" onClick={() => editCourseDeatails(params.row)} >Edit Course Details</Button>
                     </Stack>)
             }
         },
@@ -419,7 +414,7 @@ export default function CeateCourse() {
             setPublishedDateError("error");
         }
 
-        if (selectedFile.length === 0) {
+        if (previewImgSrc === "") {
             retunValue = false;
             setCoverPageError("error")
         }
@@ -430,9 +425,13 @@ export default function CeateCourse() {
 
     const createCourse = async () => {
         if (valid()) {
+            if (selectedFile?.length > 0 && buttonName === "update") {
+                createCourseForm.oldFile = editData?.file;
+            }
             const formData = new FormData();
-            createCourseForm.publishedDate = moment(new Date(publishedDate)).format('DD/MM/YYYY');
-            createCourseForm.expiryDate = moment(new Date(expiryDate)).format('DD/MM/YYYY');
+            createCourseForm.course_id = editData?.id !== undefined ? editData?.id : "";
+            const dateFormat = moment(new Date(publishedDate)).format('YYYY-MM-DD HH:mm:ss');
+            createCourseForm.publishedDate = dateFormat === "Invalid date" ? editData?.publishedDate : dateFormat;
             for (let i = 0; i < selectedFile?.length; i++) {
                 formData.append(
                     "files", selectedFile[i],
@@ -450,6 +449,15 @@ export default function CeateCourse() {
                 }
                 setSnackBarData(data);
                 getCourseList();
+                resetForm();
+            }
+            else {
+                setOpenSnackBar(true);
+                const data = {
+                    type: "error",
+                    message: resp.response.data.error
+                }
+                setSnackBarData(data);
             }
         }
     }
@@ -457,7 +465,26 @@ export default function CeateCourse() {
         setOpenSnackBar(false);
     }
 
-    async function editCourse(row) {
+    function editCourse(row) {
+        resetForm();
+        setButtonName("update");
+        setEditData(row);
+        courseFields.courseTitle = row?.title;
+        courseFields.instructor = row?.instructor;
+        courseFields.tags = row?.tags;
+        courseFields.academy = row?.academy;
+        courseFields.category = row?.category;
+        courseFields.validity = row?.validity;
+        courseFields.description = row?.description;
+        courseFields.listPrice = row?.listPrice;
+        courseFields.offerPrice = row?.offerPrice;
+        setCreateCourseForm(courseFields);
+        setShowSreen("Create");
+        setPreviewImgSrc(row.file);
+        setPublishedDate(row.publishedDate)
+    }
+
+    async function editCourseDeatails(row) {
         setEditData(row)
         setShowSreen("Edit");
         const url = serverUrl + "get/data/bycourse/" + row.id;
@@ -469,6 +496,14 @@ export default function CeateCourse() {
             else {
                 setCourseSection(defaultCourseSection)
             }
+        }
+        else {
+            setOpenSnackBar(true);
+            const data = {
+                type: "error",
+                message: resp.response.data.error
+            }
+            setSnackBarData(data);
         }
     }
 
@@ -539,6 +574,13 @@ export default function CeateCourse() {
     }
 
     const onFileChange = event => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        var url = reader.readAsDataURL(file);
+        reader.onloadend = function (e) {
+            setPreviewImgSrc([reader.result]);
+
+        }
         setSelectedFile(event.target.files);
         setCoverPageError("");
     };
@@ -561,7 +603,12 @@ export default function CeateCourse() {
                         <Grid container spacing={2} >
                             <Grid item xs={12} >
                                 <Stack spacing={2} direction="row" >
-                                    <Button variant="contained" onClick={() => setShowSreen("Create")}>Create Course</Button>
+                                    <Button variant="contained" onClick={() => {
+                                        resetForm();
+                                        setShowSreen("Create");
+                                        setButtonName("submit");
+                                        setEditData();
+                                    }}>Create Course</Button>
                                 </Stack>
                             </Grid>
 
@@ -584,7 +631,7 @@ export default function CeateCourse() {
                     <Grid container spacing={1} >
                         <Grid item xs={.5} ></Grid>
                         <Grid item xs={11} >
-                            <span style={{ fontWeight: "bold", fontSize: "30px" }}>Create Course</span>
+                            <span style={{ fontWeight: "bold", fontSize: "30px" }}>{buttonName === "submit" ? <span>Create Course</span> : <span>Update Course</span>}</span>
                         </Grid>
 
                         <Grid item xs={1} ></Grid>
@@ -695,7 +742,7 @@ export default function CeateCourse() {
 
                                 />
                             </LocalizationProvider>
-                            {publishedDateError !== "" ? <span style={{ color: "#d32f2f" }}> Publishe dDate is reuired </span> : ""}
+                            {publishedDateError !== "" ? <span style={{ color: "#d32f2f" }}> Publishe Date is reuired </span> : ""}
                         </Grid>
                         <Grid item xs={2} ></Grid>
                         <Grid item xs={1} ></Grid>
@@ -758,11 +805,11 @@ export default function CeateCourse() {
                         <Grid item xs={2} >
                         </Grid>
                         <Grid item xs={1} ></Grid>
-                        <Grid item xs={11} >
+                        <Grid item xs={6} >
                             <TextField
                                 id="outlined-multiline-static"
                                 label="Description"
-                                sx={{ width: '54%' }}
+                                sx={{ width: '100%' }}
                                 multiline
                                 value={createCourseForm.description}
                                 name="description"
@@ -773,14 +820,25 @@ export default function CeateCourse() {
                             />
                         </Grid>
                         <Grid item xs={1} >
+                            {previewImgSrc &&
+                                <span>Selcted File</span>
+                            }
+                        </Grid>
+                        <Grid item xs={4} >
+                            {previewImgSrc &&
+                                <img src={previewImgSrc} style={{ width: '40%', paddingTop: '15px' }} />
+                            }
+                        </Grid>
+                        <Grid item xs={1} >
                         </Grid>
                         <Grid item xs={10} >
                             <Stack spacing={2} direction="row" >
                                 <Button variant="contained" onClick={() => setShowSreen("Grid")}>Back</Button>
                                 <Button variant="contained" onClick={() => resetForm()}>reset</Button>
-                                <Button variant="contained" onClick={() => createCourse()}>Submit</Button>
+                                <Button variant="contained" onClick={() => createCourse()}>{buttonName}</Button>
                             </Stack>
                         </Grid>
+
                     </Grid>
                 }
             </span>

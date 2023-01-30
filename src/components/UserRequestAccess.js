@@ -7,7 +7,7 @@ import * as securedLocalStorage from "./SecureLocalaStorage";
 
 export default function UserRequestAccess() {
 
-    const serverUrl = securedLocalStorage.basUrl + "admin/request/";
+    const serverUrl = securedLocalStorage.baseUrl + "admin/request/";
     const [tableData, settableData] = React.useState([]);
 
     const columns = [

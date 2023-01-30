@@ -54,7 +54,7 @@ const names = [
     'DSC',
     'GROUPS',
 ];
-const serverUrl = securedLocalStorage.basUrl +`promocodes/`;
+const serverUrl = securedLocalStorage.baseUrl + `promocodes/`;
 
 const modelStyle = {
     position: 'absolute',
