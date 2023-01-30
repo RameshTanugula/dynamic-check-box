@@ -19,5 +19,6 @@ export const subjectsUrl = baseUrl + 'files/get/subjects';
 
 export const categoriesUrl = baseUrl + 'get/categories';
 export const usersUrl = baseUrl + 'get/users/';
+export const allActiveUsersUrl = baseUrl + 'users/list';
 
 
