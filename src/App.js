@@ -101,10 +101,6 @@ export default function App() {
   const [anchorEl, setAnchorEl] = React.useState(false);
   const [menuList, setMenuList] = React.useState([]);
 
-  // const handleChange = (event) => {
-  //   setAuth(event.target.checked);
-  // };
-
   const handleMenu = (event) => {
     setAnchorEl(true);
   };
