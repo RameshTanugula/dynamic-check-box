@@ -5,6 +5,7 @@ import api from '../services/api';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 /**
  *
  * @returns table data
@@ -29,6 +30,7 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
 
 function TablePaginationActions(props) {
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -47,33 +49,39 @@ function TablePaginationActions(props) {
     const handleLastPageButtonClick = (event) => {
         onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
 
     return (
         <Box sx={{ flexShrink: 0, ml: 2.5 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="first page"
             >
                 {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
             </IconButton>
             <IconButton
                 onClick={handleBackButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="previous page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
                 onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="next page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="last page"
             >
                 {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
@@ -99,6 +107,7 @@ export default function QuestionCreationFromStatements() {
     const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
     const [generatedData, setGeneratedData] = useState([]);
     const [showContent, setShowContent] = useState(true);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -127,13 +136,19 @@ export default function QuestionCreationFromStatements() {
         }
         fetchData();
     }, []);
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
     const renderFalseStatements = (falseList) => {
         return (<div>
             {falseList?.map((fl, i) => {
                 return (
                     <div>
                         <span>{fl.statement}.</span>
-                        <input checked={fl.checked} onClick={() => onClickCheckBox(fl.q_id, i, 2)} type="checkbox" />
+                        <input disabled={!readAndWriteAccess} checked={fl.checked} onClick={() => onClickCheckBox(fl.q_id, i, 2)} type="checkbox" />
                     </div>
                 )
             })}
@@ -148,7 +163,7 @@ export default function QuestionCreationFromStatements() {
                         <div style={{ display: 'flex' }}>
                             <div>
                                 <span>{qData.q_id}.</span>
-                                <input checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i, 1)} type="checkbox" />
+                                <input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i, 1)} type="checkbox" />
                             </div>
                             <div style={{
                                 paddingTop: '5px',
@@ -227,7 +242,7 @@ export default function QuestionCreationFromStatements() {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center"><span>
-                                    <input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBoxQuestion()} type="checkbox" />
+                                    <input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBoxQuestion()} type="checkbox" />
                                 </span></TableCell>
                                 <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">PART A</TableCell>
@@ -242,7 +257,7 @@ export default function QuestionCreationFromStatements() {
                                 <TableRow key={i}>
                                     <TableCell component="th" scope="row">
                                         <span>
-                                            <input checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
+                                            <input disabled={!readAndWriteAccess} checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
                                         </span>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
@@ -277,6 +292,7 @@ export default function QuestionCreationFromStatements() {
                                     onPageChange={handleChangePage}
                                     onRowsPerPageChange={handleChangeRowsPerPage}
                                     ActionsComponent={TablePaginationActions}
+                                    disabled={!readAndWriteAccess}
                                 />
                             </TableRow>
                         </TableFooter>
@@ -309,6 +325,7 @@ export default function QuestionCreationFromStatements() {
                         nodes={catagoryData}
                         checked={checked}
                         onCheck={checked => setChecked(checked)}
+                        disabled={!readAndWriteAccess}
                     //   onClick={(e) => onClickCheckBox(e)}
                     />}
                 </div>

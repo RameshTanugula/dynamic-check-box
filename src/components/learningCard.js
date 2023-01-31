@@ -5,6 +5,7 @@ import uniqid from 'uniqid';
 import api from '../services/api';
 import './flashCard.css';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function LearningCard() {
     // const serverUrl = `http://localhost:8080/learning/`
@@ -17,6 +18,7 @@ export default function LearningCard() {
     const [subjects, setSubjects] = useState([]);
     const [title, setTitle] = useState("");
     const [selectedSubject, setSelectedSubject] = useState();
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     React.useEffect(() => {
         async function fetchData() {
@@ -32,6 +34,12 @@ export default function LearningCard() {
 
         }
         fetchData();
+    }, []);
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
     }, [])
     const onSubmitHandler = async () => {
         if (!selectedSubject) {
@@ -88,7 +96,7 @@ export default function LearningCard() {
     return (
         <div>
             {showTable && <div style={{ "textAlign": "right", paddingBottom: '2rem' }}>
-                <button style={{ height: '2rem' }} onClick={() => setShowTable(false)}>Add New Learning Card</button>
+                <button disabled={!readAndWriteAccess} style={{ height: '2rem' }} onClick={() => setShowTable(false)}>Add New Learning Card</button>
             </div>}
             {showTable && <table>
                 <tr>
@@ -112,14 +120,14 @@ export default function LearningCard() {
                 <div className="App">
                     <header className="App-header">
                         <div>
-                            <select onChange={(e) => { setSelectedSubject(e.target.value) }}>
+                            <select disabled={!readAndWriteAccess} onChange={(e) => { setSelectedSubject(e.target.value) }}>
                                 {subjects.map(s => {
                                     return <option value={s.id}>{s.name}</option>
                                 })}</select>
                         </div>
                         <br />
                         <label >
-                            Title:<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+                            Title:<input disabled={!readAndWriteAccess} type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
                         </label><br />
                         <div>
                             <table>
@@ -131,14 +139,14 @@ export default function LearningCard() {
 
                                         <td><div>
                                             &nbsp;&nbsp;
-                                            <input type="file" onChange={(e) => onChangeCell(e, i)} />
+                                            <input disabled={!readAndWriteAccess} type="file" onChange={(e) => onChangeCell(e, i)} />
                                         </div></td>
                                     </tr>
                                 ))}
                             </table>
-                            <button id="addBtn" onClick={addRow}>Add New Row</button><br /><br />
+                            <button id="addBtn" disabled={!readAndWriteAccess} onClick={addRow}>Add New Row</button><br /><br />
                         </div>
-                        <input type="submit" onClick={() => onSubmitHandler()} value="Submit" />
+                        <input type="submit" disabled={!readAndWriteAccess} onClick={() => onSubmitHandler()} value="Submit" />
                     </header>
                 </div>
 

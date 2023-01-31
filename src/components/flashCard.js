@@ -8,6 +8,7 @@ import uniqid from 'uniqid';
 import api from '../services/api';
 import './flashCard.css';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function FlashCard() {
     // const serverUrl = `http://localhost:8080/flashcard/`
@@ -20,6 +21,8 @@ export default function FlashCard() {
     const [subjects, setSubjects] = useState([]);
     const [cardData, setCardData] = useState([]);
     const [showTable, setShowTable] = useState(true);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+
     const validateList = () => {
         list.map((l) => {
             if (((l.frontValue === '') && (l.backValue === ''))) {
@@ -41,7 +44,15 @@ export default function FlashCard() {
             }
         }
         fetchData();
-    }, [])
+    }, []);
+
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
+
     const onSubmitHandler = async () => {
         if (title === '') {
             alert('please enter title')
@@ -155,6 +166,7 @@ export default function FlashCard() {
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 name="Title"
+                                disabled={!readAndWriteAccess}
                             // error={errors.courseTitle !== ""}
                             // helperText={errors.courseTitle !== "" ? 'Title is reuired' : ' '}
                             />
@@ -167,6 +179,7 @@ export default function FlashCard() {
                                 value={selectedSubject}
                                 name="Subject"
                                 onChange={(e) => { setSelectedSubject(e.target.value) }}
+                                disabled={!readAndWriteAccess}
                             >
                                 <MenuItem value="">
                                     <em>None</em>
@@ -187,25 +200,25 @@ export default function FlashCard() {
                                     <tr>
                                         <td>{r.id}.</td>
                                         <td><div>
-                                            <span>Image:<input type="checkbox" onChange={(e) => onChangeCell(e.target.value, i, 'f', true)} value={r.frontType} /></span>
+                                            <span>Image:<input disabled={!readAndWriteAccess} type="checkbox" onChange={(e) => onChangeCell(e.target.value, i, 'f', true)} value={r.frontType} /></span>
                                             <br />
-                                            {!r.fchecked && <input type="text" onChange={(e) => onChangeCell(e.target.value, i, 'ft')} value={r.frontValue} />}
+                                            {!r.fchecked && <input disabled={!readAndWriteAccess} type="text" onChange={(e) => onChangeCell(e.target.value, i, 'ft')} value={r.frontValue} />}
                                             &nbsp;&nbsp;
-                                            {r.fchecked && <input type="file" onChange={(e) => onChangeCell(e, i, 'fi')} />}
+                                            {r.fchecked && <input disabled={!readAndWriteAccess} type="file" onChange={(e) => onChangeCell(e, i, 'fi')} />}
                                         </div></td>
                                         <td><div>
-                                            <span>Image:<input type="checkbox" onChange={(e) => onChangeCell(e.target.value, i, 'b', true)} value={r.frontType} /></span>
+                                            <span>Image:<input disabled={!readAndWriteAccess} type="checkbox" onChange={(e) => onChangeCell(e.target.value, i, 'b', true)} value={r.frontType} /></span>
                                             <br />
-                                            {!r.bchecked && <input type="text" onChange={(e) => onChangeCell(e.target.value, i, 'bt')} value={r.backValue} />}
+                                            {!r.bchecked && <input disabled={!readAndWriteAccess} type="text" onChange={(e) => onChangeCell(e.target.value, i, 'bt')} value={r.backValue} />}
                                             &nbsp;&nbsp;
-                                            {r.bchecked && <input type="file" onChange={(e) => onChangeCell(e, i, 'bi')} />}
+                                            {r.bchecked && <input disabled={!readAndWriteAccess} type="file" onChange={(e) => onChangeCell(e, i, 'bi')} />}
                                         </div></td>
                                     </tr>
                                 ))}
                             </table>
-                            <button id="addBtn" onClick={addRow}>Add New Row</button><br /><br />
+                            <button id="addBtn" disabled={!readAndWriteAccess} onClick={addRow}>Add New Row</button><br /><br />
                         </div>
-                        <input type="submit" onClick={() => onSubmitHandler()} value="Submit" />
+                        <input type="submit" disabled={!readAndWriteAccess} onClick={() => onSubmitHandler()} value="Submit" />
                     </header>
                 </div>
 

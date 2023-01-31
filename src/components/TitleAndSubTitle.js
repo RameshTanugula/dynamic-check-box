@@ -11,6 +11,7 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import api from '../services/api';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function TitleAndSubTitle() {
     const serverUrl = securedLocalStorage.baseUrl + 'question/';
@@ -22,6 +23,7 @@ export default function TitleAndSubTitle() {
     const [titleName, setTitleName] = React.useState();
     const [successMessage, setSuccessMessage] = React.useState("");
     const [errorMessage, setErrorMessage] = React.useState("");
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     function addRow(screen) {
         if (screen === "title") {
@@ -105,6 +107,10 @@ export default function TitleAndSubTitle() {
 
     React.useEffect(() => {
         getTitles();
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
     }, [])
 
     return (
@@ -118,6 +124,7 @@ export default function TitleAndSubTitle() {
                             id="demo-simple-select"
                             value={titleName ?? ""}
                             onChange={(e) => setTitleName(e?.target?.value)}
+                            disabled={!readAndWriteAccess}
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -129,22 +136,22 @@ export default function TitleAndSubTitle() {
                             ))}
                         </Select>
                     </FormControl>
-                    <Button style={{ marginTop: "20px" }} variant="contained" onClick={() => setShowTitleScreen(true)}>Add Title</Button>
+                    <Button disabled={!readAndWriteAccess} style={{ marginTop: "20px" }} variant="contained" onClick={() => setShowTitleScreen(true)}>Add Title</Button>
 
                     {subTitle.map((data, i) => (
                         <span key={i}>
                             <Grid container style={{ marginTop: "10px" }} >
                                 <Grid item xs={5} >
-                                    <TextField sx={{ width: '75%' }} id="outlined-basic" value={data} onChange={(e) => addSValue(e.target?.value, i, "")} label={"Sub Title " + i} variant="outlined" />
-                                    <Button style={{ marginLeft: "5px", marginTop: "20px" }} sx={{ height: '1.5rem', width: '2rem', }} variant="outlined" onClick={() => removeRow(i, "")}>Delete</Button>
+                                    <TextField disabled={!readAndWriteAccess} sx={{ width: '75%' }} id="outlined-basic" value={data} onChange={(e) => addSValue(e.target?.value, i, "")} label={"Sub Title " + i} variant="outlined" />
+                                    <Button disabled={!readAndWriteAccess} style={{ marginLeft: "5px", marginTop: "20px" }} sx={{ height: '1.5rem', width: '2rem', }} variant="outlined" onClick={() => removeRow(i, "")}>Delete</Button>
                                 </Grid>
                             </Grid>
                         </span>
                     ))
                     }
                     <Stack spacing={2} direction="row" style={{ marginTop: "10px" }}>
-                        <Button variant="contained" onClick={() => addRow("")}>Add row</Button>
-                        <Button variant="contained" onClick={() => saveData("")}>Save </Button>
+                        <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => addRow("")}>Add row</Button>
+                        <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => saveData("")}>Save </Button>
                     </Stack>
                 </div>
             }
@@ -154,8 +161,8 @@ export default function TitleAndSubTitle() {
                         <span key={i}>
                             <Grid container style={{ marginTop: "10px" }} >
                                 <Grid item xs={5} >
-                                    <TextField sx={{ width: '75%' }} id="outlined-basic" value={data} onChange={(e) => addSValue(e.target?.value, i, 'title')} label={"Title " + i} variant="outlined" />
-                                    <Button style={{ marginLeft: "5px", marginTop: "20px" }} sx={{ height: '1.5rem', width: '2rem', }} variant="outlined" onClick={() => removeRow(i, "title")}>Delete</Button>
+                                    <TextField disabled={!readAndWriteAccess} sx={{ width: '75%' }} id="outlined-basic" value={data} onChange={(e) => addSValue(e.target?.value, i, 'title')} label={"Title " + i} variant="outlined" />
+                                    <Button disabled={!readAndWriteAccess} style={{ marginLeft: "5px", marginTop: "20px" }} sx={{ height: '1.5rem', width: '2rem', }} variant="outlined" onClick={() => removeRow(i, "title")}>Delete</Button>
                                 </Grid>
                             </Grid>
                         </span>
@@ -163,9 +170,9 @@ export default function TitleAndSubTitle() {
                     }
 
                     <Stack spacing={2} direction="row" style={{ marginTop: "10px" }}>
-                        <Button variant="contained" onClick={() => addRow("title")}>Add row</Button>
-                        <Button variant="contained" onClick={() => saveData("title")}>Save </Button>
-                        <Button variant="contained" onClick={() => setShowTitleScreen(false)}>Cancel</Button>
+                        <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => addRow("title")}>Add row</Button>
+                        <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => saveData("title")}>Save </Button>
+                        <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => setShowTitleScreen(false)}>Cancel</Button>
                     </Stack>
                 </div>
             }

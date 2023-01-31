@@ -87,9 +87,6 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 export default function CeateCourse() {
-
-    const vertical = "bottom";
-    const horizontal = "center";
     const serverUrl = securedLocalStorage.baseUrl + 'course/';
     // const academyList = ["g"];
     const categoryList = ["DSC", "GROUPS"];
@@ -313,7 +310,7 @@ export default function CeateCourse() {
             selectedList.forEach(ele => {
                 data = data + ele + ",";
                 multiSelectList?.forEach(obj => {
-                    if (obj.id == ele) {
+                    if (obj.id === ele) {
                         showList.push(obj.title)
                     }
                 })
@@ -447,7 +444,7 @@ export default function CeateCourse() {
                 setOpenSnackBar(true);
                 const data = {
                     type: "success",
-                    message: "Course Created Sucessfully!...."
+                    message: buttonName === "submit" ? "Course created sucessfully!...." : "Course updated successfully!..."
                 }
                 setSnackBarData(data);
                 getCourseList();
@@ -463,9 +460,7 @@ export default function CeateCourse() {
             }
         }
     }
-    function CloseSnakBar() {
-        setOpenSnackBar(false);
-    }
+
 
     function editCourse(row) {
         resetForm();
@@ -491,7 +486,7 @@ export default function CeateCourse() {
         setShowSreen("Edit");
         const url = serverUrl + "get/data/bycourse/" + row.id;
         const resp = await api(null, url, 'get');
-        if (resp.status == 200) {
+        if (resp.status === 200) {
             if (resp?.data?.courseList.length > 0) {
                 setCourseSection(resp?.data?.courseList)
             }
@@ -517,12 +512,12 @@ export default function CeateCourse() {
         }
         const url = serverUrl + "add/update";
         const resp = await api(obj, url, 'post');
-        if (resp.status == 200) {
+        if (resp.status === 200) {
             setShowSreen("Grid");
             setOpenSnackBar(true);
             const data = {
                 type: "success",
-                message: "Course updated successfully!..."
+                message: "Course details updated successfully!..."
             }
             setSnackBarData(data);
             getCourseList();
@@ -593,7 +588,8 @@ export default function CeateCourse() {
 
     React.useEffect(() => {
         getCourseList();
-        if (CheckAccess.checkAccess("Create Course", 'read') && CheckAccess.checkAccess("Create Course", 'write')) {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
             setReadAndWriteAccess(true);
         }
     }, []);
@@ -608,7 +604,7 @@ export default function CeateCourse() {
                         <Grid container spacing={2} >
                             <Grid item xs={12} >
                                 <Stack spacing={2} direction="row" >
-                                    <Button variant="contained" onClick={() => {
+                                    <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => {
                                         resetForm();
                                         setShowSreen("Create");
                                         setButtonName("submit");
@@ -650,6 +646,7 @@ export default function CeateCourse() {
                                 name="courseTitle"
                                 error={errors.courseTitle !== ""}
                                 helperText={errors.courseTitle !== "" ? 'Course Title is reuired' : ' '}
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={3} >
@@ -662,6 +659,7 @@ export default function CeateCourse() {
                                 name="instructor"
                                 error={errors.instructor !== ""}
                                 helperText={errors.instructor !== "" ? 'Instructor is reuired' : ' '}
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={3} >
@@ -674,6 +672,7 @@ export default function CeateCourse() {
                                 name="tags"
                                 error={errors.tags !== ""}
                                 helperText={errors.tags !== "" ? 'Tags is reuired' : ' '}
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={2} ></Grid>
@@ -713,6 +712,7 @@ export default function CeateCourse() {
                                     onChange={handleChange}
                                     error={errors.category !== ""}
                                     helperText={errors.category !== "" ? 'Category is reuired' : ' '}
+                                    disabled={!readAndWriteAccess}
                                 >
                                     <MenuItem value="">
                                         <em>None</em>
@@ -728,7 +728,7 @@ export default function CeateCourse() {
                         <Grid item xs={3} >
                             <span>Cover Page</span>
                             <div >
-                                <input type="file" multiple onChange={onFileChange} />
+                                <input type="file" multiple onChange={onFileChange} disabled={!readAndWriteAccess} />
                             </div>
                             {coverPageError !== "" ? <span style={{ color: "#d32f2f" }}> Cover Page is reuired </span> : ""}
 
@@ -744,6 +744,7 @@ export default function CeateCourse() {
                                         setPublishedDateError("");
                                     }}
                                     renderInput={(params) => <TextField {...params} sx={{ width: '100%' }} />}
+                                    disabled={!readAndWriteAccess}
 
                                 />
                             </LocalizationProvider>
@@ -762,6 +763,7 @@ export default function CeateCourse() {
                                     onChange={handleChange}
                                     error={errors.validity !== ""}
                                     helperText={errors.validity !== "" ? 'Validity is reuired' : ' '}
+                                    disabled={!readAndWriteAccess}
                                 >
                                     <MenuItem value="">
                                         <em>None</em>
@@ -786,6 +788,7 @@ export default function CeateCourse() {
                                 onChange={handleChange}
                                 error={errors.listPrice !== ""}
                                 helperText={errors.listPrice !== "" ? 'ListPrice is required' : ' '}
+                                disabled={!readAndWriteAccess}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
@@ -802,6 +805,7 @@ export default function CeateCourse() {
                                 onChange={handleChange}
                                 error={errors.offerPrice !== ""}
                                 helperText={errors.offerPrice !== "" ? 'OfferPrice is required' : ' '}
+                                disabled={!readAndWriteAccess}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
@@ -822,6 +826,7 @@ export default function CeateCourse() {
                                 rows={4}
                                 error={errors.description !== ""}
                                 helperText={errors.description !== "" ? 'Description is reuired' : ' '}
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={1} >
@@ -838,9 +843,9 @@ export default function CeateCourse() {
                         </Grid>
                         <Grid item xs={10} >
                             <Stack spacing={2} direction="row" >
-                                <Button variant="contained" onClick={() => setShowSreen("Grid")}>Back</Button>
-                                <Button variant="contained" onClick={() => resetForm()}>reset</Button>
-                                <Button variant="contained" onClick={() => createCourse()}>{buttonName}</Button>
+                                <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => setShowSreen("Grid")}>Back</Button>
+                                <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => resetForm()}>reset</Button>
+                                <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => createCourse()}>{buttonName}</Button>
                             </Stack>
                         </Grid>
 
@@ -866,7 +871,7 @@ export default function CeateCourse() {
                                             </AccordionSummary>
                                             <AccordionDetails>
                                                 <Typography>
-                                                    <TextField sx={{ width: '91%' }} id="outlined-basic" value={data?.courseName} label={"Course " + i} onChange={(e) => addCourseValue(e.target?.value, i,)} variant="outlined" />
+                                                    <TextField sx={{ width: '91%' }} id="outlined-basic" value={data?.courseName} label={"Course " + i} disabled={!readAndWriteAccess} onChange={(e) => addCourseValue(e.target?.value, i,)} variant="outlined" />
                                                 </Typography>
                                             </AccordionDetails>
                                             {data?.subjects?.map((data, j) => (
@@ -883,7 +888,7 @@ export default function CeateCourse() {
                                                                 </AccordionSummary>
                                                                 <AccordionDetails>
                                                                     <Typography>
-                                                                        <TextField sx={{ width: '91%' }} id="outlined-basic" value={data?.subjectName} label={"Subject " + j} onChange={(e) => addChapterValue(e.target?.value, i, j)} variant="outlined" />
+                                                                        <TextField disabled={!readAndWriteAccess} sx={{ width: '91%' }} id="outlined-basic" value={data?.subjectName} label={"Subject " + j} onChange={(e) => addChapterValue(e.target?.value, i, j)} variant="outlined" />
                                                                     </Typography>
                                                                 </AccordionDetails>
 
@@ -910,7 +915,7 @@ export default function CeateCourse() {
                                                                                                     name="topicName"
                                                                                                     value={selctForm.topicName}
                                                                                                     onChange={(e) => handleChangeSelectData(e)}
-
+                                                                                                    disabled={!readAndWriteAccess}
                                                                                                 >
                                                                                                     <MenuItem value="">
                                                                                                         <em>None</em>
@@ -932,6 +937,7 @@ export default function CeateCourse() {
                                                                                                     name="topicType"
                                                                                                     value={selctForm.topicType}
                                                                                                     onChange={(e) => handleChangeSelectData(e)}
+                                                                                                    disabled={!readAndWriteAccess}
                                                                                                 >
                                                                                                     <MenuItem value="">
                                                                                                         <em>None</em>
@@ -956,6 +962,7 @@ export default function CeateCourse() {
                                                                                                     label="selectedData"
                                                                                                     renderValue={(selected) => selected.join(', ')}
                                                                                                     MenuProps={MenuProps}
+                                                                                                    disabled={!readAndWriteAccess}
                                                                                                 >
                                                                                                     {multiSelectList.map((data) => (
                                                                                                         <MenuItem key={data.id} value={data.id}>
@@ -973,13 +980,14 @@ export default function CeateCourse() {
                                                                                                     <Checkbox
                                                                                                         checked={data?.premium === "Yes"}
                                                                                                         value={data?.premium}
+                                                                                                        disabled={!readAndWriteAccess}
                                                                                                         onChange={(e) => addTopicValue(e.target?.value, i, j, k, 'premium')}
                                                                                                     />
                                                                                                 }
                                                                                                 label="Premium"
                                                                                             />
                                                                                             <Stack direction="row" >
-                                                                                                <Button variant="contained" onClick={() => AddSubjectData(i, j, k)}>Add Topic</Button>
+                                                                                                <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => AddSubjectData(i, j, k)}>Add Topic</Button>
                                                                                             </Stack>
                                                                                             <br />
                                                                                             <span style={{ fontWeight: "bold", color: "red" }}>{errorMsg}</span>
@@ -1005,7 +1013,7 @@ export default function CeateCourse() {
                                                                                                                     <TableCell >{findNameById(row.topicType, "topicType")}</TableCell>
                                                                                                                     <TableCell >{row.selectedDataShow}</TableCell>
                                                                                                                     <TableCell >
-                                                                                                                        <Button variant="contained" onClick={() => deleData(i, j, k, index)}>Delete</Button>
+                                                                                                                        <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => deleData(i, j, k, index)}>Delete</Button>
                                                                                                                     </TableCell>
                                                                                                                 </TableRow>
                                                                                                             ))}
@@ -1020,12 +1028,12 @@ export default function CeateCourse() {
                                                                             </Grid>
                                                                             <Grid item xs={1} style={{ marginLeft: "-10px" }} >
                                                                                 <IconButton>
-                                                                                    <AddIcon color="primary" onClick={() => addTopic(i, j, k)} />
+                                                                                    <AddIcon color="primary" disabled={!readAndWriteAccess} onClick={() => addTopic(i, j, k)} />
                                                                                 </IconButton>
                                                                             </Grid>
                                                                             <Grid item xs={1} style={{ marginLeft: "-40px" }} >
                                                                                 <IconButton>
-                                                                                    <DeleteIcon onClick={() => removeTopic(i, j, k)} />
+                                                                                    <DeleteIcon disabled={!readAndWriteAccess} onClick={() => removeTopic(i, j, k)} />
                                                                                 </IconButton>
                                                                             </Grid>
                                                                         </Grid>
@@ -1036,12 +1044,12 @@ export default function CeateCourse() {
                                                         </Grid>
                                                         <Grid item xs={1} style={{ marginLeft: "-10px" }} >
                                                             <IconButton>
-                                                                <AddIcon color="primary" onClick={() => addChapter(i, j)} />
+                                                                <AddIcon disabled={!readAndWriteAccess} color="primary" onClick={() => addChapter(i, j)} />
                                                             </IconButton>
                                                         </Grid>
                                                         <Grid item xs={1} style={{ marginLeft: "-60px" }} >
                                                             <IconButton>
-                                                                <DeleteIcon onClick={() => removeChapter(i, j)} />
+                                                                <DeleteIcon disabled={!readAndWriteAccess} onClick={() => removeChapter(i, j)} />
                                                             </IconButton>
                                                         </Grid>
                                                     </Grid>
@@ -1052,12 +1060,12 @@ export default function CeateCourse() {
                                     </Grid>
                                     <Grid item xs={1} style={{ marginLeft: "-10px" }}  >
                                         <IconButton>
-                                            <AddIcon color="primary" onClick={() => addCourse(i)} />
+                                            <AddIcon color="primary" disabled={!readAndWriteAccess} onClick={() => addCourse(i)} />
                                         </IconButton>
                                     </Grid>
                                     <Grid item xs={1} style={{ marginLeft: "-70px" }} >
                                         <IconButton>
-                                            <DeleteIcon onClick={() => removeCourse(i)} />
+                                            <DeleteIcon disabled={!readAndWriteAccess} onClick={() => removeCourse(i)} />
                                         </IconButton>
                                     </Grid>
                                 </Grid>
@@ -1069,7 +1077,7 @@ export default function CeateCourse() {
             </span >
 
             {openSnackBar &&
-                <SnackBar data={snackBarData} CloseSnakBar={CloseSnakBar} />
+                <SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />
             }
         </div >
     )

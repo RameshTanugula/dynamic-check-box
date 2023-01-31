@@ -3,6 +3,7 @@ import api from '../services/api';
 import './flashCard.css';
 import TextField from '@mui/material/TextField';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function FileUpload() {
 
@@ -13,7 +14,8 @@ export default function FileUpload() {
 	const [list, setList] = useState([]);
 	const [showTable, setShowTable] = useState(true);
 	const [selectedSubject, setSelectedSubject] = useState("");
-	const [title, setTitle] = useState("")
+	const [title, setTitle] = useState("");
+	const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 	React.useEffect(() => {
 		async function fetchData() {
 			const subData = await api(null, serverUrl + 'get/subjects', 'get');
@@ -31,6 +33,13 @@ export default function FileUpload() {
 		}
 		fetchData();
 	}, []);
+
+	React.useEffect(() => {
+		const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+		if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+			setReadAndWriteAccess(true);
+		}
+	}, [])
 	// On file select (from the pop up)
 	const onFileChange = event => {
 
@@ -91,7 +100,7 @@ export default function FileUpload() {
 	return (
 		<div>
 			{showTable && <div style={{ width: "60%", textAlign: "right", paddingBottom: '2rem' }}>
-				<button style={{ height: '2rem' }} onClick={() => setShowTable(false)}>Upload new Document</button>
+				<button style={{ height: '2rem' }} disabled={!readAndWriteAccess} onClick={() => setShowTable(false)}>Upload new Document</button>
 			</div>}
 			{showTable && <table>
 				<tr>
@@ -113,7 +122,7 @@ export default function FileUpload() {
 				<div style={{ paddingTop: '2rem', textAlign: 'center' }}>
 
 					<div>
-						<select onChange={(e) => { setSelectedSubject(e.target.value) }}>
+						<select disabled={!readAndWriteAccess} onChange={(e) => { setSelectedSubject(e.target.value) }}>
 							{subjects.map(s => {
 								return <option value={s.id}>{s.name}</option>
 							})}</select>
@@ -126,12 +135,13 @@ export default function FileUpload() {
 							value={title}
 							onChange={(e) => setTitle(e.target.value)}
 							name="Title"
+							disabled={!readAndWriteAccess}
 						// error={title === ""}
 						// helperText={title === "" ? 'Title is reuired' : ' '}
 						/>
 					</div>
 					<div style={{ paddingTop: '2rem' }}>
-						<input type="file" multiple onChange={onFileChange} />
+						<input disabled={!readAndWriteAccess} type="file" multiple onChange={onFileChange} />
 						<br />
 						<br />
 						<button onClick={onFileUpload}>

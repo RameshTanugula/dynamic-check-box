@@ -44,6 +44,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 import SnackBar from './SnackBar';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ITEM_HEIGHT = 48;
@@ -129,6 +130,7 @@ const style = {
 };
 
 function TablePaginationActions(props) {
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -148,32 +150,39 @@ function TablePaginationActions(props) {
         onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
 
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
+
     return (
         <Box sx={{ flexShrink: 0, ml: 2.5 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="first page"
             >
                 {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
             </IconButton>
             <IconButton
                 onClick={handleBackButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="previous page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
                 onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="next page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="last page"
             >
                 {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
@@ -222,6 +231,7 @@ export default function QuestionCreation() {
     const [editData, setEditData] = React.useState("");
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     const handleChange = (event) => {
         const {
@@ -257,6 +267,13 @@ export default function QuestionCreation() {
         }
         fetchData();
     }, []);
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
+
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - questionData.length) : 0;
 
@@ -351,6 +368,7 @@ export default function QuestionCreation() {
                         timeout: 500000000000000000,
                         invisible: true
                     }}
+                    disabled={!readAndWriteAccess}
                 >
                     {/* <Fade in={open}> */}
 
@@ -369,10 +387,10 @@ export default function QuestionCreation() {
 
                         {(selectedTitle && titleOptionsList) && getTitleOptions(selectedRow, selectedIndex)}
 
-                        <Button onClick={() => SetOption(selectedRow, selectedIndex)}>Set Option</Button> <br />
-                        <Button onClick={() => createQuestion(selectedRow, selectedIndex)}>Create Question</Button>
+                        <Button disabled={!readAndWriteAccess} onClick={() => SetOption(selectedRow, selectedIndex)}>Set Option</Button> <br />
+                        <Button disabled={!readAndWriteAccess} onClick={() => createQuestion(selectedRow, selectedIndex)}>Create Question</Button>
                         <br />
-                        <Button onClick={() => onCloseHandler()}>close</Button>
+                        <Button disabled={!readAndWriteAccess} onClick={() => onCloseHandler()}>close</Button>
 
                     </Box>
                     {/* </Fade> */}
@@ -401,6 +419,7 @@ export default function QuestionCreation() {
                 disableClearable
                 onChange={onChangeTitle}
                 options={titlesList.map((option) => option.Title)}
+                disabled={!readAndWriteAccess}
                 renderInput={(params) => (
                     <TextField
                         {...params}
@@ -440,6 +459,7 @@ export default function QuestionCreation() {
                     input={<OutlinedInput label="Tag" />}
                     renderValue={(selected) => selected.join(', ')}
                     MenuProps={MenuProps}
+                    disabled={!readAndWriteAccess}
                 >
 
                     {titleOptionsList && titleOptionsList.map((name) => (
@@ -465,6 +485,7 @@ export default function QuestionCreation() {
     const allotOptions = (row, i) => {
         return (<div>
             <Checkbox
+                disabled={!readAndWriteAccess}
                 {...label}
                 checked={row?.isChecked}
                 onClick={() => checkBoxHandler(row, i)}
@@ -474,9 +495,9 @@ export default function QuestionCreation() {
     }
     const getInputBox = (row, i) => {
         return (<div>
-            <span>Option Value 1 &nbsp;&nbsp;<input type="text" value={inputOptionValue1} onChange={(e) => setInputOptionValue1(e.target?.value)} /></span><br />
-            <span>Option Value 2 &nbsp;&nbsp;<input type="text" value={inputOptionValue2} onChange={(e) => setInputOptionValue2(e.target?.value)} /></span><br />
-            <span>Option Value 3 &nbsp;&nbsp;<input type="text" value={inputOptionValue3} onChange={(e) => setInputOptionValue3(e.target?.value)} /></span><br />
+            <span>Option Value 1 &nbsp;&nbsp;<input disabled={!readAndWriteAccess} type="text" value={inputOptionValue1} onChange={(e) => setInputOptionValue1(e.target?.value)} /></span><br />
+            <span>Option Value 2 &nbsp;&nbsp;<input disabled={!readAndWriteAccess} type="text" value={inputOptionValue2} onChange={(e) => setInputOptionValue2(e.target?.value)} /></span><br />
+            <span>Option Value 3 &nbsp;&nbsp;<input disabled={!readAndWriteAccess} type="text" value={inputOptionValue3} onChange={(e) => setInputOptionValue3(e.target?.value)} /></span><br />
         </div>)
     }
     const openModalHandler = (row, i) => {
@@ -509,6 +530,7 @@ export default function QuestionCreation() {
             <Radio
                 disableRipple
                 color="default"
+                disabled={!readAndWriteAccess}
                 checkedIcon={<BpCheckedIcon />}
                 icon={<BpIcon />}
                 {...props}
@@ -619,7 +641,7 @@ export default function QuestionCreation() {
         <div>
             <div style={{ paddingBottom: '20px', textAlign: 'end' }}>
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length === 1 &&
-                    <Button variant="contained" onClick={() => {
+                    <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => {
                         var item = questionData.find(item => item.checked === true);
                         setEditData({
                             id: item.BitBankDetailId,
@@ -630,9 +652,9 @@ export default function QuestionCreation() {
                     }}>Edit</Button>
                 }
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
+                    <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
                 }
-                &nbsp;&nbsp;<Button variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
+                &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
 
             </div>
             {showTree && <div >
@@ -643,7 +665,7 @@ export default function QuestionCreation() {
                     onCheck={checked => setChecked(checked)}
                 //   onClick={(e) => onClickCheckBox(e)}
                 />}
-                <Button variant="contained" onClick={() => getQuestions()}>Get Questions</Button>
+                <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => getQuestions()}>Get Questions</Button>
 
             </div>
             }
@@ -669,7 +691,7 @@ export default function QuestionCreation() {
                                         {i + 1}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        <input checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
+                                        <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.B_QUESTION}
@@ -678,7 +700,7 @@ export default function QuestionCreation() {
                                         {row.B_Q_ANS}
                                     </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
-                                        <Button onClick={() => openModalHandler(row, i)}>Create Question</Button>
+                                        <Button disabled={!readAndWriteAccess} onClick={() => openModalHandler(row, i)}>Create Question</Button>
                                         {open && renderModal()}
                                     </TableCell>
                                 </TableRow>
@@ -698,6 +720,7 @@ export default function QuestionCreation() {
                                     count={questionData.length}
                                     rowsPerPage={rowsPerPage}
                                     page={page}
+                                    disabled={!readAndWriteAccess}
                                     SelectProps={{
                                         inputProps: {
                                             'aria-label': 'questionData per page',
@@ -723,6 +746,7 @@ export default function QuestionCreation() {
                     aria-label="Question"
                     placeholder="Create a Question"
                     style={{ width: 500, height: 100 }}
+                    disabled={!readAndWriteAccess}
                 />
                 <div style={{ paddingTop: '2rem' }}>
                     <input type="file" onChange={onFileChange} />
@@ -732,7 +756,7 @@ export default function QuestionCreation() {
                     <img src={previewImgSrc} style={{ width: '40%', paddingTop: '15px' }} />
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <Button onClick={() => onClickAddOptions()} variant="contained">Add options</Button>
+                    <Button disabled={!readAndWriteAccess} onClick={() => onClickAddOptions()} variant="contained">Add options</Button>
 
                 </div>
                 {options?.length > 0 && <div>
@@ -741,10 +765,11 @@ export default function QuestionCreation() {
                         aria-labelledby="demo-customized-radios"
                         name="customized-radios"
                         sx={{ display: 'inline' }}
+                        disabled={!readAndWriteAccess}
                     >
                         {options?.map((op, i) => {
-                            return (<><FormControlLabel value={op.value} onClick={() => onClickRadio(i)} control={<BpRadio />} />
-                                <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} /> <br /></>)
+                            return (<><FormControlLabel disabled={!readAndWriteAccess} value={op.value} onClick={() => onClickRadio(i)} control={<BpRadio />} />
+                                <TextField disabled={!readAndWriteAccess} placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} /> <br /></>)
                         })}
                     </RadioGroup>
                     {options?.length === 4 && <TextareaAutosize
@@ -753,9 +778,10 @@ export default function QuestionCreation() {
                         aria-label="Question"
                         placeholder="Explain the answer"
                         style={{ width: 500, height: 100 }}
+                        disabled={!readAndWriteAccess}
                     />}
                     <div style={{ paddingTop: '20px' }}>
-                        <Button onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
+                        <Button disabled={!readAndWriteAccess} onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
                     </div>
                 </div>
 
@@ -763,7 +789,7 @@ export default function QuestionCreation() {
             </div>
             }
             {!showTree &&
-                <Button sx={{ marginTop: '1rem' }} variant="contained" onClick={() => setShowTree(!showTree)}>Back to Filters</Button>
+                <Button disabled={!readAndWriteAccess} sx={{ marginTop: '1rem' }} variant="contained" onClick={() => setShowTree(!showTree)}>Back to Filters</Button>
 
             }
             <Modal
@@ -782,6 +808,7 @@ export default function QuestionCreation() {
                                 value={editData.question}
                                 onChange={handleChangeEdit}
                                 name="question"
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={10}>
@@ -792,18 +819,19 @@ export default function QuestionCreation() {
                                 value={editData.answer}
                                 onChange={handleChangeEdit}
                                 name="answer"
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                     </Grid>
                     <Stack spacing={2} direction="row" style={{ marginTop: "30px" }}>
-                        <Button variant="outlined" onClick={() => setEditData("")}>Close</Button>
-                        <Button variant="contained" onClick={() => upDateQuestionData()}  >submit</Button>
+                        <Button disabled={!readAndWriteAccess} variant="outlined" onClick={() => setEditData("")}>Close</Button>
+                        <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => upDateQuestionData()}  >submit</Button>
 
                     </Stack>
                 </Box>
             </Modal>
             {openSnackBar &&
-                <SnackBar data={snackBarData} CloseSnakBar={CloseSnakBar} />
+                <SnackBar disabled={!readAndWriteAccess} data={snackBarData} CloseSnakBar={CloseSnakBar} />
             }
         </div>
     );

@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import api from '../services/api';
 import CommonTableView from './TableView';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function Statements() {
     // const serverUrl = `http://localhost:8080/statements/`;
@@ -16,6 +17,8 @@ export default function Statements() {
     const [showFalse, setShowFalse] = React.useState(false);
     const [parentStatementId, setParentStatementId] = React.useState('');
     const [parentStatementName, setParentStatementName] = React.useState('');
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+
     React.useEffect(() => {
         async function fetchData() {
             const response = await api(null, serverUrl + 'list', 'get');
@@ -25,6 +28,13 @@ export default function Statements() {
 
         }
         fetchData();
+    }, []);
+
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
     }, []);
     const addRow = () => {
         setTrueValue([...trueValue.concat([''])])
@@ -131,15 +141,15 @@ export default function Statements() {
                 {falseValue && falseValue.length > 0 && falseValue?.map((f, i) => {
                     return (<div style={{ paddingBottom: '2rem' }}>
 
-                        <TextField sx={{ width: '75%' }} id="outlined-basic" value={f} onChange={(e) => onChangeFalseValue(e.target?.value, i)} label={`False Statement - ` + (i + 1)} variant="outlined" />
-                        &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeFalseRow(i)}>Delete</Button> <br /><br />
+                        <TextField disabled={!readAndWriteAccess} sx={{ width: '75%' }} id="outlined-basic" value={f} onChange={(e) => onChangeFalseValue(e.target?.value, i)} label={`False Statement - ` + (i + 1)} variant="outlined" />
+                        &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeFalseRow(i)}>Delete</Button> <br /><br />
 
                     </div>)
                 })}
                 <Stack spacing={2} direction="row">
-                    &nbsp;&nbsp;<Button variant="contained" onClick={() => addFalseRow()}>Add Row</Button> <br /> <br />
-                    {<Button variant="contained" onClick={() => { setShowTable(true); setShowFalse(false) }}>Cancel</Button>}
-                    {<Button variant="contained" onClick={() => saveFalseStatements()}>Save False Statements</Button>}
+                    &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => addFalseRow()}>Add Row</Button> <br /> <br />
+                    {<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { setShowTable(true); setShowFalse(false) }}>Cancel</Button>}
+                    {<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => saveFalseStatements()}>Save False Statements</Button>}
                 </Stack>
             </div>
         )
@@ -147,21 +157,21 @@ export default function Statements() {
     return (
         <div>
             <div style={{ paddingBottom: '1rem', textAlign: 'right' }}>
-                {showTable && <Button variant="contained" onClick={() => setShowTable(!showTable)}>Create New Statements</Button>}
+                {showTable && <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => setShowTable(!showTable)}>Create New Statements</Button>}
             </div>
-            {showTable && data.length > 0 && <div><CommonTableView hideStatement={hideStatement} onClickCreate={onClickCreate} data={data} /></div>}
+            {showTable && data.length > 0 && <div><CommonTableView disabled={!readAndWriteAccess} hideStatement={hideStatement} onClickCreate={onClickCreate} data={data} /></div>}
             {!showTable && !showFalse && trueValue && trueValue.length > 0 && trueValue?.map((t, i) => {
                 return (<div style={{ paddingBottom: '2rem' }}>
 
-                    <TextField sx={{ width: '75%' }} id="outlined-basic" value={t} onChange={(e) => onChangeTrueValue(e.target?.value, i)} label="True Statement" variant="outlined" />
-                    &nbsp;&nbsp;<Button sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeRow(i)}>Delete</Button>
+                    <TextField disabled={!readAndWriteAccess} sx={{ width: '75%' }} id="outlined-basic" value={t} onChange={(e) => onChangeTrueValue(e.target?.value, i)} label="True Statement" variant="outlined" />
+                    &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} sx={{ height: '1.5rem', width: '2rem', marginTop: '1rem' }} variant="outlined" onClick={() => removeRow(i)}>Delete</Button>
 
                 </div>)
             })}
             {!showTable && !showFalse && <div>
                 <Stack spacing={2} direction="row">
-                    {<Button variant="contained" onClick={() => addRow()}>Add Row</Button>}
-                    {<Button variant="contained" onClick={() => saveStatements()}>Save Statements</Button>}
+                    {<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => addRow()}>Add Row</Button>}
+                    {<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => saveStatements()}>Save Statements</Button>}
                 </Stack>
             </div>}
             {showFalse && renderFakeContent()}

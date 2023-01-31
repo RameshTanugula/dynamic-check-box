@@ -1,12 +1,10 @@
 import * as securedLocalStorage from "./SecureLocalaStorage";
-
-
-
-
+import jwt_decode from "jwt-decode";
 
 export const checkAccess = (screen, type) => {
-    const roles = securedLocalStorage.get("roles");
-    const currentRole = securedLocalStorage.get("currentrole");
+    const userdata = jwt_decode(securedLocalStorage.get("token"));
+    const roles = userdata?.userRoles;
+    const currentRole = userdata?.userRoleName;
     let value = false;
     roles?.forEach(e => {
         if (e.page.toLowerCase() === screen.toLowerCase()) {
