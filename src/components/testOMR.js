@@ -29,6 +29,12 @@ export default function TestOMR() {
         setSelectedFile(event.target.files);
 
     };
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
     const formatKey = () => {
         return key?.split(",")?.map(k => parseInt(k));
     }
