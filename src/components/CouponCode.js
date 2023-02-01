@@ -23,6 +23,7 @@ import moment from "moment";
 import api from '../services/api';
 import { DataGrid } from '@mui/x-data-grid';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 const columns = [
     { field: 'coupon_code', headerName: 'Coupon Code', minWidth: 200, },
@@ -74,6 +75,8 @@ export default function CouponCode() {
     const [openModel, setOpenModel] = React.useState(false);
     const [submitValid, setSubmitValid] = React.useState(true);
     const [courseNames, setCourseNames] = React.useState([]);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+
     const [date, setDate] = React.useState(null);
     const [errors, setErrors] = React.useState({
         couponCode: "",
@@ -213,8 +216,14 @@ export default function CouponCode() {
     }
     React.useEffect(() => {
         setErrors(errors);
+    }, [submitValid]);
 
-    }, [submitValid])
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
 
     return (
         <div>
@@ -232,6 +241,7 @@ export default function CouponCode() {
                                 name="couponCode"
                                 error={errors.couponCode !== ""}
                                 helperText={errors.couponCode !== "" ? 'Coupon Code is reuired' : ' '}
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={16}>
@@ -249,6 +259,7 @@ export default function CouponCode() {
                                     error={errors.course !== ""}
                                     helperText={errors.course !== "" ? 'Please select at least one Course' : ' '}
                                     MenuProps={MenuProps}
+                                    disabled={!readAndWriteAccess}
                                 >
                                     {names.map((name) => (
                                         <MenuItem key={name} value={name}>
@@ -273,6 +284,7 @@ export default function CouponCode() {
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">%</InputAdornment>,
                                 }}
+                                disabled={!readAndWriteAccess}
                             />
                         </Grid>
                         <Grid item xs={16}>
@@ -286,7 +298,7 @@ export default function CouponCode() {
                                         setDate(newValue);
                                     }}
                                     renderInput={(params) => <TextField {...params} sx={{ width: '25%' }} />}
-
+                                    disabled={!readAndWriteAccess}
                                 />
                             </LocalizationProvider>
                         </Grid>
@@ -295,15 +307,15 @@ export default function CouponCode() {
                             <FormLabel component="legend">New Promo Code</FormLabel>
                             <FormControlLabel
                                 control={
-                                    <Checkbox checked={formFields.firstPurchase} value={formFields.firstPurchase} onChange={handleChange} name="firstPurchase" />
+                                    <Checkbox checked={formFields.firstPurchase} disabled={!readAndWriteAccess} value={formFields.firstPurchase} onChange={handleChange} name="firstPurchase" />
                                 }
                                 label="First Purchase Only"
                             />
                         </Grid>
                         <Grid item xs={16}>
                             <Stack spacing={2} direction="row">
-                                <Button variant="contained" onClick={() => preView()} >Confirm</Button>
-                                <Button variant="outlined" onClick={() => resetForm()}>Reset</Button>
+                                <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => preView()} >Confirm</Button>
+                                <Button variant="outlined" disabled={!readAndWriteAccess} onClick={() => resetForm()}>Reset</Button>
                             </Stack>
                         </Grid>
                     </Grid>
@@ -317,6 +329,7 @@ export default function CouponCode() {
                         columns={columns}
                         pageSize={5}
                         rowsPerPageOptions={[5]}
+                        disabled={!readAndWriteAccess}
                     />
                 </div>
             }
@@ -347,8 +360,8 @@ export default function CouponCode() {
                         </Grid>
                     </Grid>
                     <Stack spacing={2} direction="row" style={{ marginTop: "30px" }}>
-                        <Button variant="contained" onClick={() => submit()} >submit</Button>
-                        <Button variant="outlined" onClick={() => closeModel()}>Close</Button>
+                        <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => submit()} >submit</Button>
+                        <Button variant="outlined" disabled={!readAndWriteAccess} onClick={() => closeModel()}>Close</Button>
                     </Stack>
                 </Box>
             </Modal>

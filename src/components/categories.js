@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 
 import api from '../services/api';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function Categories() {
     // const serverUrl = `http://localhost:8080/categories/`
@@ -18,6 +19,7 @@ export default function Categories() {
     const [subCategoryData, setSubCategoryData] = React.useState([]);
     const [selectedSubCategory, setSelectedSubCategory] = React.useState(``);
     const [selectedMainCategory, setSelectedMainCategory] = React.useState(``);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [newCatValue, setNewCatValue] = React.useState(``);
     React.useEffect(() => {
         async function getData() {
@@ -45,6 +47,13 @@ export default function Categories() {
         }
         getData();
     }, [selectedMainCategory]);
+
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, [])
     const getMainCategories = () => {
         return (
             <Select
@@ -53,6 +62,7 @@ export default function Categories() {
                 id="demo-simple-select-standard"
                 value={selectedMainCategory}
                 autoWidth
+                disabled={!readAndWriteAccess}
                 onChange={(e) => setSelectedMainCategory(e?.target?.value)}
             >
                 <MenuItem value="">
@@ -98,18 +108,19 @@ export default function Categories() {
                 value={selectedSubCategory && subCategoryData?.find(sc => sc.id === selectedSubCategory)?.label}
                 filterSelectedOptions
                 renderInput={(params) => <TextField {...params} label="Categories" />}
+                disabled={!readAndWriteAccess}
             />
             <br /><br />
             <div>
 
-                <TextField sx={{ width: '25%' }} id="outlined-basic" value={newCatValue} onChange={(e) => setNewCatValue(e.target?.value)} label="New Category" variant="outlined" />
+                <TextField disabled={!readAndWriteAccess} sx={{ width: '25%' }} id="outlined-basic" value={newCatValue} onChange={(e) => setNewCatValue(e.target?.value)} label="New Category" variant="outlined" />
             </div>
             <br /><br /><br />
             <div>
 
                 <Stack spacing={2} direction="row">
-                    <Button variant="contained" onClick={() => saveCategory()}>Add Category</Button>
-                    <Button variant="outlined" onClick={() => resetAll()}>Reset</Button>
+                    <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => saveCategory()}>Add Category</Button>
+                    <Button disabled={!readAndWriteAccess} variant="outlined" onClick={() => resetAll()}>Reset</Button>
                 </Stack>
             </div>
         </div>

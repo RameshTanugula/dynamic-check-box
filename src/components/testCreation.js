@@ -3,6 +3,7 @@ import CheckboxTree from 'react-dynamic-checkbox-tree';
 import api from '../services/api';
 import './common.css';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -17,9 +18,7 @@ export default function TestCreation() {
     const [showForm, setShowForm] = React.useState(true);
     const [catagoryData, setCategoryData] = React.useState([]);
     const [result, setResult] = React.useState([]);
-
-
-
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
 
     React.useEffect(() => {
@@ -54,7 +53,13 @@ export default function TestCreation() {
             }
         }
         getData();
-    }, [checked])
+    }, [checked]);
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
     const prepareCatIds = () => {
         let ids1 = [];
         let ids2 = [];
@@ -148,6 +153,7 @@ export default function TestCreation() {
                         checked={checked}
                         onCheck={checked => setChecked(checked)}
                         onClick={(e) => onClickCheckBox(e)}
+                        disabled={!readAndWriteAccess}
                     />
                     }
                 </div>
@@ -160,7 +166,7 @@ export default function TestCreation() {
                                 <div style={{ padding: '5px' }}>
 
                                     <div>
-                                        <div><input checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
+                                        <div><input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
                                         <div style={{
                                             paddingTop: '5px',
                                             border: '1px solid blue'
@@ -181,23 +187,23 @@ export default function TestCreation() {
                             <label >
                                 Test Name:
                             </label><br />
-                            <input type="text" value={testName} required onChange={(e) => { setTestName(e.target.value) }} /><br />
+                            <input disabled={!readAndWriteAccess} type="text" value={testName} required onChange={(e) => { setTestName(e.target.value) }} /><br />
 
                             <label >
                                 Test Description:
                             </label><br />
-                            <textarea id="dur" name="w3review" rows="4" cols="50" value={testDesc} required onChange={(e) => { setTestDesc(e.target.value) }} ></textarea><br />
+                            <textarea disabled={!readAndWriteAccess} id="dur" name="w3review" rows="4" cols="50" value={testDesc} required onChange={(e) => { setTestDesc(e.target.value) }} ></textarea><br />
 
                             <label>
                                 Test Duration (in Min):
                             </label><br />
-                            <input type="number" value={testDur} required onChange={(e) => { setTestDur(e.target.value) }} /><br />
+                            <input disabled={!readAndWriteAccess} type="number" value={testDur} required onChange={(e) => { setTestDur(e.target.value) }} /><br />
                             <label>
                                 No.Of Questions:
                             </label><br />
-                            <input type="number" value={testNoOfQuestions} required onChange={(e) => { setTestNoOfQuestions(e.target.value) }} /><br />
+                            <input disabled={!readAndWriteAccess} type="number" value={testNoOfQuestions} required onChange={(e) => { setTestNoOfQuestions(e.target.value) }} /><br />
 
-                            <input type="submit" value="Submit" />
+                            <input disabled={!readAndWriteAccess} type="submit" value="Submit" />
                         </form>
                     </header>
                 </div>

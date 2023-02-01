@@ -4,6 +4,7 @@ import './flashCard.css';
 import TextField from '@mui/material/TextField';
 import Loader from './circularProgress';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function TestOMR() {
 
@@ -21,7 +22,7 @@ export default function TestOMR() {
     const [totalWrong, setTotalWrong] = useState(null);
     const [isRollNumMatched, setIsRollNumMatched] = useState(false);
     const [testIdMatched, setTestIdMatched] = useState(false);
-
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     // On file select (from the pop up)
     const onFileChange = event => {
 
@@ -120,6 +121,7 @@ export default function TestOMR() {
                             value={testId}
                             onChange={(e) => setTestId(e.target.value)}
                             name="TestId"
+                            disabled={!readAndWriteAccess}
                         // error={title === ""}
                         // helperText={title === "" ? 'Title is reuired' : ' '}
                         /><br />
@@ -131,6 +133,7 @@ export default function TestOMR() {
                             value={key}
                             onChange={(e) => setKey(e.target.value)}
                             name="Key"
+                            disabled={!readAndWriteAccess}
                         /><br />
 
                         <TextField
@@ -140,10 +143,11 @@ export default function TestOMR() {
                             value={studentId}
                             onChange={(e) => setStudentId(e.target.value)}
                             name="Roll Number"
+                            disabled={!readAndWriteAccess}
                         /><br />
                     </div>
                     <div style={{ paddingTop: '2rem' }}>
-                        <input type="file" multiple onChange={onFileChange} />
+                        <input disabled={!readAndWriteAccess} type="file" multiple onChange={onFileChange} />
                         <br />
                         <br />
                         <button onClick={onFileUpload}>

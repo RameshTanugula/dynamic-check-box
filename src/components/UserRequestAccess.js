@@ -4,11 +4,12 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import api from '../services/api';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function UserRequestAccess() {
-
     const serverUrl = securedLocalStorage.baseUrl + "admin/request/";
     const [tableData, settableData] = React.useState([]);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     const columns = [
         { field: 'user_id', headerName: 'User Id', minWidth: 150, },
@@ -22,7 +23,7 @@ export default function UserRequestAccess() {
             renderCell: (params) => {
                 return (
                     <Stack direction="row" spacing={1}>
-                        <Button variant="outlined" onClick={() => requestAccess(params.row)} >Approve</Button>
+                        <Button variant="outlined" disabled={!readAndWriteAccess} onClick={() => requestAccess(params.row)} >Approve</Button>
                     </Stack>)
             }
         },
@@ -52,7 +53,11 @@ export default function UserRequestAccess() {
 
     React.useEffect(() => {
         getDeatails();
-    }, [])
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
 
     return (
         <div style={{ height: 400, width: '100%' }}>

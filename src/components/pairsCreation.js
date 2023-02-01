@@ -28,8 +28,10 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
+import * as CheckAccess from "./CheckAccess";
 
 function TablePaginationActions(props) {
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -48,33 +50,40 @@ function TablePaginationActions(props) {
     const handleLastPageButtonClick = (event) => {
         onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
+
 
     return (
         <Box sx={{ flexShrink: 0, ml: 2.5 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="first page"
             >
                 {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
             </IconButton>
             <IconButton
                 onClick={handleBackButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="previous page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
                 onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="next page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="last page"
             >
                 {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
@@ -108,6 +117,7 @@ export default function CreatePairs() {
     const [showTable, setShowTable] = React.useState(false);
     const [from, setFrom] = React.useState(null);
     const [to, setTo] = React.useState(null);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
 
     /**
@@ -140,6 +150,14 @@ export default function CreatePairs() {
         }
         fetchData();
     }, [type]);
+
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -156,6 +174,7 @@ export default function CreatePairs() {
                 id="demo-simple-select-standard"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
+                disabled={!readAndWriteAccess}
             >
 
                 {typeList.map((tl) => { return (<MenuItem value={tl.value}>{tl.label}</MenuItem>) })}
@@ -176,6 +195,7 @@ export default function CreatePairs() {
                 id="demo-simple-select-standard"
                 value={user}
                 onChange={(e) => onChangeUser(e.target.value)}
+                disabled={!readAndWriteAccess}
             >
                 {usersList.map((tl) => { return (<MenuItem value={tl.user}>{tl.user}</MenuItem>) })}
             </Select>
@@ -199,9 +219,9 @@ export default function CreatePairs() {
             <div>
                 {data.map(((d, i) => {
                     return (<div style={{ display: 'flex' }}>
-                        <span style={{ paddingRight: '1rem', paddingTop: '1rem' }}>    <input checked={d.checked} value={d.checked} onClick={() => onClickPairCheckBox(i)} type="checkbox" />
+                        <span style={{ paddingRight: '1rem', paddingTop: '1rem' }}>    <input disabled={!readAndWriteAccess} checked={d.checked} value={d.checked} onClick={() => onClickPairCheckBox(i)} type="checkbox" />
                         </span>
-                        <span onClick={() => onClickHandler(d)} style={{ display: 'flex' }}>
+                        <span disabled={!readAndWriteAccess} onClick={() => onClickHandler(d)} style={{ display: 'flex' }}>
 
                             <p style={{ "fontWeight": "bold" }}>{d.id}:</p>&nbsp;<p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span></div>)
                 }))}
@@ -211,7 +231,7 @@ export default function CreatePairs() {
     const renderPairContent = () => {
         return (
             <div>
-                <span><TextField label="Part A" value={part_a} /> <TextField label="Part B" value={part_b} /></span>
+                <span><TextField disabled={!readAndWriteAccess} label="Part A" value={part_a} /> <TextField disabled={!readAndWriteAccess} label="Part B" value={part_b} /></span>
             </div>
         )
     }
@@ -292,15 +312,15 @@ export default function CreatePairs() {
                 <div style={{ float: 'right', paddingBottom: '2rem' }}>
                     <Stack spacing={2} direction="row" sx={{ textAlign: 'right' }}>
                         {pairsData.filter(pp => pp.checked)?.length > 0 &&
-                            <Button variant="contained" onClick={createGroup}>Create as a Group</Button>}
-                        <Button variant="contained" sx={{ paddingLeft: '2rem' }} onClick={() => setShowTable(false)}>Back To Screen</Button>
+                            <Button disabled={!readAndWriteAccess} variant="contained" onClick={createGroup}>Create as a Group</Button>}
+                        <Button disabled={!readAndWriteAccess} variant="contained" sx={{ paddingLeft: '2rem' }} onClick={() => setShowTable(false)}>Back To Screen</Button>
                     </Stack>
                 </div><TableContainer component={Paper}>
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                         <TableHead>
                             <TableRow>
                                 <TableCell>
-                                    <input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" />
+                                    <input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" />
                                 </TableCell>
                                 <TableCell align="center" sx={{ fontWeight: 'bold' }}>Part A</TableCell>
                                 <TableCell align="center" sx={{ fontWeight: 'bold' }}>Part B</TableCell>
@@ -313,7 +333,7 @@ export default function CreatePairs() {
                             ).map((row, i) => (
                                 <TableRow key={i}>
                                     <TableCell component="th" scope="row">
-                                        <input checked={row.checked} onClick={() => onClickCheckBox(row.id, i)} type="checkbox" />
+                                        <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(row.id, i)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.parts_a}
@@ -343,7 +363,9 @@ export default function CreatePairs() {
                                     }}
                                     onPageChange={handleChangePage}
                                     onRowsPerPageChange={handleChangeRowsPerPage}
-                                    ActionsComponent={TablePaginationActions} />
+                                    ActionsComponent={TablePaginationActions}
+                                    disabled={!readAndWriteAccess}
+                                />
                             </TableRow>
                         </TableFooter>
                     </Table>
@@ -393,9 +415,9 @@ export default function CreatePairs() {
                     <div>
                         {renderSelect()}
                         &nbsp;&nbsp;{renderUsers()}
-                        &nbsp; &nbsp;<TextField label="From" value={from} onChange={(e) => setFrom(e.target.value)} placeholder='From' />
-                        &nbsp; &nbsp;<TextField label="To" value={to} placeholder='To' onChange={(e) => setTo(e.target.value)} />
-                        &nbsp; &nbsp;<Button variant="contained" onClick={getData}>
+                        &nbsp; &nbsp;<TextField disabled={!readAndWriteAccess} label="From" value={from} onChange={(e) => setFrom(e.target.value)} placeholder='From' />
+                        &nbsp; &nbsp;<TextField disabled={!readAndWriteAccess} label="To" value={to} placeholder='To' onChange={(e) => setTo(e.target.value)} />
+                        &nbsp; &nbsp;<Button disabled={!readAndWriteAccess} variant="contained" onClick={getData}>
                             Get Data
                         </Button>
                         &nbsp; &nbsp; {data?.filter(d => d.checked)?.length > 0 && <Button variant="contained" onClick={hidePairs}>
@@ -406,7 +428,7 @@ export default function CreatePairs() {
                     <div style={{ width: '100%' }}>
                         <div style={{ textAlign: 'end' }}>
                             <div>
-                                <Button variant="contained" onClick={getSelectionHandler}>
+                                <Button disabled={!readAndWriteAccess} variant="contained" onClick={getSelectionHandler}>
                                     Copy Selection
                                 </Button>
                                 <br />
@@ -415,7 +437,7 @@ export default function CreatePairs() {
                             {renderPairContent()}
                             <div>
                                 <br />
-                                <Button variant="contained" onClick={addToPairBox}>
+                                <Button disabled={!readAndWriteAccess} variant="contained" onClick={addToPairBox}>
                                     Add
                                 </Button>
                                 <br />

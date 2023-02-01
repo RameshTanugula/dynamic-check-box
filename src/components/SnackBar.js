@@ -15,22 +15,8 @@ export default function SnackBar(props) {
     const [open, setOpen] = React.useState(true);
 
     function closeSnakBar() {
-        props.CloseSnakBar();
+        props.closeSnakBar();
     }
-
-    const snackBarAction = (
-        <React.Fragment>
-            <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={closeSnakBar}
-            >
-                <CloseIcon fontSize="small" />
-            </IconButton>
-        </React.Fragment>
-    );
-
 
     return (
         <Snackbar open={open} autoHideDuration={6000} onClose={closeSnakBar} anchorOrigin={{ vertical, horizontal }} key={vertical + horizontal}>

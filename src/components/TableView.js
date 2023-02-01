@@ -18,8 +18,10 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
+import * as CheckAccess from "./CheckAccess";
 
 function TablePaginationActions(props) {
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -39,33 +41,39 @@ function TablePaginationActions(props) {
         onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
 
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
 
     return (
         <Box sx={{ flexShrink: 0, ml: 2.5 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="first page"
             >
                 {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
             </IconButton>
             <IconButton
                 onClick={handleBackButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="previous page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
                 onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="next page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="last page"
             >
                 {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
@@ -84,6 +92,7 @@ export default function CommonTableView(props) {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     // const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     const handleChangePage = (event, newPage) => {
@@ -97,9 +106,15 @@ export default function CommonTableView(props) {
     const onClickFakeCreate = (row) => {
         props.onClickCreate(row)
     }
-    const hideStatement=(id)=>{
+    const hideStatement = (id) => {
         props.hideStatement(id)
     }
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
@@ -120,9 +135,9 @@ export default function CommonTableView(props) {
                             </TableCell>
                             <TableCell style={{ width: 160 }} align="right">
                                 {/* {row.parts_b} */}
-                                <Button variant="contained" onClick={() => onClickFakeCreate(row)}>Add False</Button>
-                                <Button sx={{marginTop:'5px'}} variant="contained" onClick={() => hideStatement(row.StatementId)}>Hide</Button>
-                            
+                                <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => onClickFakeCreate(row)}>Add False</Button>
+                                <Button disabled={!readAndWriteAccess} sx={{ marginTop: '5px' }} variant="contained" onClick={() => hideStatement(row.StatementId)}>Hide</Button>
+
                             </TableCell>
 
                         </TableRow>
@@ -133,6 +148,7 @@ export default function CommonTableView(props) {
                 <TableFooter>
                     <TableRow>
                         <TablePagination
+                            disabled={!readAndWriteAccess}
                             rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
                             colSpan={5}
                             count={props.data?.length}

@@ -4,6 +4,7 @@ import CheckboxTree from 'react-dynamic-checkbox-tree';
 import api from '../services/api';
 import Loader from './circularProgress';
 import * as securedLocalStorage from "./SecureLocalaStorage";
+import * as CheckAccess from "./CheckAccess";
 
 export default function Mapping() {
   // const serverUrl = `http://localhost:8080/`
@@ -22,6 +23,8 @@ export default function Mapping() {
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(true);
   const [isRange, setIsRange] = useState(false);
+  const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+
   const contentTypeList = [
     { label: "Content Type", value: null },
     { label: "Bit Bank", value: "bitbank" },
@@ -73,7 +76,14 @@ export default function Mapping() {
       }
     }
     fetchData();
-  }, [type])
+  }, [type]);
+
+  React.useEffect(() => {
+    const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+    if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+      setReadAndWriteAccess(true);
+    }
+  }, []);
   const getQuestions = async () => {
     if (from && to) {
       setLoading(true);
@@ -249,7 +259,7 @@ export default function Mapping() {
       {/* {loading && "Loading...!"} */}
       {<div>
         <div style={{}}>
-          <span><select onChange={(e) => onChangeType(e.target.value)}>
+          <span><select disabled={!readAndWriteAccess} onChange={(e) => onChangeType(e.target.value)}>
             {contentTypeList.map((c, i) => {
               return (
                 <option key={i} value={c.value}>{c.label}</option>
@@ -257,7 +267,7 @@ export default function Mapping() {
             })}
           </select>
           </span>
-          &nbsp;&nbsp;<span><select value={selectedUser} onChange={(e) => onChangeUser(e.target.value)}>
+          &nbsp;&nbsp;<span><select disabled={!readAndWriteAccess} value={selectedUser} onChange={(e) => onChangeUser(e.target.value)}>
             <option value={""}>Select User</option>
             {user && user?.map((u, i) => {
               return (
@@ -266,14 +276,14 @@ export default function Mapping() {
             })}
           </select>
           </span>
-          <span><input type="checkbox" checked={isRange} onClick={() => onChangeRange()} /> Select Range</span>
+          <span><input disabled={!readAndWriteAccess} type="checkbox" checked={isRange} onClick={() => onChangeRange()} /> Select Range</span>
           {/* <span>Questions:<input type="checkbox" checked={type==="questions"} onClick={()=>setType("questions")}/>
            BitBank:<input type="checkbox" checked={type==="bitbank"} onClick={()=>setType("bitbank")}/> </span> */}
 
-          &nbsp;&nbsp;&nbsp;&nbsp;<input placeholder='From:' type="text" value={from} onChange={(e) => setFrom(e.target.value)} />
-          &nbsp;&nbsp;<input type="text" placeholder='To:' value={to} onChange={(e) => setTo(e.target.value)} />
-          &nbsp;&nbsp;&nbsp;{!isRange && <button onClick={() => { (!isRange && from && to) ? applyTagsToQset() : applyTags() }}>Add Tags</button>}
-          {isRange && <button onClick={() => { getQuestions() }}>Get Questions</button>}
+          &nbsp;&nbsp;&nbsp;&nbsp;<input disabled={!readAndWriteAccess} placeholder='From:' type="text" value={from} onChange={(e) => setFrom(e.target.value)} />
+          &nbsp;&nbsp;<input disabled={!readAndWriteAccess} type="text" placeholder='To:' value={to} onChange={(e) => setTo(e.target.value)} />
+          &nbsp;&nbsp;&nbsp;{!isRange && <button disabled={!readAndWriteAccess} onClick={() => { (!isRange && from && to) ? applyTagsToQset() : applyTags() }}>Add Tags</button>}
+          {isRange && <button disabled={!readAndWriteAccess} onClick={() => { getQuestions() }}>Get Questions</button>}
 
         </div>
         {/* <button onClick={() => { applyTags() }}>Apply Tags</button> */}
@@ -286,7 +296,7 @@ export default function Mapping() {
           <button onClick={() => { applyTagsToQset() }}>Apply Tags </button>
 
         </div> */}
-          {questionData?.length > 0 && <><p>Select All:</p><input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" /></>}
+          {questionData?.length > 0 && <><p>Select All:</p><input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" /></>}
 
           {questionData?.length > 0 &&
             questionData?.map((qData, i) => {
@@ -296,7 +306,7 @@ export default function Mapping() {
                   <div style={{ display: 'flex' }}>
                     <div>
                       <span>{qData.q_id}.</span>
-                      <input checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
+                      <input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
                     <div style={{
                       paddingTop: '5px',
                       border: '1px solid blue'
@@ -310,7 +320,7 @@ export default function Mapping() {
                     {qData.tags &&
                       qData.tags?.split(',')?.sort()?.map((tg, j) =>
                         <div style={{ paddingRight: '5px' }}>
-                          {tg !== '' && <span><button onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>}
+                          {tg !== '' && <span><button disabled={!readAndWriteAccess} onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>}
                         </div>)}
                   </div>
                 </div>)
@@ -324,6 +334,7 @@ export default function Mapping() {
             checked={checked}
             onCheck={checked => setChecked(checked)}
             onClick={(e) => onClickCheckBox(e)}
+            disabled={!readAndWriteAccess}
           />}
         </div>
 

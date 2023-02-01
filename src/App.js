@@ -101,10 +101,6 @@ export default function App() {
   const [anchorEl, setAnchorEl] = React.useState(false);
   const [menuList, setMenuList] = React.useState([]);
 
-  // const handleChange = (event) => {
-  //   setAuth(event.target.checked);
-  // };
-
   const handleMenu = (event) => {
     setAnchorEl(true);
   };
@@ -130,9 +126,6 @@ export default function App() {
   function loginData() {
     if (securedLocalStorage.get("token") !== "") {
       const userdata = jwt_decode(securedLocalStorage.get("token"));
-      console.log(userdata)
-      securedLocalStorage.set("roles", userdata?.userRoles);
-      securedLocalStorage.set("currentrole", userdata?.userRoleName);
       setUserData(userdata);
       setMenuList(userdata.menuList);
       setIsLoggedIn(true);

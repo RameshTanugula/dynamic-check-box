@@ -21,7 +21,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import jwt_decode from "jwt-decode";
-
+import * as CheckAccess from "./CheckAccess";
 import api from '../services/api';
 import './common.css';
 import { TextField } from '@mui/material';
@@ -98,6 +98,7 @@ const style = {
 };
 
 function TablePaginationActions(props) {
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -116,33 +117,39 @@ function TablePaginationActions(props) {
     const handleLastPageButtonClick = (event) => {
         onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
 
     return (
         <Box sx={{ flexShrink: 0, ml: 2.5 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="first page"
             >
                 {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
             </IconButton>
             <IconButton
                 onClick={handleBackButtonClick}
-                disabled={page === 0}
+                disabled={page === 0 && !readAndWriteAccess}
                 aria-label="previous page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
                 onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="next page"
             >
                 {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
                 aria-label="last page"
             >
                 {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
@@ -171,6 +178,8 @@ export default function Questions() {
     const [userRoleName, setUserRoleName] = React.useState("")
     const [userDashBoardData, setUserDashBoardData] = React.useState([]);
     const [showDashBoard, setShowDashBoard] = React.useState(false);
+    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+
     React.useEffect(() => {
         async function fetchData() {
             const tokenData = jwt_decode(securedLocalStorage.get("token"));
@@ -197,7 +206,12 @@ export default function Questions() {
         fetchData()
     }, [])
 
-
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+    }, []);
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - questionData.length) : 0;
 
@@ -243,30 +257,31 @@ export default function Questions() {
         <div>
             <div>
                 &nbsp;&nbsp;
-                <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => setShowDashBoard(!showDashBoard)}>Show User DashBoard</Button>
+                <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => setShowDashBoard(!showDashBoard)}>Show User DashBoard</Button>
                 <br />
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <TextField placeholder='From' sx={{ paddingBottom: '20px' }} onChange={(e) => setFrom(e.target.value)} value={from} />
+                <TextField disabled={!readAndWriteAccess} placeholder='From' sx={{ paddingBottom: '20px' }} onChange={(e) => setFrom(e.target.value)} value={from} />
                 &nbsp;&nbsp;&nbsp;&nbsp;<TextField placeholder='To' sx={{ paddingBottom: '20px' }} onChange={(e) => setTo(e.target.value)} value={to} />
                 &nbsp;&nbsp;<Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
                     value={selectedUser}
                     onChange={(e) => getQuestionsByUser(e.target.value)}
+                    disabled={!readAndWriteAccess}
                 >
                     <MenuItem value="">Select User</MenuItem>
                     {users.map((tl) => { return (<MenuItem value={tl.id}>{tl.first_name} {tl.last_name}</MenuItem>) })}
                 </Select>
-                &nbsp;&nbsp;{<Button variant="contained" onClick={() => { getQuestions() }}>Get Questions</Button>}
+                &nbsp;&nbsp;{<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { getQuestions() }}>Get Questions</Button>}
                 <br />
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('1')}>Accept Questions</Button>
+                    <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('1')}>Accept Questions</Button>
                 }
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('3')}>Reject Questions</Button>
+                    <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('3')}>Reject Questions</Button>
                 }
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('2')}>Edit Questions</Button>
+                    <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('2')}>Edit Questions</Button>
                 }
                 {selectedUser && <div><b>No.of Questions:</b>{questionData?.length}</div>}
             </div>
@@ -315,7 +330,7 @@ export default function Questions() {
                                         {i + 1}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        <input checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
+                                        <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.QuestionTitle}
@@ -358,6 +373,7 @@ export default function Questions() {
                                     onPageChange={handleChangePage}
                                     onRowsPerPageChange={handleChangeRowsPerPage}
                                     ActionsComponent={TablePaginationActions}
+                                    disabled={!readAndWriteAccess}
                                 />
                             </TableRow>
                         </TableFooter>
