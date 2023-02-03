@@ -334,7 +334,8 @@ export default function Questions() {
                                         <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        {row.QuestionTitle}
+                                        {row.QuestionTitle && row.QuestionTitle }
+                                        {row.QUrls && <img src={row.QUrls}/>}
                                     </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
                                         {row.Option1}
