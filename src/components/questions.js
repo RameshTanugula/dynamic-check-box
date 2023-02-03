@@ -246,11 +246,12 @@ export default function Questions() {
         const data = await api({ selectedIds: selectedIds, type: 'questions', status }, serverUrl + 'status/change', 'post');
 
         if (data.status === 200) {
-            const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
-            if (qData.status === 200) {
-                setSelectedUser(null);
-                setQuestionData(qData.data?.res);
-            }
+            getQuestionsByUser(selectedUser);
+            // const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
+            // if (qData.status === 200) {
+            //     setSelectedUser(null);
+            //     setQuestionData(qData.data?.res);
+            // }
         }
     }
     return (
