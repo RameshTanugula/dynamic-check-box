@@ -286,11 +286,12 @@ export default function QuestionCreation() {
             }
         });
         const data = questionData;
+        console.log(data)
         setQuestionData([]);
         setTimeout(() => {
             setQuestionData(data);
         }, 100);
-
+        setEditData("")
     };
 
     const handleChangeRowsPerPage = (event) => {
@@ -600,7 +601,8 @@ export default function QuestionCreation() {
             }
         }
     }
-    const onClickCheckBox = (index) => {
+    const onClickCheckBox = (bitbankID) => {
+        var index = questionData.findIndex(x => x.BitBankDetailId === bitbankID);
         questionData[index]['checked'] = !questionData[index]['checked'];
         setQuestionData([...questionData]);
     }
@@ -652,7 +654,8 @@ export default function QuestionCreation() {
     return (
         <div>
             <div style={{ paddingBottom: '20px', textAlign: 'end' }}>
-                &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length === 1 &&
+                &nbsp;&nbsp;{
+                    questionData?.filter(q => q.checked)?.length === 1 &&
                     <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => {
                         var item = questionData.find(item => item.checked === true);
                         setEditData({
@@ -703,7 +706,7 @@ export default function QuestionCreation() {
                                         {i + 1}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
+                                        <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(row.BitBankDetailId)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.B_QUESTION}
