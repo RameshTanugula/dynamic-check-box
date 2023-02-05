@@ -279,6 +279,13 @@ export default function QuestionCreation() {
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
+        questionData?.forEach(ele => {
+            if (ele.checked) {
+                ele.checked = false;
+            }
+        });
+        setQuestionData(questionData)
+
     };
 
     const handleChangeRowsPerPage = (event) => {

@@ -305,13 +305,14 @@ export default function CeateCourse() {
     function AddSubjectData(i, j, k) {
         var data = ""
         var showList = [];
-        console.log(selectedList)
+        var urls = [];
         if (selectedList.length > 0) {
             selectedList.forEach(ele => {
                 data = data + ele + ",";
                 multiSelectList?.forEach(obj => {
                     if (obj.id === ele) {
-                        showList.push(obj.title)
+                        showList.push(obj.title);
+                        urls.push(obj.url)
                     }
                 })
             });
@@ -321,6 +322,7 @@ export default function CeateCourse() {
                 topicType: selctForm.topicType,
                 selectedData: data,
                 selectedDataShow: showList,
+                url: urls,
             }
             courseSection[i].subjects[j].topics[k].tapicData = [...courseSection[i].subjects[j].topics[k].tapicData, obj]
             setCourseSection([...courseSection]);
