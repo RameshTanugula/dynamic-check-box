@@ -281,10 +281,15 @@ export default function QuestionCreation() {
         setPage(newPage);
         questionData?.forEach(ele => {
             if (ele.checked) {
+                console.log(ele)
                 ele.checked = false;
             }
         });
-        setQuestionData(questionData)
+        const data = questionData;
+        setQuestionData([]);
+        setTimeout(() => {
+            setQuestionData(data);
+        }, 100);
 
     };
 
