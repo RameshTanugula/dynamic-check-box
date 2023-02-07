@@ -44,6 +44,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
+import Users from './components/Users';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -128,6 +129,7 @@ export default function App() {
       const userdata = jwt_decode(securedLocalStorage.get("token"));
       setUserData(userdata);
       setMenuList(userdata.menuList);
+      console.log(menuList)
       setIsLoggedIn(true);
       setAnchorEl(false);
     }
@@ -258,6 +260,7 @@ export default function App() {
                 <Route exact path="/user request access" element={<UserRequestAccess />} />
                 <Route exact path="/titles and sub titles" element={<TitleAndSubTitle />} />
                 <Route exact path="/create course" element={<CreateCourse />} />
+                <Route exact path="/Users" element={<Users />} />
               </Routes>
 
             </Main>

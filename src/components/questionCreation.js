@@ -281,12 +281,10 @@ export default function QuestionCreation() {
         setPage(newPage);
         questionData?.forEach(ele => {
             if (ele.checked) {
-                console.log(ele)
                 ele.checked = false;
             }
         });
         const data = questionData;
-        console.log(data)
         setQuestionData([]);
         setTimeout(() => {
             setQuestionData(data);
@@ -647,7 +645,7 @@ export default function QuestionCreation() {
             questionData[index].checked = false;
         }
     }
-    function CloseSnakBar() {
+    function closeSnakBar() {
         setOpenSnackBar(false);
     }
 
@@ -846,7 +844,7 @@ export default function QuestionCreation() {
                 </Box>
             </Modal>
             {openSnackBar &&
-                <SnackBar disabled={!readAndWriteAccess} data={snackBarData} CloseSnakBar={CloseSnakBar} />
+                <SnackBar disabled={!readAndWriteAccess} data={snackBarData} closeSnakBar={closeSnakBar} />
             }
         </div>
     );
