@@ -2,7 +2,6 @@ import React, { Component, useState } from 'react';
 import api from '../services/api';
 import './flashCard.css';
 import TextField from '@mui/material/TextField';
-import Loader from './circularProgress';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
 
@@ -118,7 +117,7 @@ export default function TestOMR() {
 
             {
                 <div style={{ paddingTop: '2rem', textAlign: 'center' }}>
-                    {!loaded && <Loader />}
+                    {/* {!loaded && <Loader />} */}
                     <div>
                         <TextField
                             label="TestId"
