@@ -45,6 +45,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import SnackBar from './SnackBar';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
+import Loader from './Loader';
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ITEM_HEIGHT = 48;
@@ -232,6 +233,7 @@ export default function QuestionCreation() {
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+    const [showLoader, setShowLoader] = React.useState(false);
 
     const handleChange = (event) => {
         const {
@@ -605,10 +607,12 @@ export default function QuestionCreation() {
         setQuestionData([...questionData]);
     }
     const getQuestions = async () => {
+        setShowLoader(true);
         setShowTree(!showTree)
         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
         if (data.status === 200) {
             setQuestionData(data.data?.res)
+            setShowLoader(false);
         }
     }
     const hideQuestions = async () => {
@@ -845,6 +849,9 @@ export default function QuestionCreation() {
             </Modal>
             {openSnackBar &&
                 <SnackBar disabled={!readAndWriteAccess} data={snackBarData} closeSnakBar={closeSnakBar} />
+            }
+            {showLoader &&
+                <Loader />
             }
         </div>
     );

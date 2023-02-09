@@ -19,6 +19,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
 import api from '../services/api';
 import { DataGrid } from '@mui/x-data-grid';
+import Loader from './Loader';
+
 const style = {
     position: 'absolute',
     top: '40%',
@@ -61,6 +63,8 @@ export default function Users() {
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [isActive, setIsActive] = React.useState("0");
+    const [showLoader, setShowLoader] = React.useState(false);
+
     const columns = [
         { field: 'first_name', headerName: 'First Name', minWidth: 200, },
         { field: 'last_name', headerName: 'Last Name', minWidth: 200, },
@@ -77,8 +81,8 @@ export default function Users() {
             }
         },
     ];
+
     function update(row) {
-        console.log(row)
         resetForm();
         setFormType("Update User");
         setUpdateRow(row);
@@ -154,10 +158,12 @@ export default function Users() {
 
 
     async function getUerList() {
+        setShowLoader(true);
         const url = serverUrl + "list/all";
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
             setTableData(resp.data);
+            setShowLoader(false);
         }
     }
     async function getRoles() {
@@ -169,6 +175,7 @@ export default function Users() {
     }
 
     async function createOrUpdateUser() {
+        setShowLoader(true);
         if (valid()) {
             let message = "created";
             useForm["course"] = "";
@@ -194,9 +201,9 @@ export default function Users() {
                 setSnackBarData(data);
                 setFormType("");
                 getUerList();
+                setShowLoader(false);
             }
             else {
-                console.log()
                 const data = {
                     type: "error",
                     message: resp.response.data.errorMsg
@@ -366,6 +373,9 @@ export default function Users() {
 
             {openSnackBar &&
                 <SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />
+            }
+            {showLoader &&
+                <Loader />
             }
         </div>
     )

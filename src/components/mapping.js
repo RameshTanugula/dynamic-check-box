@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useState } from 'react';
 import CheckboxTree from 'react-dynamic-checkbox-tree';
 import api from '../services/api';
-import Loader from './circularProgress';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
 
