@@ -85,7 +85,6 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
     padding: theme.spacing(2),
     borderTop: '1px solid rgba(0, 0, 0, .125)',
 }));
-
 export default function CeateCourse() {
     const serverUrl = securedLocalStorage.baseUrl + 'course/';
     // const academyList = ["g"];
@@ -110,16 +109,21 @@ export default function CeateCourse() {
     const [publishedDate, setPublishedDate] = React.useState(null);
     const [buttonName, setButtonName] = React.useState("submit");
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+    const [showTestType, setShowTestType] = React.useState(false);
 
-    const [topicTypesList, setTopicTypesList] = React.useState(
-        [
-            { id: 1, type: "PDF" },
-            { id: 2, type: "Learning Card" },
-            { id: 3, type: "Flash Card" },
-            { id: 4, type: "Test" },
-        ]
+    const topicTypesList = [
+        { id: 1, type: "PDF" },
+        { id: 2, type: "Learning Card" },
+        { id: 3, type: "Flash Card" },
+        { id: 4, type: "Test" },
+    ]
 
-    );
+    const testTypeList = [
+        { id: 1, type: "OMR" },
+        { id: 2, type: "Online" },
+
+    ]
+
     const [subjectList, setSubjectList] = React.useState([]);
     const courseFields = {
         courseTitle: "",
@@ -149,11 +153,12 @@ export default function CeateCourse() {
 
 
     const [publishedDateError, setPublishedDateError] = React.useState("")
-    const [coverPageError, setCoverPageError] = React.useState("")
+    const [coverPageError, setCoverPageError] = React.useState("");
 
     const [selctForm, setSelctForm] = React.useState({
         topicName: "",
         topicType: "",
+        tesType: "",
         selectedData: ""
     });
 
@@ -192,7 +197,21 @@ export default function CeateCourse() {
 
         }
         setSelctForm(newData);
-        if (e.target.name === "topicType" && newData.topicName !== "" && newData.topicType !== "") {
+        if (e.target.name === "topicType") {
+            setmultiSelectList([]);
+            if (newData.topicType === 4) {
+                console.log("hi")
+                newData.topicName = null;
+                setShowTestType(true);
+                getTopicssList(newData);
+            }
+            else {
+                setmultiSelectList([]);
+                setShowTestType(false);
+            }
+        }
+        else if (e.target.name === "topicName" && newData.topicName !== "" && newData.topicType !== "") {
+            setmultiSelectList([]);
             getTopicssList(newData);
         }
     }
@@ -320,6 +339,7 @@ export default function CeateCourse() {
                 id: courseSection[i].subjects[j].topics[k].tapicData.length,
                 topicName: selctForm.topicName,
                 topicType: selctForm.topicType,
+                testType: selctForm.tesType,
                 selectedData: data,
                 selectedDataShow: showList,
                 url: urls,
@@ -484,6 +504,8 @@ export default function CeateCourse() {
     }
 
     async function editCourseDeatails(row) {
+        setShowTestType(false);
+        rsetSelectForm();
         setEditData(row)
         setShowSreen("Edit");
         const url = serverUrl + "get/data/bycourse/" + row.id;
@@ -910,6 +932,28 @@ export default function CeateCourse() {
                                                                                         <Typography>
                                                                                             <TextField sx={{ width: '72%' }} id="outlined-basic" value={data?.topicName} label={"Topic " + k} onChange={(e) => addTopicValue(e.target?.value, i, j, k, 'topicName')} variant="outlined" />
                                                                                             <FormControl sx={{ m: 1, minWidth: 490 }} style={{ marginLeft: "-3px" }}>
+                                                                                                <Select
+                                                                                                    labelId="demo-simple-select-label"
+                                                                                                    id="demo-simple-select"
+                                                                                                    name="topicType"
+                                                                                                    value={selctForm.topicType}
+                                                                                                    onChange={(e) => handleChangeSelectData(e)}
+                                                                                                    disabled={!readAndWriteAccess}
+                                                                                                    style={{ marginTop: "15px" }}
+                                                                                                >
+                                                                                                    <MenuItem value="">
+                                                                                                        <em>None</em>
+                                                                                                    </MenuItem>
+                                                                                                    {topicTypesList.map((data, s) => (
+                                                                                                        <MenuItem key={s} value={data.id}>
+                                                                                                            {data.type}
+                                                                                                        </MenuItem>
+                                                                                                    ))}
+                                                                                                </Select>
+                                                                                                <FormHelperText>Type is Required</FormHelperText>
+                                                                                            </FormControl>
+
+                                                                                            <FormControl sx={{ m: 1, minWidth: 490 }} style={{ marginLeft: "-3px" }}>
                                                                                                 <InputLabel id="demo-simple-select-label">Subject Name</InputLabel>
                                                                                                 <Select
                                                                                                     labelId="demo-simple-select-label"
@@ -917,7 +961,7 @@ export default function CeateCourse() {
                                                                                                     name="topicName"
                                                                                                     value={selctForm.topicName}
                                                                                                     onChange={(e) => handleChangeSelectData(e)}
-                                                                                                    disabled={!readAndWriteAccess}
+                                                                                                    disabled={!readAndWriteAccess || showTestType}
                                                                                                 >
                                                                                                     <MenuItem value="">
                                                                                                         <em>None</em>
@@ -931,27 +975,29 @@ export default function CeateCourse() {
                                                                                                 </Select>
                                                                                                 <FormHelperText>Subject Name is Required</FormHelperText>
                                                                                             </FormControl>
-                                                                                            <FormControl sx={{ m: 1, minWidth: 490 }} style={{ marginLeft: "-3px" }}>
-                                                                                                <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                                                                                                <Select
-                                                                                                    labelId="demo-simple-select-label"
-                                                                                                    id="demo-simple-select"
-                                                                                                    name="topicType"
-                                                                                                    value={selctForm.topicType}
-                                                                                                    onChange={(e) => handleChangeSelectData(e)}
-                                                                                                    disabled={!readAndWriteAccess}
-                                                                                                >
-                                                                                                    <MenuItem value="">
-                                                                                                        <em>None</em>
-                                                                                                    </MenuItem>
-                                                                                                    {topicTypesList.map((data, s) => (
-                                                                                                        <MenuItem key={s} value={data.id}>
-                                                                                                            {data.type}
+                                                                                            {showTestType &&
+                                                                                                <FormControl sx={{ m: 1, minWidth: 490 }} style={{ marginLeft: "-3px" }}>
+                                                                                                    <InputLabel id="demo-simple-select-label">Test Type</InputLabel>
+                                                                                                    <Select
+                                                                                                        labelId="demo-simple-select-label"
+                                                                                                        id="demo-simple-select"
+                                                                                                        name="tesType"
+                                                                                                        value={selctForm.tesType}
+                                                                                                        onChange={(e) => handleChangeSelectData(e)}
+                                                                                                        disabled={!readAndWriteAccess}
+                                                                                                    >
+                                                                                                        <MenuItem value="">
+                                                                                                            <em>None</em>
                                                                                                         </MenuItem>
-                                                                                                    ))}
-                                                                                                </Select>
-                                                                                                <FormHelperText>Type is Required</FormHelperText>
-                                                                                            </FormControl>
+                                                                                                        {testTypeList.map((data, s) => (
+                                                                                                            <MenuItem key={s} value={data.type}>
+                                                                                                                {data.type}
+                                                                                                            </MenuItem>
+                                                                                                        ))}
+                                                                                                    </Select>
+                                                                                                    <FormHelperText>Test Type is Required</FormHelperText>
+                                                                                                </FormControl>
+                                                                                            }
                                                                                             <FormControl sx={{ width: 490 }}>
                                                                                                 <InputLabel id="demo-multiple-checkbox-label">Topic Select</InputLabel>
                                                                                                 <Select
