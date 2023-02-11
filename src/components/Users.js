@@ -232,7 +232,7 @@ export default function Users() {
 
     return (
         <div>
-            <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { setFormType("Create User"); resetForm() }}>Crete User</Button>
+            <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { setFormType("Create User"); resetForm() }}>Create User</Button>
             <br />
             <div style={{ height: 400, width: '100%', marginTop: "5px" }}>
                 <DataGrid
