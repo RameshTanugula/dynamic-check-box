@@ -618,8 +618,10 @@ export default function QuestionCreation() {
             }
             const createOptins = []
             chekedOptins.forEach(ele => {
-                createOptins.push({ checked: true, value: ele, label: '' })
+                createOptins.push({ checked: false, value: ele, label: '' })
             });
+            let foundIndex = createOptins.findIndex(element => element.value === radioButtonValue)
+            createOptins[foundIndex].checked = true;
             const optionArray = manual === true ? options : createOptins;
             formData.append("title", questionValue);
             formData.append("solution", solutionValue);
