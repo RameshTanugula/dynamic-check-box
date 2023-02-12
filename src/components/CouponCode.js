@@ -51,10 +51,6 @@ const MenuProps = {
     },
 };
 
-const names = [
-    'DSC',
-    'GROUPS',
-];
 const serverUrl = securedLocalStorage.baseUrl + `promocodes/`;
 
 const modelStyle = {
@@ -76,6 +72,7 @@ export default function CouponCode() {
     const [submitValid, setSubmitValid] = React.useState(true);
     const [courseNames, setCourseNames] = React.useState([]);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+    const [courseList, setCourseList] = React.useState([]);
 
     const [date, setDate] = React.useState(null);
     const [errors, setErrors] = React.useState({
@@ -181,6 +178,7 @@ export default function CouponCode() {
             setSubmitValid(true);
             setOpenModel(true)
             var course = ""
+
             courseNames.forEach(ele => {
                 course = course + ele + ",";
             });
@@ -214,6 +212,14 @@ export default function CouponCode() {
             settableData(res.data)
         }
     }
+
+    async function getCourseList() {
+        const resp = await api(null, securedLocalStorage.baseUrl + "course/list", 'get');
+        if (resp.status === 200) {
+            setCourseList(resp.data);
+        }
+    }
+
     React.useEffect(() => {
         setErrors(errors);
     }, [submitValid]);
@@ -223,6 +229,7 @@ export default function CouponCode() {
         if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
             setReadAndWriteAccess(true);
         }
+        getCourseList();
     }, []);
 
     return (
@@ -261,10 +268,10 @@ export default function CouponCode() {
                                     MenuProps={MenuProps}
                                     disabled={!readAndWriteAccess}
                                 >
-                                    {names.map((name) => (
-                                        <MenuItem key={name} value={name}>
-                                            <Checkbox checked={courseNames.indexOf(name) > -1} />
-                                            <ListItemText primary={name} />
+                                    {courseList.map((name) => (
+                                        <MenuItem key={name.id} value={name.id}>
+                                            <Checkbox checked={courseNames.indexOf(name.id) > -1} />
+                                            <ListItemText primary={name.title} />
                                         </MenuItem>
                                     ))}
                                 </Select>
