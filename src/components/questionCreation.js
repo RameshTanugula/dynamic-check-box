@@ -237,6 +237,11 @@ export default function QuestionCreation() {
     const [showLoader, setShowLoader] = React.useState(false);
     const [manual, setManual] = React.useState(false);
     const [chekedOptins, setChekedOptins] = React.useState([]);
+    const [radioButtonValue, setRadioButtonValue] = React.useState("");
+
+    const handleChangeRadiButton = (event) => {
+        setRadioButtonValue(event.target.value);
+    }
 
 
     const handleChange1 = (event) => {
@@ -263,7 +268,11 @@ export default function QuestionCreation() {
             );
         }
         else {
-            alert("Please choose only 4 Options...")
+            alert("Please choose only 4 Options...");
+        }
+
+        if (value.length !== 4) {
+            setRadioButtonValue("");
         }
 
     }
@@ -589,6 +598,8 @@ export default function QuestionCreation() {
                 alert('Please enter question value or choose an image');
             } else if (chekedOptins?.length < 4) {
                 alert('Please provide 4 options');
+            } else if (radioButtonValue === "") {
+                alert('Please select correct answer');
             }
             else {
                 valid = true;
@@ -869,6 +880,25 @@ export default function QuestionCreation() {
                                         ))}
                                     </Select>
                                 </FormControl>
+                                {chekedOptins.length === 4 &&
+                                    <span>
+                                        <InputLabel style={{ fontWeight: "bold", color: "black" }}>Select correct answer</InputLabel>
+                                        <RadioGroup
+                                            aria-labelledby="demo-controlled-radio-buttons-group"
+                                            name="controlled-radio-buttons-group"
+                                            value={radioButtonValue}
+                                            onChange={handleChangeRadiButton}
+                                        >
+                                            {chekedOptins.map((name) => (
+                                                <FormControlLabel value={name} control={<Radio />} label={name} />
+                                            ))
+
+                                            }
+
+
+                                        </RadioGroup>
+                                    </span>
+                                }
                                 <br />
                             </span>
                         }
