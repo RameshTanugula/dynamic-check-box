@@ -21,10 +21,11 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-
+import Switch from '@mui/material/Switch';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
 
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 
@@ -201,10 +202,10 @@ TablePaginationActions.propTypes = {
 
 export default function QuestionCreation() {
     // const serverUrl1 = `http://65.0.6.118:8080/`
+    const defaultOptions = [{ checked: false, value: '', label: '' }]
     const serverUrl = securedLocalStorage.baseUrl + 'question/'
     const [questionData, setQuestionData] = React.useState([]);
     const [titlesList, setTitlesList] = React.useState([]);
-    const [searchValue, setSearchValue] = React.useState("")
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [selectedTitle, setSelectedTitle] = React.useState("");
@@ -222,7 +223,7 @@ export default function QuestionCreation() {
     const [showForm, setShowForm] = React.useState(false);
     const [checked, setChecked] = React.useState([]);
     const [showTree, setShowTree] = React.useState(true)
-    const [options, setOptions] = React.useState([]);
+    const [options, setOptions] = React.useState(defaultOptions);
     const [questionValue, setQuestionValue] = React.useState("");
     const [selectedFile, setSelectedFile] = React.useState([]);
     const [previewImgSrc, setPreviewImgSrc] = React.useState(null);
@@ -234,6 +235,13 @@ export default function QuestionCreation() {
     const [snackBarData, setSnackBarData] = React.useState();
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showLoader, setShowLoader] = React.useState(false);
+    const [manual, setManual] = React.useState(false);
+    const [chekedOptins, setChekedOptins] = React.useState([]);
+
+
+    const handleChange1 = (event) => {
+        setManual(event.target.checked);
+    };
 
     const handleChange = (event) => {
         const {
@@ -244,36 +252,39 @@ export default function QuestionCreation() {
             typeof value === 'string' ? value.split(',') : value,
         );
     };
-    // React.useEffect(() => {
-    //     async function fetchData() {
-    //         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
 
-    //         if (data.status === 200) {
-    //             setQuestionData(data.data?.res)
-    //         }
-    //     }
-    //     fetchData()
-    // }, [showTree])
-    React.useEffect(() => {
-        async function fetchData() {
-            // You can await here
-            const catData = await api(null, securedLocalStorage.categoriesUrl, 'get');
-            if (catData.status === 200) {
-                setCategoryData(catData.data);
-            }
-            // const data = await api(checked, serverUrl + 'get/data', 'post');
-            const titleData = await api(null, serverUrl + 'get/titles', 'get');
-            if (titleData.status === 200) {
-                setTitlesList(titleData.data?.res)
-            }
+    function optionMultiSelect(e) {
+        const {
+            target: { value },
+        } = e;
+        if (value.length < 5) {
+            setChekedOptins(
+                typeof value === 'string' ? value.split(',') : e.target.value,
+            );
         }
-        fetchData();
-    }, []);
+        else {
+            alert("Please choose only 4 Options...")
+        }
+
+    }
+
+    async function fetchData() {
+        const catData = await api(null, securedLocalStorage.categoriesUrl, 'get');
+        if (catData.status === 200) {
+            setCategoryData(catData.data);
+        }
+        const titleData = await api(null, serverUrl + 'get/titles', 'get');
+        if (titleData.status === 200) {
+            setTitlesList(titleData.data?.res)
+        }
+    }
+
     React.useEffect(() => {
         const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
         if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
             setReadAndWriteAccess(true);
         }
+        fetchData();
     }, []);
 
     const emptyRows =
@@ -444,19 +455,7 @@ export default function QuestionCreation() {
                     />
                 )}
             />
-            {/* <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedTitle}
-                onChange={(e) => onChangeTitle(e?.target?.value)}
-            >
-                         <TextField placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onSearch(e.target.value)} value={""} />
 
-                <MenuItem value="">
-                    <em>None</em>
-                </MenuItem>
-                {titlesList.map((tl) => { return (<MenuItem value={tl.OptionTitleId}>{tl.Title}</MenuItem>) })}
-            </Select> */}
         </div>)
     }
     const getTitleOptions = (row, i) => {
@@ -567,35 +566,64 @@ export default function QuestionCreation() {
         }
         return true;
     }
+
+    function doValidation() {
+        let valid = false;
+        if (manual) {
+            const isOptSelected = options.find(o => o.checked);
+            if (!questionValue && (selectedFile.length === 0)) {
+                alert('Please enter question value or choose an image');
+            } else if (options?.length < 4) {
+                alert('Please provide 4 options');
+            } else if (!validateOptions()) {
+                alert('Please enter option value');
+            } else if (!isOptSelected) {
+                alert('Please select correct answer');
+            }
+            else {
+                valid = true;
+            }
+        }
+        else {
+            if (!questionValue && (selectedFile.length === 0)) {
+                alert('Please enter question value or choose an image');
+            } else if (chekedOptins?.length < 4) {
+                alert('Please provide 4 options');
+            }
+            else {
+                valid = true;
+            }
+        }
+        return valid;
+    }
+
     const onClickAddQuestion = async () => {
-        const isOptSelected = options.find(o => o.checked);
-        if (!questionValue && (selectedFile.length === 0)) {
-            alert('Please enter question value or choose an image');
-        } else if (options?.length < 4) {
-            alert('Please provide 4 options');
-        } else if (!validateOptions()) {
-            alert('Please enter option value');
-        } else if (!isOptSelected) {
-            alert('Please select correct answer');
-        } else {
+        if (doValidation()) {
             const formData = new FormData();
             if (selectedFile && selectedFile.length > 0) {
                 formData.append(
                     "files", selectedFile[0],
                 );
             }
+            const createOptins = []
+            chekedOptins.forEach(ele => {
+                createOptins.push({ checked: true, value: ele, label: '' })
+            });
+            const optionArray = manual === true ? options : createOptins;
             formData.append("title", questionValue);
             formData.append("solution", solutionValue);
-            formData.append("options", JSON.stringify(options));
+            formData.append("options", JSON.stringify(optionArray));
 
             const response = await api(formData, serverUrl + 'create/question/manual', 'post');
             if (response.status === 200) {
                 alert(`${questionValue} added succesfully`);
                 setQuestionValue('');
                 setOptions([]);
-                setShowForm(false);
+                setShowForm(true);
                 setSelectedFile([]);
-                setPreviewImgSrc("")
+                setPreviewImgSrc("");
+                setOptions(defaultOptions);
+                setChekedOptins([]);
             } else {
                 alert(`Something wenr wrong!`)
             }
@@ -671,7 +699,12 @@ export default function QuestionCreation() {
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
                     <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
                 }
-                &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => setShowForm(!showForm)}>Add New Question</Button>
+                &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => {
+                    setShowForm(!showForm);
+                    setManual(false);
+                    setOptions(defaultOptions);
+                    setChekedOptins([]);
+                }}>Add New Question</Button>
 
             </div>
             {showTree && <div >
@@ -772,42 +805,92 @@ export default function QuestionCreation() {
                 <div>
                     <img src={previewImgSrc} style={{ width: '40%', paddingTop: '15px' }} />
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                    <Button disabled={!readAndWriteAccess} onClick={() => onClickAddOptions()} variant="contained">Add options</Button>
 
-                </div>
-                {options?.length > 0 && <div>
-                    <RadioGroup
-                        defaultValue="female"
-                        aria-labelledby="demo-customized-radios"
-                        name="customized-radios"
-                        sx={{ display: 'inline' }}
-                        disabled={!readAndWriteAccess}
-                    >
-                        {options?.map((op, i) => {
-                            return (<><FormControlLabel disabled={!readAndWriteAccess} value={op.value} onClick={() => onClickRadio(i)} control={<BpRadio />} />
-                                <TextField disabled={!readAndWriteAccess} placeholder='option1' sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} /> <br /></>)
-                        })}
-                    </RadioGroup>
-                    {options?.length === 4 && <TextareaAutosize
-                        value={solutionValue}
-                        onChange={(e) => setSolutionValue(e.target?.value)}
-                        aria-label="Question"
-                        placeholder="Explain the answer"
-                        style={{ width: 500, height: 100 }}
-                        disabled={!readAndWriteAccess}
-                    />}
-                    <div style={{ paddingTop: '20px' }}>
-                        <Button disabled={!readAndWriteAccess} onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
+                <Switch
+                    checked={manual}
+                    onChange={handleChange1}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                />
+                <span>
+                    Manual
+                </span>
+                <span style={{ marginTop: '20px' }}>
+                    {options?.length > 0 && <div>
+                        {manual &&
+                            <span>
+                                <RadioGroup
+                                    defaultValue="female"
+                                    aria-labelledby="demo-customized-radios"
+                                    name="customized-radios"
+                                    sx={{ display: 'inline' }}
+                                    disabled={!readAndWriteAccess}
+                                >
+                                    {options?.map((op, i) => {
+                                        return (
+                                            <span>{ }
+                                                <FormControlLabel disabled={!readAndWriteAccess} value={op.value} onClick={() => onClickRadio(i)} control={<BpRadio />} />
+                                                <TextField disabled={!readAndWriteAccess} placeholder={'option' + (i + 1)} sx={{ paddingBottom: '20px' }} onChange={(e) => onChangeOption(i, e.target?.value)} value={op.value} />
+                                                <span>{options?.length < 4 &&
+                                                    < IconButton >
+                                                        <AddIcon color="primary" disabled={!readAndWriteAccess} onClick={() => onClickAddOptions()} />
+                                                    </IconButton>
+                                                }
+                                                </span>
+                                                <br />
+                                            </span>
+                                        )
+
+                                    })}
+                                </RadioGroup>
+
+                            </span>
+                        }
+                        {!manual &&
+                            <span >
+                                <FormControl sx={{ width: 500 }}>
+                                    <InputLabel style={{ marginTop: "15px" }} id="demo-multiple-checkbox-label">Options</InputLabel>
+                                    <Select
+                                        labelId="demo-multiple-checkbox-label"
+                                        id="demo-multiple-checkbox"
+                                        multiple
+                                        value={chekedOptins}
+                                        onChange={optionMultiSelect}
+                                        label="Options"
+                                        renderValue={(selected) => selected.join(', ')}
+                                        MenuProps={MenuProps}
+                                        disabled={!readAndWriteAccess}
+                                        style={{ marginBottom: "15px", marginTop: "15px" }}
+                                    >
+                                        {titlesList.map((name) => (
+                                            <MenuItem key={name.OptionTitleId} value={name.Title}>
+                                                <Checkbox checked={chekedOptins.indexOf(name.Title) > -1} />
+                                                <ListItemText primary={name.Title} />
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <br />
+                            </span>
+                        }
+                        <TextareaAutosize
+                            value={solutionValue}
+                            onChange={(e) => setSolutionValue(e.target?.value)}
+                            aria-label="Question"
+                            placeholder="Explain the answer"
+                            style={{ width: 500, height: 100 }}
+                            disabled={!readAndWriteAccess}
+                        />
                     </div>
-                </div>
-
-                }
+                    }
+                </span>
             </div>
             }
-            {!showTree &&
-                <Button disabled={!readAndWriteAccess} sx={{ marginTop: '1rem' }} variant="contained" onClick={() => setShowTree(!showTree)}>Back to Filters</Button>
-
+            {
+                !showTree &&
+                <span>
+                    <Button style={{ marginTop: "17px" }} disabled={!readAndWriteAccess} onClick={() => onClickAddQuestion()} variant="contained">Add Question</Button>
+                    <Button style={{ marginLeft: "3px" }} disabled={!readAndWriteAccess} sx={{ marginTop: '1rem' }} variant="contained" onClick={() => setShowTree(!showTree)}>Back to Filters</Button>
+                </span>
             }
             <Modal
                 open={editData !== ""}
@@ -847,12 +930,14 @@ export default function QuestionCreation() {
                     </Stack>
                 </Box>
             </Modal>
-            {openSnackBar &&
+            {
+                openSnackBar &&
                 <SnackBar disabled={!readAndWriteAccess} data={snackBarData} closeSnakBar={closeSnakBar} />
             }
-            {showLoader &&
+            {
+                showLoader &&
                 <Loader />
             }
-        </div>
+        </div >
     );
 }

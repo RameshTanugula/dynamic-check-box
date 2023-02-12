@@ -110,7 +110,6 @@ export default function CeateCourse() {
     const [buttonName, setButtonName] = React.useState("submit");
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showTestType, setShowTestType] = React.useState(false);
-
     const topicTypesList = [
         { id: 1, type: "PDF" },
         { id: 2, type: "Learning Card" },
@@ -611,15 +610,15 @@ export default function CeateCourse() {
     }, [isValid]);
 
     React.useEffect(() => {
-        getCourseList();
+
         const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
         if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
             setReadAndWriteAccess(true);
         }
-    }, []);
-    React.useEffect(() => {
         getSubjectsList();
+        getCourseList();
     }, []);
+
     return (
         <div>
             <span>

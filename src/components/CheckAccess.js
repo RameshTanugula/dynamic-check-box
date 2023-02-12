@@ -18,3 +18,7 @@ export const checkAccess = (screen, type) => {
 
     return value;
 }
+
+export const getRole = () => {
+    return (jwt_decode(securedLocalStorage.get("token"))).userRoleName;
+}
