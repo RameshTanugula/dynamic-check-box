@@ -34,7 +34,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import moment from "moment";
 import SnackBar from './SnackBar';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
@@ -451,7 +450,7 @@ export default function CeateCourse() {
             }
             const formData = new FormData();
             createCourseForm.course_id = editData?.id !== undefined ? editData?.id : "";
-            const dateFormat = moment(new Date(publishedDate)).format('YYYY-MM-DD HH:mm:ss');
+            const dateFormat = CheckAccess.getDateInFormat(publishedDate);
             createCourseForm.publishedDate = dateFormat === "Invalid date" ? editData?.publishedDate : dateFormat;
             for (let i = 0; i < selectedFile?.length; i++) {
                 formData.append(
