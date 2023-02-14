@@ -278,6 +278,7 @@ export default function QuestionCreation() {
     }
 
     async function fetchData() {
+        setShowLoader(true);
         const catData = await api(null, securedLocalStorage.categoriesUrl, 'get');
         if (catData.status === 200) {
             setCategoryData(catData.data);
@@ -286,6 +287,7 @@ export default function QuestionCreation() {
         if (titleData.status === 200) {
             setTitlesList(titleData.data?.res)
         }
+        setShowLoader(false);
     }
 
     React.useEffect(() => {
@@ -372,6 +374,7 @@ export default function QuestionCreation() {
         if (selectedOptions && selectedOptions?.length < 3) {
             alert('Please select minimum 3 options')
         } else {
+            setShowLoader(true);
             const response = await api({ bitBankObj: row, selectedOptions }, serverUrl + 'create/question', 'post');
             if (response.status === 200) {
                 alert('Question Created Succesfully!');
@@ -385,6 +388,7 @@ export default function QuestionCreation() {
                     setQuestionData(data.data?.res)
                 }
             }
+            setShowLoader(false);
         }
     }
     const renderModal = () => {
@@ -439,10 +443,12 @@ export default function QuestionCreation() {
         setSelectedTitles([]);
         setChekedOptins([]);
         if (value) {
+            setShowLoader(true);
             const titleOptionData = await api(null, serverUrl + 'get/title/options/' + selValue, 'get');
             if (titleOptionData.status === 200) {
                 setTitleOptionsList(titleOptionData.data?.res)
             }
+            setShowLoader(false);
         }
     };
     const getTitles = (row, i) => {
@@ -627,7 +633,7 @@ export default function QuestionCreation() {
             formData.append("title", questionValue);
             formData.append("solution", solutionValue);
             formData.append("options", JSON.stringify(optionArray));
-
+            setShowLoader(true);
             const response = await api(formData, serverUrl + 'create/question/manual', 'post');
             if (response.status === 200) {
                 alert(`${questionValue} added succesfully`);
@@ -641,6 +647,7 @@ export default function QuestionCreation() {
             } else {
                 alert(`Something wenr wrong!`)
             }
+            setShowLoader(false);
         }
     }
     const onClickCheckBox = (bitbankID) => {
@@ -654,10 +661,12 @@ export default function QuestionCreation() {
         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
         if (data.status === 200) {
             setQuestionData(data.data?.res)
-            setShowLoader(false);
+           
         }
+        setShowLoader(false);
     }
     const hideQuestions = async () => {
+        setShowLoader(true);
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.BitBankDetailId);
         const data = await api({ selectedIds: selectedIds, type: 'bitbank' }, serverUrl + 'hide', 'post');
 
@@ -667,6 +676,7 @@ export default function QuestionCreation() {
                 setQuestionData(qData.data?.res);
             }
         }
+        setShowLoader(false);
     }
     function handleChangeEdit(e) {
         const newData = {
@@ -678,6 +688,7 @@ export default function QuestionCreation() {
     }
 
     async function upDateQuestionData() {
+        setShowLoader(true);
         const data = await api(editData, securedLocalStorage.baseUrl + 'common/update', 'post');
         if (data.status === 200) {
             const data = {
@@ -690,6 +701,7 @@ export default function QuestionCreation() {
             var index = questionData.findIndex(item => item.checked === true);
             questionData[index].checked = false;
         }
+        setShowLoader(false);
     }
     function closeSnakBar() {
         setOpenSnackBar(false);

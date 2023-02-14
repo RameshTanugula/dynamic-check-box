@@ -14,6 +14,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import SnackBar from './SnackBar';
+import Loader from './Loader';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -30,6 +31,7 @@ export default function TestCreation() {
     const [isValid, setIsValid] = React.useState(false);
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
+    const [showLoader, setShowLoader] = React.useState(false);
 
     const defaultTestFields = {
         testName: "",
@@ -68,7 +70,8 @@ export default function TestCreation() {
         }
     };
 
-    async function fetchData() {
+    async function fetchData() { 
+        setShowLoader(true);
         const data = await api(null, serverUrl + 'get/data', 'get');
         const catData = await api(null, serverUrl + 'get/categories', 'get');
         if (catData.status === 200) {
@@ -77,6 +80,7 @@ export default function TestCreation() {
         if (data.status === 200) {
             setQuestionData(data.data?.res)
         }
+        setShowLoader(false);
     }
 
 
@@ -172,12 +176,12 @@ export default function TestCreation() {
         const Index = selectedQuestionsList.findIndex((obj) => obj.q_id === id);
         if (item.checked) {
             if (Index === -1) {
-                if (selectedQuestionsList.length < 50) {
+                if (selectedQuestionsList.length < parseInt(testForm.numberOfQuestions)) {
                     selectedQuestionsList.push(item)
                     setSelectedQuestionsList([...selectedQuestionsList]);
                 }
                 else {
-                    alert("You are able select maximum 50 questions only.")
+                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
                 }
             }
             else {
@@ -206,11 +210,12 @@ export default function TestCreation() {
             test_duration: testForm.testDuration,
             test_description: testForm.testDescription,
             no_of_questions: testForm.numberOfQuestions,
-            no_of_attempts: testForm.numberOfQuestions,
+            no_of_attempts: testForm.nuberOfAttempts,
             scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
             question_ids: selectedQuestionsList.map(qi => qi.q_id),
             is_active: 1, created_by: 1, update_by: 1
         }
+        setShowLoader(true);
         const data = await api(payload, serverUrl + 'add/test', 'post');
         if (data.status === 200) {
             setShowForm(true);
@@ -231,6 +236,7 @@ export default function TestCreation() {
             }
             setSnackBarData(message);
         }
+        setShowLoader(false);
         // }
     }
 
@@ -248,10 +254,12 @@ export default function TestCreation() {
     React.useEffect(() => {
         async function getData() {
             const catIds = prepareCatIds();
+            setShowLoader(true);
             const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
             if (data.status === 200) {
                 setQuestionData(data.data?.res)
             }
+            setShowLoader(false);
         }
         getData();
     }, [checked]);
@@ -271,8 +279,8 @@ export default function TestCreation() {
                     <Grid item xs={12} style={{ position: "absolute", right: "50px" }}>
                         <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
-                            <Button variant="contained" disabled={selectedQuestionsList.length !== 50} onClick={() => addToTestHandler()}>Add Test</Button>
-                            <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/50"}>
+                            <Button variant="contained" disabled={selectedQuestionsList.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
+                            <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/" + parseInt(testForm.numberOfQuestions)}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
                             </Badge>
                         </Stack>
@@ -417,6 +425,9 @@ export default function TestCreation() {
             }
 
             {openSnackBar &&<SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />}
+            {showLoader &&
+                <Loader />
+            }
     
         </div>
     )
