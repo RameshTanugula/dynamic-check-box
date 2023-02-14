@@ -110,6 +110,7 @@ export default function CeateCourse() {
     const [buttonName, setButtonName] = React.useState("submit");
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showTestType, setShowTestType] = React.useState(false);
+    const [currentRole, setCurrentRole] = React.useState("");
     const topicTypesList = [
         { id: 1, type: "PDF" },
         { id: 2, type: "Learning Card" },
@@ -610,13 +611,13 @@ export default function CeateCourse() {
     }, [isValid]);
 
     React.useEffect(() => {
-
         const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
         if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
             setReadAndWriteAccess(true);
         }
         getSubjectsList();
         getCourseList();
+        setCurrentRole(CheckAccess.getRole());
     }, []);
 
     return (
@@ -776,7 +777,7 @@ export default function CeateCourse() {
                         <Grid item xs={2} ></Grid>
                         <Grid item xs={1} ></Grid>
                         <Grid item xs={3} style={{ marginTop: "5px" }}>
-                            <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-5px" }}>
+                            <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-1px" }}>
                                 <InputLabel id="demo-simple-select-label">Validity</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
@@ -786,7 +787,7 @@ export default function CeateCourse() {
                                     onChange={handleChange}
                                     error={errors.validity !== ""}
                                     helperText={errors.validity !== "" ? 'Validity is reuired' : ' '}
-                                    disabled={!readAndWriteAccess}
+                                    disabled={!readAndWriteAccess || currentRole==="Content Lead"}
                                 >
                                     <MenuItem value="">
                                         <em>None</em>
@@ -811,7 +812,7 @@ export default function CeateCourse() {
                                 onChange={handleChange}
                                 error={errors.listPrice !== ""}
                                 helperText={errors.listPrice !== "" ? 'ListPrice is required' : ' '}
-                                disabled={!readAndWriteAccess}
+                                disabled={!readAndWriteAccess || currentRole==="Content Lead"}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
@@ -828,7 +829,7 @@ export default function CeateCourse() {
                                 onChange={handleChange}
                                 error={errors.offerPrice !== ""}
                                 helperText={errors.offerPrice !== "" ? 'OfferPrice is required' : ' '}
-                                disabled={!readAndWriteAccess}
+                                disabled={!readAndWriteAccess || currentRole==="Content Lead"}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}

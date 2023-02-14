@@ -45,6 +45,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Users from './components/Users';
+import UserDashBoard from './components/UserDashBoard';
+import Sales from './components/Sales';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -129,7 +131,6 @@ export default function App() {
       const userdata = jwt_decode(securedLocalStorage.get("token"));
       setUserData(userdata);
       setMenuList(userdata.menuList);
-      console.log(menuList)
       setIsLoggedIn(true);
       setAnchorEl(false);
     }
@@ -212,7 +213,6 @@ export default function App() {
                 {menuList?.map((text, index) => (
                   <ListItem key={text} disablePadding>
                     <ListItemButton>
-                      {/* <ListItemText primary={text} onClick={() => setComp(text)} /> */}
                       <Link to={text.toLowerCase()}>
                         <span onClick={() => setComp(text)}>{text}</span>
                       </Link>
@@ -223,31 +223,11 @@ export default function App() {
             </Drawer>
             <Main open={open}>
               <DrawerHeader />
-
-              {/* {comp?.toLowerCase() === 'categories' && <Categories />}
-          {comp?.toLowerCase() === 'questions' && <Questions />}
-          {comp?.toLowerCase() === 'mapping' && <Mapping />}
-          {comp?.toLowerCase() === 'create question' && <QuestionCreation />}
-          {comp?.toLowerCase() === 'create question from pairs' && <QuestionCreationFromPairs />}
-          {comp?.toLowerCase() === 'create pairs' && <CreatePairs />}
-          {comp?.toLowerCase() === 'create statements' && <Statements />}
-          {comp?.toLowerCase() === 'create a test' && <TestCreation />}
-          {comp?.toLowerCase() === 'upload files' && <FileUpload />}
-          {comp?.toLowerCase() === 'testomr' && <TestOMR />}
-
-          {comp?.toLowerCase() === 'flash cards' && <FlashCard />}
-          {comp?.toLowerCase() === 'learning cards' && <LearningCard />}
-          {comp?.toLowerCase() === 'coupon code' && <CoupenCode />}
-          {comp?.toLowerCase() === 'user request access' && <UserRequestAccess />}
-          {comp?.toLowerCase() === 'title and subtitle' && <TitleAndSubTitle />}
-          {comp?.toLowerCase() === 'create course' && <CreateCourse />} */}
               <Routes>
-
                 <Route exact path="/categories" element={<Categories />} />
                 <Route exact path="/review page" element={<Questions />} />
                 <Route exact path="/mapping" element={<Mapping />} />
                 <Route exact path="/create questions" element={<QuestionCreation />} />
-
                 <Route exact path="/create questions from pairs" element={<QuestionCreationFromPairs />} />
                 <Route exact path="/create pairs" element={<CreatePairs />} />
                 <Route exact path="/create statements" element={<Statements />} />
@@ -261,8 +241,9 @@ export default function App() {
                 <Route exact path="/titles and sub titles" element={<TitleAndSubTitle />} />
                 <Route exact path="/create course" element={<CreateCourse />} />
                 <Route exact path="/Users" element={<Users />} />
+                <Route exact path="/User Dash Board" element={<UserDashBoard />} />
+                <Route exact path="/Sales" element={<Sales />} />
               </Routes>
-
             </Main>
           </BrowserRouter>
         </Box >
