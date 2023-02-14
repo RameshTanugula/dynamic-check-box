@@ -175,26 +175,12 @@ export default function Questions() {
     const [selectedUser, setSelectedUser] = React.useState(null);
     const [to, setTo] = React.useState(null);
     const [users, setUsers] = React.useState([]);
-    const [userRoleName, setUserRoleName] = React.useState("")
-    const [userDashBoardData, setUserDashBoardData] = React.useState([]);
-    const [showDashBoard, setShowDashBoard] = React.useState(false);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     React.useEffect(() => {
         async function fetchData() {
-            const tokenData = jwt_decode(securedLocalStorage.get("token"));
-            securedLocalStorage.set("currentrole", tokenData?.userRoleName);
-            setUserRoleName(tokenData?.userRoleName)
-            if (tokenData?.userRoleName?.toLowerCase() === "super admin") {
-                const userDBData = await api(null, serverUrl + 'count/all/users', 'get');
-                if (userDBData.status === 200) {
-                    setUserDashBoardData(userDBData.data)
-                }
-            }
             const userData = await api(null, securedLocalStorage.allActiveUsersUrl, 'get');
-
             if (userData.status === 200) {
-                // setSelectedUser(userData.data[0].id)
                 setUsers(userData.data)
             }
             const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
@@ -247,19 +233,11 @@ export default function Questions() {
 
         if (data.status === 200) {
             getQuestionsByUser(selectedUser);
-            // const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
-            // if (qData.status === 200) {
-            //     setSelectedUser(null);
-            //     setQuestionData(qData.data?.res);
-            // }
         }
     }
     return (
         <div>
             <div>
-                &nbsp;&nbsp;
-                <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => setShowDashBoard(!showDashBoard)}>Show User DashBoard</Button>
-                <br />
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <TextField disabled={!readAndWriteAccess} placeholder='From' sx={{ paddingBottom: '20px' }} onChange={(e) => setFrom(e.target.value)} value={from} />
                 &nbsp;&nbsp;&nbsp;&nbsp;<TextField placeholder='To' sx={{ paddingBottom: '20px' }} onChange={(e) => setTo(e.target.value)} value={to} />
@@ -286,27 +264,6 @@ export default function Questions() {
                 }
                 {selectedUser && <div><b>No.of Questions:</b>{questionData?.length}</div>}
             </div>
-
-            {showDashBoard && (userRoleName?.toLowerCase() === "super admin") && <div style={{ marginBottom: "2rem" }}>
-                <table>
-                    <th>S.No</th>
-                    <th>User Name</th>
-                    <th>Accepted</th>
-                    <th>Under Review</th>
-                    <th>Rejected</th>
-                    <th>Total</th>
-                    {userDashBoardData.map((r, i) => (
-                        <tr>
-                            <td>{i + 1}.</td>
-                            <td>{r.name}</td>
-                            <td>{r.accepted}</td>
-                            <td>{r.under_review}</td>
-                            <td>{r.rejected}</td>
-                            <td>{r.total}</td>
-                        </tr>
-                    ))}
-                </table>
-            </div>}
             {questionData?.length > 0 && <div>
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
