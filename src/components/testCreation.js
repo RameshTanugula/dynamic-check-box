@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import SnackBar from './SnackBar';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -27,6 +28,8 @@ export default function TestCreation() {
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [scheduledDate, setScheduledDate] = React.useState(null);
     const [isValid, setIsValid] = React.useState(false);
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const [snackBarData, setSnackBarData] = React.useState();
 
     const defaultTestFields = {
         testName: "",
@@ -210,12 +213,29 @@ export default function TestCreation() {
         }
         const data = await api(payload, serverUrl + 'add/test', 'post');
         if (data.status === 200) {
-            alert(data.data.message);
             setShowForm(true);
             resetForm();
             setSelectedQuestionsList([]);
+            setOpenSnackBar(true);
+            const message = {
+                type: "success",
+                message: "Test added successfully!..."
+            }
+            setSnackBarData(message);
+        }
+        else {
+            setOpenSnackBar(true);
+            const message = {
+                type: "error",
+                message: data.response.data.error
+            }
+            setSnackBarData(message);
         }
         // }
+    }
+
+    function closeSnakBar() {
+        setOpenSnackBar(false)
     }
 
     React.useEffect(() => {
@@ -250,6 +270,7 @@ export default function TestCreation() {
                 <Grid container spacing={1} >
                     <Grid item xs={12} style={{ position: "absolute", right: "50px" }}>
                         <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
+                            <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length !== 50} onClick={() => addToTestHandler()}>Add Test</Button>
                             <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/50"}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
@@ -393,10 +414,10 @@ export default function TestCreation() {
                         <Button variant="contained" onClick={() => submitTestForm()} disabled={!readAndWriteAccess} >submit</Button>
                     </Stack>
                 </Grid>
-
-
-
             }
+
+            {openSnackBar &&<SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />}
+    
         </div>
     )
 }
