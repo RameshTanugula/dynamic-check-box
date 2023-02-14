@@ -11,11 +11,13 @@ export default function Sales() {
     const [usersList, setUsersList] = React.useState([]);
 
     const columns = [
-        { field: 'user_name', headerName: 'User Name', minWidth: 250, },
-        { field: 'email', headerName: 'Email', minWidth: 250, },
-        { field: 'title', headerName: 'Course Title', minWidth: 250, },
-        { field: 'price', headerName: 'Price', minWidth: 200, },
+        { field: 'user_name', headerName: 'User Name', minWidth: 200, },
+        { field: 'email', headerName: 'Email', minWidth: 200, },
+        { field: 'title', headerName: 'Course Title', minWidth: 200, },
+        { field: 'price', headerName: 'Price', minWidth: 150, },
+        { field: 'mobile', headerName: 'Mobile', minWidth: 200, },
         { field: 'purchased_date', headerName: 'Purchased Date', minWidth: 250, },
+        
     ];
 
     async function getSalesData() {

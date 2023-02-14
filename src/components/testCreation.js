@@ -4,6 +4,11 @@ import api from '../services/api';
 import './common.css';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Badge from '@mui/material/Badge';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -11,6 +16,7 @@ export default function TestCreation() {
     const [checked, setChecked] = React.useState([]);
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     const [questionData, setQuestionData] = React.useState([]);
+    const [selectedQuestionsList, setSelectedQuestionsList] = React.useState([]);
     const [testName, setTestName] = React.useState('');
     const [testDesc, setTestDesc] = React.useState('');
     const [testDur, setTestDur] = React.useState(0);
@@ -106,6 +112,7 @@ export default function TestCreation() {
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
             questionData[index]['checked'] = !questionData[index]['checked'];
+            selectedData(id, index)
         } else {
             setAllCheckBoxValue(!allCheckBoxValue)
             questionData.map(q => q.checked = !allCheckBoxValue)
@@ -117,17 +124,47 @@ export default function TestCreation() {
             setShowForm(false)
         }
     }
+
+    function selectedData(id, index) {
+        var item = questionData.find(item => item.q_id === id);
+        const Index = selectedQuestionsList.findIndex((obj) => obj.q_id === id);
+        if (item.checked) {
+            if (Index === -1) {
+                if (selectedQuestionsList.length < 50) {
+                    selectedQuestionsList.push(item)
+                    setSelectedQuestionsList([...selectedQuestionsList]);
+                }
+                else {
+                    alert("You are able select maximum 50 questions only.")
+                }
+            }
+            else {
+                alert(selectedQuestionsList[Index].question + "  Already added this quetion");
+            }
+
+        }
+        else {
+            if (Index !== -1) {
+                selectedQuestionsList.splice(Index, 1);
+                setSelectedQuestionsList([...selectedQuestionsList]);
+            }
+           
+        }
+    }
+
+
+
     const addToTestHandler = async () => {
-        const selectedQuestions = questionData.filter(q => q.checked);
-        if (selectedQuestions && selectedQuestions?.length !== parseInt(testNoOfQuestions)) {
-            window.alert('please verify selected no of questions')
-        } else {
+        // const selectedQuestions = questionData.filter(q => q.checked);
+        // if (selectedQuestions && selectedQuestions?.length !== parseInt(testNoOfQuestions)) {
+        //     window.alert('please verify selected no of questions')
+        // } else {
             const payload = {
                 test_name: testName,
                 test_duration: testDur,
                 test_description: testDur,
                 no_of_questions: testNoOfQuestions,
-                question_ids: selectedQuestions.map(qi => qi.q_id),
+                question_ids: selectedQuestionsList.map(qi => qi.q_id),
                 is_active: 1, created_by: 1, update_by: 1
             }
             const data = await api(payload, serverUrl + 'add/test', 'post');
@@ -140,46 +177,54 @@ export default function TestCreation() {
                 setTestDur('');
 
             }
-        }
+        // }
     }
+
     return (
         <div>
-            {!showForm && <div>
-                <div className='button-add'><span><button onClick={() => addToTestHandler()}>Add Test</button></span></div>
-                <div style={{ width: '100%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
-                    {catagoryData?.length > 0 && <CheckboxTree
-                        // nodes={treeViewData}
-                        nodes={catagoryData}
-                        checked={checked}
-                        onCheck={checked => setChecked(checked)}
-                        onClick={(e) => onClickCheckBox(e)}
-                        disabled={!readAndWriteAccess}
-                    />
-                    }
-                </div>
-                <br />
+            {!showForm &&
+                <Grid container spacing={1} >
+                    <Grid item xs={12} style={{ position: "absolute", right: "50px" }}>
+                        <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
+                            <Button variant="contained" disabled={selectedQuestionsList.length !== 50} onClick={() => addToTestHandler()}>Add Test</Button>
+                            <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/50"}>
+                                <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
+                            </Badge>
+                        </Stack>
+                    </Grid>
+                    <Grid item xs={1} style={{ width: '100%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
+                        {catagoryData?.length > 0 && <CheckboxTree
+                            // nodes={treeViewData}
+                            nodes={catagoryData}
+                            checked={checked}
+                            onCheck={checked => setChecked(checked)}
+                            onClick={(e) => onClickCheckBox(e)}
+                            disabled={!readAndWriteAccess}
+                        />
+                        }
+                    </Grid>
 
-                <div>
-                    {questionData?.length > 0 &&
-                        questionData?.map((qData, i) => {
-                            return (
-                                <div style={{ padding: '5px' }}>
+                    <Grid item xs={12} style={{ overflow: "auto", height: "900px", marginTop: "10px" }} >
+                        {questionData?.length > 0 &&
+                            questionData?.map((qData, i) => {
+                                return (
+                                    <div style={{ padding: '5px', }}>
 
-                                    <div>
-                                        <div><input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
-                                        <div style={{
-                                            paddingTop: '5px',
-                                            border: '1px solid blue'
-                                        }}><span>Question: {qData.question}</span> <br />
-                                            <span>Answer: {qData.answer}</span>
+                                        <div>
+                                            <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
+                                            <div style={{
+                                                paddingTop: '5px',
+                                                border: '1px solid blue'
+                                            }}><span>Question: {qData.question}</span> <br />
+                                                <span>Answer: {qData.answer}</span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                </div>)
-                        })
-                    }
-                </div>
-            </div>}
+                                    </div>)
+                            })
+                        }
+                    </Grid>
+                </Grid>}
             {showForm &&
                 <div className="App">
                     <header className="App-header">

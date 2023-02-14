@@ -437,6 +437,7 @@ export default function QuestionCreation() {
         const selValue = titlesList.filter(tl => tl.Title === value)[0]?.OptionTitleId;
         setSelectedTitle(selValue)
         setSelectedTitles([]);
+        setChekedOptins([]);
         if (value) {
             const titleOptionData = await api(null, serverUrl + 'get/title/options/' + selValue, 'get');
             if (titleOptionData.status === 200) {
@@ -859,7 +860,29 @@ export default function QuestionCreation() {
                             </span>
                         }
                         {!manual &&
-                            <span >
+                            <span  >
+                                 <FormControl sx={{ width: 500 }}>
+                                <Autocomplete
+                                    freeSolo
+                                    id="free-solo-2-demo"
+                                    disableClearable
+                                    onChange={onChangeTitle}
+                                    options={titlesList.map((option) => option.Title)}
+                                    disabled={!readAndWriteAccess}
+                                    style={{ marginTop: "15px" }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Search input"
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                type: 'search',
+                                            }}
+                                        />
+                                    )}
+                                />
+                                </FormControl>
+                                <br/>
                                 <FormControl sx={{ width: 500 }}>
                                     <InputLabel style={{ marginTop: "15px" }} id="demo-multiple-checkbox-label">Options</InputLabel>
                                     <Select
@@ -874,10 +897,10 @@ export default function QuestionCreation() {
                                         disabled={!readAndWriteAccess}
                                         style={{ marginBottom: "15px", marginTop: "15px" }}
                                     >
-                                        {titlesList.map((name) => (
-                                            <MenuItem key={name.OptionTitleId} value={name.Title}>
-                                                <Checkbox checked={chekedOptins.indexOf(name.Title) > -1} />
-                                                <ListItemText primary={name.Title} />
+                                        {titleOptionsList.map((name) => (
+                                            <MenuItem key={name.OptionNames} value={name.OptionNames}>
+                                                <Checkbox checked={chekedOptins.indexOf(name.OptionNames) > -1} />
+                                                <ListItemText primary={name.OptionNames} />
                                             </MenuItem>
                                         ))}
                                     </Select>
