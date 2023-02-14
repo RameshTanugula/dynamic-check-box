@@ -1,5 +1,6 @@
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import jwt_decode from "jwt-decode";
+import moment from "moment";
 
 export const checkAccess = (screen, type) => {
     const userdata = jwt_decode(securedLocalStorage.get("token"));
@@ -24,6 +25,10 @@ export const getRole = () => {
 }
 
 export const getUserId = () => {
-    return (jwt_decode(securedLocalStorage.get("token"))).userId
-;
+    return (jwt_decode(securedLocalStorage.get("token"))).userId;
+
+}
+
+export const getDateInFormat = (date) => {
+    return moment(new Date(date)).format('YYYY-MM-DD HH:mm:ss');
 }

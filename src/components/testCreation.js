@@ -9,6 +9,10 @@ import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -17,55 +21,63 @@ export default function TestCreation() {
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     const [questionData, setQuestionData] = React.useState([]);
     const [selectedQuestionsList, setSelectedQuestionsList] = React.useState([]);
-    const [testName, setTestName] = React.useState('');
-    const [testDesc, setTestDesc] = React.useState('');
-    const [testDur, setTestDur] = React.useState(0);
-    const [testNoOfQuestions, setTestNoOfQuestions] = React.useState(0);
     const [showForm, setShowForm] = React.useState(true);
     const [catagoryData, setCategoryData] = React.useState([]);
     const [result, setResult] = React.useState([]);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+    const [scheduledDate, setScheduledDate] = React.useState(null);
+    const [isValid, setIsValid] = React.useState(false);
 
+    const defaultTestFields = {
+        testName: "",
+        testDescription: "",
+        testDuration: "",
+        numberOfQuestions: "",
+        nuberOfAttempts: "",
+    }
 
-    React.useEffect(() => {
-        async function fetchData() {
-            // You can await here
-            const data = await api(null, serverUrl + 'get/data', 'get');
-            // const catData = await api(null, 'http://3.111.198.158/api/AdminPanel/GetCategoryTrees', 'get');
+    const [testForm, setTestForm] = React.useState(defaultTestFields);
+    const errorTestFields = {
+        testName: "",
+        testDescription: "",
+        testDuration: "",
+        numberOfQuestions: "",
+    }
+    const [errors, setErrors] = React.useState(errorTestFields);
 
-            const catData = await api(null, serverUrl + 'get/categories', 'get');
-
-            if (catData.status === 200) {
-                setCategoryData(catData.data);
-            }
-            if (data.status === 200) {
-                setQuestionData(data.data?.res)
-            }
+    function handleChange(e) {
+        let value = e.target.value;
+        const newData = {
+            ...testForm,
+            [e.target.name]: value
         }
-        fetchData();
-    }, []);
-    React.useEffect(() => {
-        const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
-        const tmpData = { viewData: catagoryData }
-        const tmpResult = tmpData.viewData.flatMap(flat);
-        setResult([...tmpResult])
-    }, [catagoryData])
-    React.useEffect(() => {
-        async function getData() {
-            const catIds = prepareCatIds();
-            const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
-            if (data.status === 200) {
-                setQuestionData(data.data?.res)
-            }
+        setTestForm(newData);
+        checkIsValid(e.target.name, value)
+
+    }
+
+    const checkIsValid = (name, value) => {
+        if (value === "") {
+            errors[name] = name;
         }
-        getData();
-    }, [checked]);
-    React.useEffect(() => {
-        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
-        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
-            setReadAndWriteAccess(true);
+        else {
+            errors[name] = "";
         }
-    }, []);
+    };
+
+    async function fetchData() {
+        const data = await api(null, serverUrl + 'get/data', 'get');
+        const catData = await api(null, serverUrl + 'get/categories', 'get');
+        if (catData.status === 200) {
+            setCategoryData(catData.data);
+        }
+        if (data.status === 200) {
+            setQuestionData(data.data?.res)
+        }
+    }
+
+
+
     const prepareCatIds = () => {
         let ids1 = [];
         let ids2 = [];
@@ -119,10 +131,37 @@ export default function TestCreation() {
         }
         setQuestionData(questionData);
     }
-    const handleSubmit = (e) => {
-        if (testName && testDesc && testDur) {
+
+    function valid() {
+        let retunValue = false;
+        let result = [];
+        result = Object.keys(testForm).filter(ele => !testForm[ele]);
+        if (result.includes("nuberOfAttempts")) {
+            result.splice(result.indexOf('nuberOfAttempts'), 1);
+        }
+        if (result.length === 0) {
+            retunValue = true;
+        }
+        else {
+            setIsValid(true);
+            for (const v of result) {
+                errors[v] = v
+            }
+            retunValue = false;
+        }
+        return retunValue;
+    }
+
+    function submitTestForm() {
+        if (valid()) {
             setShowForm(false)
         }
+    }
+
+    function resetForm() {
+        setTestForm(defaultTestFields);
+        setErrors(errorTestFields);
+        setScheduledDate(null);
     }
 
     function selectedData(id, index) {
@@ -148,7 +187,7 @@ export default function TestCreation() {
                 selectedQuestionsList.splice(Index, 1);
                 setSelectedQuestionsList([...selectedQuestionsList]);
             }
-           
+
         }
     }
 
@@ -159,26 +198,51 @@ export default function TestCreation() {
         // if (selectedQuestions && selectedQuestions?.length !== parseInt(testNoOfQuestions)) {
         //     window.alert('please verify selected no of questions')
         // } else {
-            const payload = {
-                test_name: testName,
-                test_duration: testDur,
-                test_description: testDur,
-                no_of_questions: testNoOfQuestions,
-                question_ids: selectedQuestionsList.map(qi => qi.q_id),
-                is_active: 1, created_by: 1, update_by: 1
-            }
-            const data = await api(payload, serverUrl + 'add/test', 'post');
-            if (data.status === 200) {
-                alert(data.data.message);
-                setShowForm(true);
-                setTestName('');
-                setTestDesc('');
-                setTestNoOfQuestions(0);
-                setTestDur('');
-
-            }
+        const payload = {
+            test_name: testForm.testName,
+            test_duration: testForm.testDuration,
+            test_description: testForm.testDescription,
+            no_of_questions: testForm.numberOfQuestions,
+            no_of_attempts: testForm.numberOfQuestions,
+            scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
+            question_ids: selectedQuestionsList.map(qi => qi.q_id),
+            is_active: 1, created_by: 1, update_by: 1
+        }
+        const data = await api(payload, serverUrl + 'add/test', 'post');
+        if (data.status === 200) {
+            alert(data.data.message);
+            setShowForm(true);
+            resetForm();
+            setSelectedQuestionsList([]);
+        }
         // }
     }
+
+    React.useEffect(() => {
+        const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
+        const tmpData = { viewData: catagoryData }
+        const tmpResult = tmpData.viewData.flatMap(flat);
+        setResult([...tmpResult])
+    }, [catagoryData]);
+
+    React.useEffect(() => {
+        async function getData() {
+            const catIds = prepareCatIds();
+            const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
+            if (data.status === 200) {
+                setQuestionData(data.data?.res)
+            }
+        }
+        getData();
+    }, [checked]);
+
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+        fetchData();
+    }, []);
 
     return (
         <div>
@@ -208,7 +272,7 @@ export default function TestCreation() {
                         {questionData?.length > 0 &&
                             questionData?.map((qData, i) => {
                                 return (
-                                    <div style={{ padding: '5px', }}>
+                                    <div style={{ padding: '5px' }}>
 
                                         <div>
                                             <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
@@ -226,32 +290,111 @@ export default function TestCreation() {
                     </Grid>
                 </Grid>}
             {showForm &&
-                <div className="App">
-                    <header className="App-header">
-                        <form onSubmit={(e) => { handleSubmit(e) }}>
-                            <label >
-                                Test Name:
-                            </label><br />
-                            <input disabled={!readAndWriteAccess} type="text" value={testName} required onChange={(e) => { setTestName(e.target.value) }} /><br />
+                <Grid container spacing={1} >
+                    <Grid item xs={1} ></Grid>
+                    <Grid item xs={4} >
+                        <TextField
+                            label="Test Name"
+                            required
+                            id="outlined-start-adornment"
+                            sx={{ width: '100%' }}
+                            value={testForm.testName}
+                            onChange={handleChange}
+                            name="testName"
+                            error={errors.testName !== ""}
+                            helperText={errors.testName !== "" ? 'Test Name is reuired' : ' '}
+                            disabled={!readAndWriteAccess}
+                        />
+                    </Grid>
+                    <Grid item xs={4} >
+                        <TextField
+                            label="Number Of Questions"
+                            required
+                            id="outlined-start-adornment"
+                            sx={{ width: '100%' }}
+                            value={testForm.numberOfQuestions}
+                            onChange={handleChange}
+                            name="numberOfQuestions"
+                            type="number"
+                            error={errors.numberOfQuestions !== ""}
+                            helperText={errors.numberOfQuestions !== "" ? 'Number Of Questions is reuired' : ' '}
+                            disabled={!readAndWriteAccess}
+                        />
+                    </Grid>
+                    <Grid item xs={3} ></Grid>
+                    <Grid item xs={1} ></Grid>
+                    <Grid item xs={4} >
+                        <TextField
+                            label="Test Duration"
+                            required
+                            id="outlined-start-adornment"
+                            sx={{ width: '100%' }}
+                            value={testForm.testDuration}
+                            onChange={handleChange}
+                            name="testDuration"
+                            type="number"
+                            error={errors.testDuration !== ""}
+                            helperText={errors.testDuration !== "" ? 'Test Duration is reuired' : ' '}
+                            disabled={!readAndWriteAccess}
+                        />
+                    </Grid>
+                    <Grid item xs={4} >
+                        <TextField
+                            label="Number Of Attempts"
+                            id="outlined-start-adornment"
+                            sx={{ width: '100%' }}
+                            value={testForm.nuberOfAttempts}
+                            onChange={handleChange}
+                            name="nuberOfAttempts"
+                            type="number"
+                            disabled={!readAndWriteAccess}
+                        />
+                    </Grid>
+                    <Grid item xs={3} ></Grid>
+                    <Grid item xs={1} ></Grid>
+                    <Grid item xs={4} >
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DesktopDatePicker
+                                label="Scheduled Date"
+                                value={scheduledDate}
+                                inputFormat="DD/MM/YYYY"
+                                onChange={(newValue) => {
+                                    setScheduledDate(newValue);
+                                }}
+                                renderInput={(params) => <TextField {...params} sx={{ width: '100%' }} />}
+                                disabled={!readAndWriteAccess}
 
-                            <label >
-                                Test Description:
-                            </label><br />
-                            <textarea disabled={!readAndWriteAccess} id="dur" name="w3review" rows="4" cols="50" value={testDesc} required onChange={(e) => { setTestDesc(e.target.value) }} ></textarea><br />
+                            />
+                        </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={7} ></Grid>
+                    <Grid item xs={1} ></Grid>
+                    <Grid item xs={7} >
+                        <TextField
+                            label="Test Description "
+                            required
+                            id="outlined-start-adornment"
+                            sx={{ width: '100%' }}
+                            value={testForm.testDescription}
+                            onChange={handleChange}
+                            name="testDescription"
+                            multiline
+                            rows={4}
+                            error={errors.testDescription !== ""}
+                            helperText={errors.testDescription !== "" ? 'Test Description is reuired' : ' '}
+                            disabled={!readAndWriteAccess}
+                        />
 
-                            <label>
-                                Test Duration (in Min):
-                            </label><br />
-                            <input disabled={!readAndWriteAccess} type="number" value={testDur} required onChange={(e) => { setTestDur(e.target.value) }} /><br />
-                            <label>
-                                No.Of Questions:
-                            </label><br />
-                            <input disabled={!readAndWriteAccess} type="number" value={testNoOfQuestions} required onChange={(e) => { setTestNoOfQuestions(e.target.value) }} /><br />
+                    </Grid>
+                    <Grid item xs={4} ></Grid>
+                    <Grid item xs={1} ></Grid>
+                    <Stack direction="row" spacing={1}>
+                        <Button variant="outlined" onClick={() => resetForm()} disabled={!readAndWriteAccess}>reset</Button>
+                        <Button variant="contained" onClick={() => submitTestForm()} disabled={!readAndWriteAccess} >submit</Button>
+                    </Stack>
+                </Grid>
 
-                            <input disabled={!readAndWriteAccess} type="submit" value="Submit" />
-                        </form>
-                    </header>
-                </div>
+
 
             }
         </div>
