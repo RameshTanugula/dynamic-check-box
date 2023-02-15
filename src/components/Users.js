@@ -64,12 +64,12 @@ export default function Users() {
     const [snackBarData, setSnackBarData] = React.useState();
     const [isActive, setIsActive] = React.useState("0");
     const [showLoader, setShowLoader] = React.useState(false);
+    const [selectedRole, setSelectedRole] = React.useState("Super Admin");
 
     const columns = [
-        { field: 'first_name', headerName: 'First Name', minWidth: 200, },
-        { field: 'last_name', headerName: 'Last Name', minWidth: 200, },
+        { field: 'user_name', headerName: 'User Name', minWidth: 250, },
         { field: 'email', headerName: 'Email', minWidth: 300, },
-        { field: 'role', headerName: 'Role', minWidth: 200, },
+        { field: 'role_name', headerName: 'Role', minWidth: 250, },
         { field: 'mobile', headerName: 'Phone Number', minWidth: 200, },
         {
             field: '', headerName: 'Action', minWidth: 150,
@@ -159,7 +159,7 @@ export default function Users() {
 
     async function getUerList() {
         setShowLoader(true);
-        const url = serverUrl + "list/all";
+        const url = serverUrl + "list/all/" + selectedRole;
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
             setTableData(resp.data);
@@ -232,14 +232,41 @@ export default function Users() {
 
     return (
         <div>
-            <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { setFormType("Create User"); resetForm() }}>Create User</Button>
-            <br />
-            <div style={{ height: 400, width: '100%', marginTop: "5px" }}>
+            <Grid container spacing={1} >
+                <Grid item xs={4} >
+                    <FormControl sx={{ m: 1, minWidth: 360 }} style={{ marginLeft: "2px", marginTop: "-2px" }}>
+                        <InputLabel id="demo-simple-select-label">Role</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={selectedRole}
+                            onChange={(e) => {
+                                setSelectedRole(e.target.value);
+                            }}
+                            disabled={!readAndWriteAccess}
+                        >
+                            {roles.map((data, i) => (
+                                <MenuItem key={i} value={data.name}>
+                                    {data.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={6} style={{marginTop:"10px"}} >
+                    <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => getUerList()}>Applay</Button>
+                </Grid>
+                <Grid item xs={2} style={{marginTop:"10px"}}>
+                    <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { setFormType("Create User"); resetForm() }}>Create User</Button>
+                </Grid>
+            </Grid>
+            <div style={{ height: 370, width: '100%', marginTop: "5px" }}>
                 <DataGrid
                     rows={tableData}
                     columns={columns}
                     pageSize={5}
                     rowsPerPageOptions={[5]}
+                    getRowId={(row) => row.user_id}
                 />
             </div>
 
