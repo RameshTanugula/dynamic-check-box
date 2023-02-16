@@ -70,7 +70,7 @@ export default function TestCreation() {
         }
     };
 
-    async function fetchData() { 
+    async function fetchData() {
         setShowLoader(true);
         const data = await api(null, serverUrl + 'get/data', 'get');
         const catData = await api(null, serverUrl + 'get/categories', 'get');
@@ -130,8 +130,21 @@ export default function TestCreation() {
     const onClickCheckBox = (id, index) => {
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
-            questionData[index]['checked'] = !questionData[index]['checked'];
-            selectedData(id, index)
+            if (selectedQuestionsList.includes(id)) {
+                var Index = selectedQuestionsList.findIndex(x => x === id);
+                selectedQuestionsList.splice(Index, 1);
+                setSelectedQuestionsList([...selectedQuestionsList]);
+            }
+            else {
+                if (selectedQuestionsList.length < parseInt(testForm.numberOfQuestions)) {
+                    selectedQuestionsList.push(id)
+                    setSelectedQuestionsList([...selectedQuestionsList]);
+                }
+                else{
+                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)  
+                }
+
+            }
         } else {
             setAllCheckBoxValue(!allCheckBoxValue)
             questionData.map(q => q.checked = !allCheckBoxValue)
@@ -171,40 +184,7 @@ export default function TestCreation() {
         setScheduledDate(null);
     }
 
-    function selectedData(id, index) {
-        var item = questionData.find(item => item.q_id === id);
-        const Index = selectedQuestionsList.findIndex((obj) => obj.q_id === id);
-        if (item.checked) {
-            if (Index === -1) {
-                if (selectedQuestionsList.length < parseInt(testForm.numberOfQuestions)) {
-                    selectedQuestionsList.push(item)
-                    setSelectedQuestionsList([...selectedQuestionsList]);
-                }
-                else {
-                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
-                }
-            }
-            else {
-                alert(selectedQuestionsList[Index].question + "  Already added this quetion");
-            }
-
-        }
-        else {
-            if (Index !== -1) {
-                selectedQuestionsList.splice(Index, 1);
-                setSelectedQuestionsList([...selectedQuestionsList]);
-            }
-
-        }
-    }
-
-
-
     const addToTestHandler = async () => {
-        // const selectedQuestions = questionData.filter(q => q.checked);
-        // if (selectedQuestions && selectedQuestions?.length !== parseInt(testNoOfQuestions)) {
-        //     window.alert('please verify selected no of questions')
-        // } else {
         const payload = {
             test_name: testForm.testName,
             test_duration: testForm.testDuration,
@@ -212,7 +192,7 @@ export default function TestCreation() {
             no_of_questions: testForm.numberOfQuestions,
             no_of_attempts: testForm.nuberOfAttempts,
             scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
-            question_ids: selectedQuestionsList.map(qi => qi.q_id),
+            question_ids: selectedQuestionsList,
             is_active: 1, created_by: 1, update_by: 1
         }
         setShowLoader(true);
@@ -237,7 +217,6 @@ export default function TestCreation() {
             setSnackBarData(message);
         }
         setShowLoader(false);
-        // }
     }
 
     function closeSnakBar() {
@@ -304,7 +283,7 @@ export default function TestCreation() {
                                     <div style={{ padding: '5px' }}>
 
                                         <div>
-                                            <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
+                                            <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={selectedQuestionsList.includes(qData.q_id)} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
                                             <div style={{
                                                 paddingTop: '5px',
                                                 border: '1px solid blue'
@@ -424,11 +403,11 @@ export default function TestCreation() {
                 </Grid>
             }
 
-            {openSnackBar &&<SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />}
+            {openSnackBar && <SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />}
             {showLoader &&
                 <Loader />
             }
-    
+
         </div>
     )
 }
