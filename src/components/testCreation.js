@@ -15,6 +15,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import SnackBar from './SnackBar';
 import Loader from './Loader';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import InputLabel from '@mui/material/InputLabel';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -32,6 +35,9 @@ export default function TestCreation() {
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [showLoader, setShowLoader] = React.useState(false);
+    const [isOnline, setIsOnline] = React.useState(false);
+    const [isOMR, setIsOMR] = React.useState(false);
+    const [testTypeError, setTestTypeError] = React.useState("");
 
     const defaultTestFields = {
         testName: "",
@@ -47,6 +53,7 @@ export default function TestCreation() {
         testDescription: "",
         testDuration: "",
         numberOfQuestions: "",
+
     }
     const [errors, setErrors] = React.useState(errorTestFields);
 
@@ -140,8 +147,8 @@ export default function TestCreation() {
                     selectedQuestionsList.push(id)
                     setSelectedQuestionsList([...selectedQuestionsList]);
                 }
-                else{
-                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)  
+                else {
+                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
                 }
 
             }
@@ -169,6 +176,14 @@ export default function TestCreation() {
             }
             retunValue = false;
         }
+        if (!isOnline && !isOMR) {
+            retunValue = false;
+            setIsValid(true);
+            setTestTypeError("error");
+        }
+        else {
+            setTestTypeError("");
+        }
         return retunValue;
     }
 
@@ -182,6 +197,10 @@ export default function TestCreation() {
         setTestForm(defaultTestFields);
         setErrors(errorTestFields);
         setScheduledDate(null);
+        setTestTypeError("");
+        setIsOMR(false);
+        setIsOnline(false);
+        setIsValid(false)
     }
 
     const addToTestHandler = async () => {
@@ -193,6 +212,7 @@ export default function TestCreation() {
             no_of_attempts: testForm.nuberOfAttempts,
             scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
             question_ids: selectedQuestionsList,
+            is_online:isOnline, is_omr:isOMR,
             is_active: 1, created_by: 1, update_by: 1
         }
         setShowLoader(true);
@@ -347,6 +367,34 @@ export default function TestCreation() {
                         />
                     </Grid>
                     <Grid item xs={4} >
+                        {/* <span style={{font}}>Test Type</span> */}
+                        <InputLabel style={{ fontWeight: "bold" }} id="demo-multiple-checkbox-label">Test Type *</InputLabel>
+                        <FormControlLabel
+                            label="Online"
+                            control={
+                                <Checkbox
+                                    disabled={!readAndWriteAccess}
+                                    checked={isOnline}
+                                    onClick={() => { setIsOnline(!isOnline); setTestTypeError("") }}
+                                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                                />}
+                        />
+                        <FormControlLabel
+                            label="OMR"
+                            control={
+                                <Checkbox
+                                    disabled={!readAndWriteAccess}
+                                    checked={isOMR}
+                                    onClick={() => { setIsOMR(!isOMR);; setTestTypeError("") }}
+                                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                                />}
+                        />
+                        <br />
+                        {testTypeError !== "" && <span style={{ color: "red" }}>Test type is required</span>}
+                    </Grid>
+                    <Grid item xs={3} />
+                    <Grid item xs={1} />
+                    <Grid item xs={4} >
                         <TextField
                             label="Number Of Attempts"
                             id="outlined-start-adornment"
@@ -358,8 +406,6 @@ export default function TestCreation() {
                             disabled={!readAndWriteAccess}
                         />
                     </Grid>
-                    <Grid item xs={3} ></Grid>
-                    <Grid item xs={1} ></Grid>
                     <Grid item xs={4} >
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DesktopDatePicker
@@ -375,8 +421,8 @@ export default function TestCreation() {
                             />
                         </LocalizationProvider>
                     </Grid>
-                    <Grid item xs={7} ></Grid>
-                    <Grid item xs={1} ></Grid>
+                    <Grid item xs={3} />
+                    <Grid item xs={1} />
                     <Grid item xs={7} >
                         <TextField
                             label="Test Description "

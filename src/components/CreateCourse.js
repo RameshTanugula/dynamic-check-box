@@ -123,6 +123,8 @@ export default function CeateCourse() {
 
     ]
 
+    const typesList = ["Online Test Series", "OMR Merged Tests", "Books", "Courses"]
+
     const [subjectList, setSubjectList] = React.useState([]);
     const courseFields = {
         courseTitle: "",
@@ -134,6 +136,7 @@ export default function CeateCourse() {
         description: "",
         listPrice: "",
         offerPrice: "",
+        type: "",
     }
 
     const [createCourseForm, setCreateCourseForm] = React.useState(courseFields);
@@ -147,6 +150,7 @@ export default function CeateCourse() {
         description: "",
         listPrice: "",
         offerPrice: "",
+        type: "",
     }
     const [errors, setErrors] = React.useState(errorseFields);
 
@@ -219,6 +223,9 @@ export default function CeateCourse() {
         setCreateCourseForm(courseFields);
         setErrors(errorseFields);
         setSelectedFile([]);
+        if (selectedFile.length > 0) {
+            document.getElementById("file").value = "";
+        }
         setPreviewImgSrc(null)
         setPublishedDate(null);
         setPublishedDateError("");
@@ -434,7 +441,7 @@ export default function CeateCourse() {
             setPublishedDateError("error");
         }
 
-        if (previewImgSrc === "") {
+        if (previewImgSrc === null) {
             retunValue = false;
             setCoverPageError("error")
         }
@@ -496,6 +503,7 @@ export default function CeateCourse() {
         courseFields.description = row?.description;
         courseFields.listPrice = row?.listPrice;
         courseFields.offerPrice = row?.offerPrice;
+        courseFields.type = row?.type;
         setCreateCourseForm(courseFields);
         setShowSreen("Create");
         setPreviewImgSrc(row.file);
@@ -661,6 +669,7 @@ export default function CeateCourse() {
                         <Grid item xs={1} ></Grid>
                         <Grid item xs={3} >
                             <TextField
+                                required
                                 label="Course Title"
                                 id="outlined-start-adornment"
                                 sx={{ width: '100%' }}
@@ -674,6 +683,7 @@ export default function CeateCourse() {
                         </Grid>
                         <Grid item xs={3} >
                             <TextField
+                                required
                                 label="Instructor"
                                 id="outlined-start-adornment"
                                 sx={{ width: '100%' }}
@@ -687,6 +697,7 @@ export default function CeateCourse() {
                         </Grid>
                         <Grid item xs={3} >
                             <TextField
+                                required
                                 label="Tags"
                                 id="outlined-start-adornment"
                                 sx={{ width: '100%' }}
@@ -726,7 +737,7 @@ export default function CeateCourse() {
                         <Grid item xs={1} ></Grid>
                         <Grid item xs={3} >
                             <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-5px" }}>
-                                <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                <InputLabel id="demo-simple-select-label">Category *</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
@@ -747,11 +758,12 @@ export default function CeateCourse() {
                                     ))}
                                 </Select>
                             </FormControl>
+                            {errors.category !== "" ? <span style={{ color: "#d32f2f" }}>Category is reuired </span> : ""}
                         </Grid>
                         <Grid item xs={3} >
-                            <span>Cover Page</span>
+                            <span>Cover Page *</span>
                             <div >
-                                <input type="file" multiple onChange={onFileChange} disabled={!readAndWriteAccess} />
+                                <input id="file" type="file" multiple onChange={onFileChange} disabled={!readAndWriteAccess} />
                             </div>
                             {coverPageError !== "" ? <span style={{ color: "#d32f2f" }}> Cover Page is reuired </span> : ""}
 
@@ -759,6 +771,7 @@ export default function CeateCourse() {
                         <Grid item xs={3} style={{ marginTop: "-2px" }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DesktopDatePicker
+                                    required
                                     label="Published Date"
                                     value={publishedDate}
                                     inputFormat="DD/MM/YYYY"
@@ -777,7 +790,7 @@ export default function CeateCourse() {
                         <Grid item xs={1} ></Grid>
                         <Grid item xs={3} style={{ marginTop: "5px" }}>
                             <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-1px" }}>
-                                <InputLabel id="demo-simple-select-label">Validity</InputLabel>
+                                <InputLabel id="demo-simple-select-label">Validity *</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
@@ -786,7 +799,7 @@ export default function CeateCourse() {
                                     onChange={handleChange}
                                     error={errors.validity !== ""}
                                     helperText={errors.validity !== "" ? 'Validity is reuired' : ' '}
-                                    disabled={!readAndWriteAccess || currentRole==="Content Lead"}
+                                    disabled={!readAndWriteAccess || currentRole === "Content Lead"}
                                 >
                                     <MenuItem value="">
                                         <em>None</em>
@@ -798,10 +811,11 @@ export default function CeateCourse() {
                                     ))}
                                 </Select>
                             </FormControl>
-
+                            {errors.validity !== "" ? <span style={{ color: "#d32f2f" }}>Validity is reuired </span> : ""}
                         </Grid>
                         <Grid item xs={3} style={{ marginTop: "5px" }}>
                             <TextField
+                                required
                                 label="List Price"
                                 id="outlined-start-adornment"
                                 sx={{ width: '100%' }}
@@ -811,7 +825,7 @@ export default function CeateCourse() {
                                 onChange={handleChange}
                                 error={errors.listPrice !== ""}
                                 helperText={errors.listPrice !== "" ? 'ListPrice is required' : ' '}
-                                disabled={!readAndWriteAccess || currentRole==="Content Lead"}
+                                disabled={!readAndWriteAccess || currentRole === "Content Lead"}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
@@ -819,6 +833,7 @@ export default function CeateCourse() {
                         </Grid>
                         <Grid item xs={3} style={{ marginTop: "5px" }}>
                             <TextField
+                                required
                                 label="Offer Price"
                                 id="outlined-start-adornment"
                                 sx={{ width: '100%' }}
@@ -828,17 +843,19 @@ export default function CeateCourse() {
                                 onChange={handleChange}
                                 error={errors.offerPrice !== ""}
                                 helperText={errors.offerPrice !== "" ? 'OfferPrice is required' : ' '}
-                                disabled={!readAndWriteAccess || currentRole==="Content Lead"}
+                                disabled={!readAndWriteAccess || currentRole === "Content Lead"}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">₹</InputAdornment>,
                                 }}
                             />
+                            {errors.offerPrice !== "" ? <span style={{ color: "#d32f2f" }}>Offer Price is reuired </span> : ""}
                         </Grid>
                         <Grid item xs={2} >
                         </Grid>
                         <Grid item xs={1} ></Grid>
                         <Grid item xs={6} >
                             <TextField
+                                required
                                 id="outlined-multiline-static"
                                 label="Description"
                                 sx={{ width: '100%' }}
@@ -852,26 +869,52 @@ export default function CeateCourse() {
                                 disabled={!readAndWriteAccess}
                             />
                         </Grid>
+                        <Grid item xs={3} style={{ marginTop: "5px" }}>
+                            <FormControl sx={{ m: 1, minWidth: 300 }} style={{ marginLeft: "2px", marginTop: "-1px" }}>
+                                <InputLabel id="demo-simple-select-label">Type *</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={createCourseForm.type}
+                                    name="type"
+                                    onChange={handleChange}
+                                    error={errors.type !== ""}
+                                    helperText={errors.type !== "" ? 'type is reuired' : ' '}
+                                    disabled={!readAndWriteAccess}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    {typesList.map((data, i) => (
+                                        <MenuItem key={i} value={data}>
+                                            {data}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {errors.type !== "" ? <span style={{ color: "#d32f2f" }}>Type is reuired </span> : ""}
+                        </Grid>
+                        <Grid item xs={2} />
+
                         <Grid item xs={1} >
-                            {previewImgSrc &&
-                                <span>Selcted File</span>
-                            }
                         </Grid>
-                        <Grid item xs={4} >
-                            {previewImgSrc &&
-                                <img src={previewImgSrc} style={{ width: '40%', paddingTop: '15px' }} />
-                            }
-                        </Grid>
-                        <Grid item xs={1} >
-                        </Grid>
-                        <Grid item xs={10} >
+                        <Grid item xs={6} >
                             <Stack spacing={2} direction="row" >
                                 <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => setShowSreen("Grid")}>Back</Button>
                                 <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => resetForm()}>reset</Button>
                                 <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => createCourse()}>{buttonName}</Button>
                             </Stack>
                         </Grid>
-
+                        <Grid item xs={1} style={{ marginTop: "-60px" }}  >
+                            {previewImgSrc &&
+                                <span>Selcted File</span>
+                            }
+                        </Grid>
+                        <Grid item xs={4} style={{ marginTop: "-50px", }} >
+                            {previewImgSrc &&
+                                <img src={previewImgSrc} style={{ width: '50%', paddingTop: '15px', height: "150%" }} />
+                            }
+                        </Grid>
                     </Grid>
                 }
             </span>

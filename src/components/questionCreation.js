@@ -209,7 +209,7 @@ export default function QuestionCreation() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [selectedTitle, setSelectedTitle] = React.useState("");
-    const [titleOptionsList, setTitleOptionsList] = React.useState("");
+    const [titleOptionsList, setTitleOptionsList] = React.useState([]);
     const [inputOptionValue1, setInputOptionValue1] = React.useState("");
     const [inputOptionValue2, setInputOptionValue2] = React.useState("");
     const [inputOptionValue3, setInputOptionValue3] = React.useState("");
@@ -909,7 +909,7 @@ export default function QuestionCreation() {
                                         disabled={!readAndWriteAccess}
                                         style={{ marginBottom: "15px", marginTop: "15px" }}
                                     >
-                                        {titleOptionsList.map((name) => (
+                                        {titleOptionsList?.map((name) => (
                                             <MenuItem key={name.OptionNames} value={name.OptionNames}>
                                                 <Checkbox checked={chekedOptins.indexOf(name.OptionNames) > -1} />
                                                 <ListItemText primary={name.OptionNames} />
