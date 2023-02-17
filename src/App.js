@@ -47,6 +47,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Users from './components/Users';
 import UserDashBoard from './components/UserDashBoard';
 import Sales from './components/Sales';
+import Books from './components/Books';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -243,6 +244,7 @@ export default function App() {
                 <Route exact path="/Users" element={<Users />} />
                 <Route exact path="/User Dash Board" element={<UserDashBoard />} />
                 <Route exact path="/Sales" element={<Sales />} />
+                <Route exact path="/Books" element={<Books />} />
               </Routes>
             </Main>
           </BrowserRouter>
