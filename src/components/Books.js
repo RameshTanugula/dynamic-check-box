@@ -23,7 +23,7 @@ export default function Books() {
     const defaultBookFields = {
         bookTiltle: "",
         edition: "",
-        autherName: "",
+        authorName: "",
         isbnNumber: "",
         coverPage: "",
         bookSample: "",
@@ -35,7 +35,7 @@ export default function Books() {
     const errorFields = {
         bookTiltle: "",
         edition: "",
-        autherName: "",
+        authorName: "",
         isbnNumber: "",
         coverPage: "",
         bookSample: "",
@@ -93,17 +93,17 @@ export default function Books() {
             const payload = {
                 bookTiltle: bookForm.bookTiltle,
                 edition: bookForm.edition,
-                autherName: bookForm.autherName,
+                authorName: bookForm.authorName,
                 isbnNumber: bookForm.isbnNumber,
                 bookDescription: bookForm.bookDescription,
             }
-            const filesList = [];
-            filesList.push(bookForm.coverPage);
-            filesList.push(bookForm.bookSample);
-
+            
             const formData = new FormData();
             formData.append(
-                "files", filesList,
+                "files", bookForm.coverPage,
+            );
+            formData.append(
+                "files", bookForm.bookSample,
             );
 
             formData.append(
@@ -200,11 +200,11 @@ export default function Books() {
                         required
                         id="outlined-start-adornment"
                         sx={{ width: '100%' }}
-                        value={bookForm.autherName}
+                        value={bookForm.authorName}
                         onChange={handleChange}
-                        name="autherName"
-                        error={errors.autherName !== ""}
-                        helperText={errors.autherName !== "" ? 'Auther Name is reuired' : ' '}
+                        name="authorName"
+                        error={errors.authorName !== ""}
+                        helperText={errors.authorName !== "" ? 'Auther Name is reuired' : ' '}
                         disabled={!readAndWriteAccess}
                     />
                 </Grid>
