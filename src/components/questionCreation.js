@@ -661,7 +661,6 @@ export default function QuestionCreation() {
         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
         if (data.status === 200) {
             setQuestionData(data.data?.res)
-           
         }
         setShowLoader(false);
     }
@@ -691,15 +690,23 @@ export default function QuestionCreation() {
         setShowLoader(true);
         const data = await api(editData, securedLocalStorage.baseUrl + 'common/update', 'post');
         if (data.status === 200) {
-            const data = {
+            const data1 = {
                 type: "success",
                 message: "Updated Sucessfully!...."
             }
             setEditData("");
             setOpenSnackBar(true);
-            setSnackBarData(data);
+            setSnackBarData(data1);
             var index = questionData.findIndex(item => item.checked === true);
             questionData[index].checked = false;
+        }
+        else{
+            setOpenSnackBar(true);
+            const data1 = {
+                type: "error",
+                message: data.response.data.error
+            }
+            setSnackBarData(data1);
         }
         setShowLoader(false);
     }
