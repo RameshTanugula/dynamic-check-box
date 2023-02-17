@@ -602,13 +602,8 @@ export default function CeateCourse() {
     }
 
     const onFileChange = event => {
-        var file = event.target.files[0];
-        var reader = new FileReader();
-        var url = reader.readAsDataURL(file);
-        reader.onloadend = function (e) {
-            setPreviewImgSrc([reader.result]);
-
-        }
+        const objectUrl = URL.createObjectURL(event.target.files[0])
+        setPreviewImgSrc(objectUrl)
         setSelectedFile(event.target.files);
         setCoverPageError("");
     };
