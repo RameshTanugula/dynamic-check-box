@@ -378,10 +378,10 @@ export default function Users() {
                                 <FormControlLabel
                                     control={
                                         <Checkbox
-                                            checked={isActive === "1"}
+                                            checked={isActive === 1}
                                             value={isActive}
                                             disabled={!readAndWriteAccess}
-                                            onChange={() => setIsActive(isActive === "1" ? "0" : "1")}
+                                            onChange={() => setIsActive(isActive === 1 ? 0 : 1)}
                                         />
                                     }
                                     label="Active"
