@@ -33,7 +33,7 @@ export default function TestDashBoard() {
         {
             field: '', headerName: 'Test Type', minWidth: 200,
             renderCell: (params) => {
-                return (params.row.is_omr === 1 ? "OMR" : "Online")
+                return (getTestType(params.row))
 
             }
         },
@@ -42,6 +42,18 @@ export default function TestDashBoard() {
         { field: 'created_at', headerName: 'Created Date', minWidth: 250, },
     ];
 
+
+    function getTestType(row) {
+        let value = "";
+        if (row.is_omr === 1 && row.is_online === 1) {
+            value = "OMR,Online";
+        }
+        else {
+            value = row.is_omr === 1 ? "OMR" : row.is_online === 1 && "Online"
+        }
+        return value;
+    }
+    
     function exportToWord() {
         var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
             "xmlns:w='urn:schemas-microsoft-com:office:word' " +
@@ -103,12 +115,12 @@ export default function TestDashBoard() {
             }
             {showSreen === "Questions" &&
                 <span>
-                    <Stack style={{ float: "right"}} direction="row" spacing={1}>
+                    <Stack style={{ float: "right" }} direction="row" spacing={1}>
                         <Button variant="outlined" onClick={() => setShowSreen("Grid")} >Back</Button>
                         <Button variant="outlined" onClick={() => exportToWord()} >Export</Button>
                     </Stack>
                     <div id="element" style={{ marginTop: "20px" }}>
-                    &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style={{ fontSize: "25px" }} >Questions</span>
+                        &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style={{ fontSize: "25px" }} >Questions</span>
                         <br />
                         <br />
                         <span>
