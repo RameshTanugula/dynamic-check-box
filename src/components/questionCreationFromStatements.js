@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
+import Loader from './Loader';
 /**
  *
  * @returns table data
@@ -102,10 +103,10 @@ export default function QuestionCreationFromStatements() {
     const serverUrl = securedLocalStorage.baseUrl + 'statements/'
     const [checked, setChecked] = useState([]);
     const [catagoryData, setCategoryData] = useState([]);
-    const [pairsData, setPairsData] = useState([]);
     const [statementsList, setStatementsList] = useState([])
     const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
     const [generatedData, setGeneratedData] = useState([]);
+    const [showLoader, setShowLoader] = React.useState(false);
     const [showContent, setShowContent] = useState(true);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
@@ -123,16 +124,14 @@ export default function QuestionCreationFromStatements() {
     React.useEffect(() => {
         async function fetchData() {
             // You can await here
-            const response = await api({ catIds: checked }, serverUrl + 'list/all', 'post');
-            setStatementsList(response.data)
+            setShowLoader(true);
+            const response = await api({ catIds: checked }, serverUrl + 'bycategory/list', 'post');
+            setStatementsList(response.data);
             const catData = await api(null, securedLocalStorage.categoriesUrl, 'get');
-            // const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
             if (catData.status === 200) {
                 setCategoryData(catData.data);
             }
-            // if (pairsData.status === 200) {
-            //     setPairsData(pairsData.data);
-            // }
+            setShowLoader(false);
         }
         fetchData();
     }, []);
@@ -147,14 +146,15 @@ export default function QuestionCreationFromStatements() {
             {falseList?.map((fl, i) => {
                 return (
                     <div>
-                        <span>{fl.statement}.</span>
-                        <input disabled={!readAndWriteAccess} checked={fl.checked} onClick={() => onClickCheckBox(fl.q_id, i, 2)} type="checkbox" />
+                        <input disabled={!readAndWriteAccess} checked={fl.checked} onClick={() => onClickCheckBox(fl, i, 2)} type="checkbox" />.
+                    
+                        <span>{fl.Statement}</span>
                     </div>
                 )
             })}
         </div>)
     }
-    const renderPairsData = () => {
+    const renderStatements = () => {
         return (<div>
             {statementsList?.map((qData, i) => {
                 return (
@@ -170,9 +170,9 @@ export default function QuestionCreationFromStatements() {
                                 border: '1px solid blue'
                             }}>
 
-                                <span>Question: {qData.statement}</span> <br />
+                                <span><b>Statements: </b>{qData.statement}</span> <br />
                                 {/* <span>Answer: {qData.answer}</span> */}
-                                {renderFalseStatements(qData.falseList)}
+                                <span><b>False Statements:</b> <br/> {renderFalseStatements(qData.falseList)}</span>
                             </div>
                         </div>
                     </div>)
@@ -182,47 +182,86 @@ export default function QuestionCreationFromStatements() {
     }
     React.useEffect(() => {
         async function fetchData() {
-            const response = await api({ catIds: checked }, serverUrl + 'list/all', 'post');
-            console.log(response?.length, response)
+            setShowLoader(true);
+            const response = await api({ catIds: checked }, serverUrl + 'bycategory/list', 'post');
             setStatementsList(response.data)
-            // if (pairsData.status === 200) {
-            //     setPairsData(pairsData.data);
-            // }
+            if (response.status === 200) {
+                setStatementsList([...response.data])
+            } else {
+                setStatementsList([])
+            }
+            setShowLoader(false);
         }
         fetchData();
     }, [checked]);
     const createQuestions = async () => {
-        const qList = generatedData.filter(g => g.checked);
-        const response = await api({ list: qList }, serverUrl + 'create/questions/pairs', 'post');
-        if (response.status === 200) {
-            const pairsData = await api({ catIds: checked }, serverUrl + 'get/pairs', 'post');
-
-            if (pairsData.status === 200) {
-                setPairsData(pairsData.data);
+        setShowLoader(true);
+        const createResponse = await api(generatedData, serverUrl + 'create/questions', 'post');
+        if (createResponse.status === 200) {
+            const response = await api({ catIds: checked }, serverUrl + 'bycategory/list', 'post');
+            setStatementsList(response.data)
+            if (response.status === 200) {
+                setStatementsList(response.data)
             }
             setGeneratedData([]);
             setShowContent(true);
             alert('Question Created successfully!');
         }
+        setShowLoader(false);
+    }
+    const sliceIntoChunks=(arr, chunkSize)=> {
+        const res = [];
+        for (let i = 0; i < arr.length; i += chunkSize) {
+            const chunk = arr.slice(i, i + chunkSize);
+            res.push(chunk);
+        }
+        return res;
     }
     const generateQuestions = async () => {
-        const ids = pairsData.filter(p => p.checked)?.map(pp => pp.pair_id);
-        const response = await api({ pairids: ids }, serverUrl + 'generate/questions', 'post');
-
-        if (response.status === 200) {
-            setShowContent(false);
-            setGeneratedData(response.data);
+        let selectedStatements = [];
+        statementsList.forEach(element=>{
+            if(element?.checked){
+                selectedStatements.push({id:element.StatementId, statement:element.statement, isTrueStatement: true})
+            }
+            if(element?.falseList?.length>0){
+                element.falseList.forEach(falseElement=>{
+                    if(falseElement?.checked){
+                        selectedStatements.push({id:falseElement.id, statement: falseElement.statement, isTrueStatement: false})
+                    }
+                })
+            }
+        })
+        let shuffleList = shuffle(JSON.parse(JSON.stringify(selectedStatements)));
+        const splittedArrays = sliceIntoChunks(shuffleList, 2);
+        let questionsList=[];
+        for (let i = 0; i < splittedArrays.length; i++) {
+            questionsList.push({questionData:splittedArrays[i]})
         }
+        setShowContent(false);
+            setGeneratedData([...questionsList]);
     }
-    const onClickCheckBox = (id, index, type) => {
-        if (id && index >= 0) {
-            setAllCheckBoxValue(false);
-            pairsData[index]['checked'] = !pairsData[index]['checked'];
-        } else {
-            setAllCheckBoxValue(!allCheckBoxValue)
-            pairsData.map(q => q.checked = !allCheckBoxValue)
+    const shuffle=(sourceArray)=> {
+        for (var i = 0; i < sourceArray.length - 1; i++) {
+            var j = i + Math.floor(Math.random() * (sourceArray.length - i));
+    
+            var temp = sourceArray[j];
+            sourceArray[j] = sourceArray[i];
+            sourceArray[i] = temp;
         }
-        setPairsData(pairsData);
+        return sourceArray;
+      }
+    const onClickCheckBox = (info, index, type) => {
+        if(type===1){
+            statementsList[index]['checked']=!statementsList[index]['checked'];
+        } else if(type===2){
+            const trueStatement = statementsList.find(s=>s.StatementId===info.StatementId);
+            if(trueStatement && trueStatement['falseList'] && trueStatement['falseList']?.length>0){
+                trueStatement['falseList'][index]['checked'] = !trueStatement['falseList'][index]['checked'];
+              const trueStatementIndex =  statementsList.findIndex(si=>si.StatementId === info.StatementId);
+              statementsList[trueStatementIndex] = trueStatement;
+            }
+        }
+        setStatementsList([...statementsList]);
     }
     const onClickCheckBoxQuestion = (id, index) => {
         if (id && index >= 0) {
@@ -245,8 +284,8 @@ export default function QuestionCreationFromStatements() {
                                     <input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBoxQuestion()} type="checkbox" />
                                 </span></TableCell>
                                 <TableCell align="center">Question Title</TableCell>
-                                <TableCell align="center">PART A</TableCell>
-                                <TableCell align="right">PART B</TableCell>
+                                <TableCell align="center">Statements</TableCell>
+                                <TableCell align="right">Answers</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -255,21 +294,22 @@ export default function QuestionCreationFromStatements() {
                                 : generatedData
                             ).map((row, i) => (
                                 <TableRow key={i}>
-                                    <TableCell component="th" scope="row">
-                                        <span>
-                                            <input disabled={!readAndWriteAccess} checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
-                                        </span>
-                                    </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        Match the following
-                                    </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        {row.part_a?.map((a, i) => { return (<><div>{i + 1}{')'}.<span>{a}</span></div><br /></>) })}
-                                    </TableCell>
-                                    <TableCell style={{ width: 160 }} align="right">
-                                        {row.part_b?.map((b, i) => { return (<><div>{i + 1}{')'}.<span>{b}</span></div><br /></>) })}
-                                    </TableCell>
-
+                                    {(row.questionData?.length ===2)&&
+                                    <><><TableCell component="th" scope="row">
+                                            <span>
+                                                <input disabled={!readAndWriteAccess} checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
+                                            </span>
+                                        </TableCell><TableCell component="th" scope="row">
+                                                Choose the correct statements
+                                            </TableCell><TableCell component="th" scope="row">
+                                                {(row.questionData?.length === 2) && row.questionData?.map((a, i) => { return (<><div>{i + 1}{')'}.<span>{a.statement}</span></div><br /></>); })}
+                                            </TableCell>
+                                        </><TableCell component="th" scope="row">
+                                                {(row.questionData?.length === 2) && row.questionData?.map((a, i) => { return (<><div>{i + 1}{')'}.<span>{a.isTrueStatement ? 'true' : 'false'}</span></div><br /></>); })}
+                                            </TableCell></>
+                                            
+                                   
+                                }
                                 </TableRow>
                             ))}
 
@@ -304,23 +344,20 @@ export default function QuestionCreationFromStatements() {
     return (
         <>
             {<div>
-                {/* <div style={{ float: 'right' }}>
-                    <Stack spacing={2} direction="row">
-                        {showContent && (generatedData.length === 0) && <Button variant="contained" onClick={() => generateQuestions()}>Generate Questions</Button>}
-                        {!showContent && (generatedData.length > 0) && <Button variant="contained" onClick={() => createQuestions()}>Create Questions</Button>}
-
-                    </Stack>
-                </div>
                 {!showContent && <div style={{ height: '30rem', overflow: 'auto', width: '65%', float: 'left', paddingLeft: '5%', marginTop: '5%' }}>
                     {generatedData && generatedData.length > 0 && renderGeneratedData()}
                 </div>}
+                <div style={{textAlign:'right'}}>
+                    
+                {showContent && <Button variant="contained"  onClick={() => generateQuestions()}>Generate Questions</Button>}
+                {!showContent && (generatedData.length > 0) && <Button variant="contained" onClick={() => createQuestions()}>Create Questions</Button>}
+
+                </div>
                 {showContent && <div style={{ height: '30rem', overflow: 'auto', width: '65%', float: 'left', paddingLeft: '5%', marginTop: '5%' }}>
-                    {pairsData && pairsData.length > 0 && renderPairsData()}
-                </div>} */}
-                {showContent && <div style={{ height: '30rem', overflow: 'auto', width: '65%', float: 'left', paddingLeft: '5%', marginTop: '5%' }}>
-                    {statementsList && statementsList.length > 0 && renderPairsData()}
+                    {statementsList && statementsList.length > 0 && renderStatements()}
                 </div>}
                 <div style={{ height: '30rem', width: '20%', float: 'right', paddingRight: '5%', overflow: 'auto', paddingTop: '5%' }}>
+                   
                     {showContent && catagoryData?.length > 0 && <CheckboxTree
                         nodes={catagoryData}
                         checked={checked}
@@ -329,7 +366,9 @@ export default function QuestionCreationFromStatements() {
                     //   onClick={(e) => onClickCheckBox(e)}
                     />}
                 </div>
-
+                {showLoader &&
+                <Loader />
+            }
             </div>}
         </>
     )

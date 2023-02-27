@@ -31,7 +31,7 @@ import Statements from './components/statements';
 import CoupenCode from './components/CouponCode';
 import UserRequestAccess from './components/UserRequestAccess';
 import TitleAndSubTitle from './components/TitleAndSubTitle';
-// import QuestionCreationFromStatements from './components/questionCreationFromStatements'
+import QuestionCreationFromStatements from './components/questionCreationFromStatements'
 import Questions from './components/questions';
 import CreateCourse from './components/CreateCourse';
 import TestOMR from './components/testOMR'
@@ -234,7 +234,8 @@ export default function App() {
                 <Route exact path="/create questions from pairs" element={<QuestionCreationFromPairs />} />
                 <Route exact path="/create pairs" element={<CreatePairs />} />
                 <Route exact path="/create statements" element={<Statements />} />
-                <Route exact path="/create a test" element={<TestCreation />} />
+                <Route exact path="/create questions from statements" element={<QuestionCreationFromStatements />} />
+               <Route exact path="/create a test" element={<TestCreation />} />
                 <Route exact path="/upload files" element={<FileUpload />} />
                 <Route exact path="/testOMR" element={<TestOMR />} />
                 <Route exact path="/flash cards" element={<FlashCard />} />
