@@ -48,6 +48,8 @@ import Users from './components/Users';
 import UserDashBoard from './components/UserDashBoard';
 import Sales from './components/Sales';
 import Books from './components/Books';
+import TestDashBoard from './components/TestDashBoard';
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -245,6 +247,7 @@ export default function App() {
                 <Route exact path="/User Dash Board" element={<UserDashBoard />} />
                 <Route exact path="/Sales" element={<Sales />} />
                 <Route exact path="/Books" element={<Books />} />
+                <Route exact path="/Test Dashboard" element={<TestDashBoard />} />
               </Routes>
             </Main>
           </BrowserRouter>
