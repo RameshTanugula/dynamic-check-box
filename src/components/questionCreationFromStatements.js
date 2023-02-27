@@ -145,7 +145,7 @@ export default function QuestionCreationFromStatements() {
         return (<div>
             {falseList?.map((fl, i) => {
                 return (
-                    <div>
+                    <div style={{background: fl?.IsActive === 6 ? 'yellow' : ''}}>
                         <input disabled={!readAndWriteAccess} checked={fl.checked} onClick={() => onClickCheckBox(fl, i, 2)} type="checkbox" />.
                     
                         <span>{fl.Statement}</span>
@@ -170,7 +170,7 @@ export default function QuestionCreationFromStatements() {
                                 border: '1px solid blue'
                             }}>
 
-                                <span><b>Statements: </b>{qData.statement}</span> <br />
+                                <span><b>Statements: </b><span style={{background: qData?.IsActive === 6 ? 'yellow' : ''}}>{qData.statement}</span></span> <br />
                                 {/* <span>Answer: {qData.answer}</span> */}
                                 <span><b>False Statements:</b> <br/> {renderFalseStatements(qData.falseList)}</span>
                             </div>
