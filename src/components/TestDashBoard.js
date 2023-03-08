@@ -53,7 +53,7 @@ export default function TestDashBoard() {
         }
         return value;
     }
-    
+
     function exportToWord() {
         var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
             "xmlns:w='urn:schemas-microsoft-com:office:word' " +
@@ -115,7 +115,7 @@ export default function TestDashBoard() {
             }
             {showSreen === "Questions" &&
                 <span>
-                    <Stack style={{ float: "right" }} direction="row" spacing={1}>
+                    <Stack style={{ float: "right", top: "110px", position: "sticky" }} direction="row" spacing={1}>
                         <Button variant="outlined" onClick={() => setShowSreen("Grid")} >Back</Button>
                         <Button variant="outlined" onClick={() => exportToWord()} >Export</Button>
                     </Stack>
@@ -125,7 +125,7 @@ export default function TestDashBoard() {
                         <br />
                         <span>
                             {questionsData && questionsData.map((question, i) => {
-                                return (<span><span style={{ fontWeight: "bold" }}>{i + 1}.{question.QuestionTitle}</span>. <br /> <span>A.{question.Option1}.</span><br /> <span>B.{question.Option2}.</span><br /> <span>C.{question.Option3}.</span> <br /> <span>D.{question.Option4}.</span><br /><br /> </span>)
+                                return (<span key={i}><span style={{ fontWeight: "bold" }}>{i + 1}.{question.QuestionTitle}</span>. <br /> <span>A.{question.Option1}.</span><br /> <span>B.{question.Option2}.</span><br /> <span>C.{question.Option3}.</span> <br /> <span>D.{question.Option4}.</span><br /><br /> </span>)
                             })}
                         </span>
                     </div>
