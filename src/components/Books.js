@@ -32,6 +32,8 @@ export default function Books() {
         { field: 'author', headerName: 'Author', minWidth: 200, },
         { field: 'edition', headerName: 'Edition', minWidth: 200, },
         { field: 'isbn_number', headerName: 'ISBN Number', minWidth: 200, },
+        { field: 'price', headerName: 'Price', minWidth: 200, },
+        { field: 'offer_price', headerName: 'Offer Price', minWidth: 200, },
         { field: 'book_description', headerName: 'Description', minWidth: 280, },
         {
             field: '', headerName: 'Action', minWidth: 150,
@@ -49,6 +51,8 @@ export default function Books() {
         edition: "",
         authorName: "",
         isbnNumber: "",
+        price:"",
+        offer_price:"",
         coverPage: "",
         bookSample: "",
         bookDescription: "",
@@ -61,6 +65,8 @@ export default function Books() {
         edition: "",
         authorName: "",
         isbnNumber: "",
+        price:"",
+        offer_price:"",
         coverPage: "",
         bookSample: "",
         bookDescription: "",
@@ -119,6 +125,8 @@ export default function Books() {
         bookForm.edition = row.edition;
         bookForm.authorName = row.author;
         bookForm.isbnNumber = row.isbn_number;
+        bookForm.price = row.price;
+        bookForm.offer_price = row.offer_price;
         bookForm.bookDescription = row.book_description;
         bookForm.coverPage = row.cover_page_url;
         bookForm.bookSample = row.content_page_url;
@@ -134,6 +142,8 @@ export default function Books() {
                 authorName: bookForm.authorName,
                 isbnNumber: bookForm.isbnNumber,
                 bookDescription: bookForm.bookDescription,
+                price: bookForm.price,
+                offer_price:bookForm.offer_price
             }
             if (buttonName === "Update") {
                 payload.id = updateRow.id;
@@ -286,6 +296,38 @@ export default function Books() {
                                 onChange={handleChange}
                                 name="isbnNumber"
                                 type="number"
+                                disabled={!readAndWriteAccess}
+                            />
+                        </Grid>
+                        <Grid item xs={3} />
+                        <Grid item xs={1} />
+                        <Grid item xs={4} >
+                            <TextField
+                                label="Price"
+                                required
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={bookForm.price}
+                                onChange={handleChange}
+                                name="price"
+                                type="number"
+                                error={errors.price !== ""}
+                                helperText={errors.price !== "" ? 'Price Name is reuired' : ' '}
+                                disabled={!readAndWriteAccess}
+                            />
+                        </Grid>
+                        <Grid item xs={4} >
+                            <TextField
+                                label="Offer Price"
+                                required
+                                id="outlined-start-adornment"
+                                sx={{ width: '100%' }}
+                                value={bookForm.offer_price}
+                                onChange={handleChange}
+                                name="offer_price"
+                                type="number"
+                                error={errors.offer_price !== ""}
+                                helperText={errors.offer_price !== "" ? 'Offer price Name is reuired' : ' '}
                                 disabled={!readAndWriteAccess}
                             />
                         </Grid>
