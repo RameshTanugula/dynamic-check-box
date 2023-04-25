@@ -4,6 +4,9 @@ import './flashCard.css';
 import TextField from '@mui/material/TextField';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
+import SnackBar from './SnackBar';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function FileUpload() {
 
@@ -16,6 +19,13 @@ export default function FileUpload() {
 	const [selectedSubject, setSelectedSubject] = useState("");
 	const [title, setTitle] = useState("");
 	const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+	const sample = {
+		type: "pdf",
+		list: []
+	}
+	const [openSnackBar, setOpenSnackBar] = React.useState(false);
+	const [snackBarData, setSnackBarData] = React.useState();
+	const [selectedSubjects, setSelectedSubjects] = useState(sample);
 	React.useEffect(() => {
 		async function fetchData() {
 			const subData = await api(null, serverUrl + 'get/subjects', 'get');
@@ -97,19 +107,77 @@ export default function FileUpload() {
 		);
 
 	};
+
+	function selectedList(row) {
+		let val = 0;
+		if (row.is_home_ref === 0) {
+			val = 1;
+		}
+		var foundIndex = list.findIndex(x => x.id == row.id);
+		list[foundIndex].is_home_ref = val;
+		setList([...list]);
+		const index = selectedSubjects.list.findIndex(x => x.id == row.id);
+		if (index === -1) {
+			selectedSubjects.list.push({ id: row.id, value: val })
+		}
+		else {
+			selectedSubjects.list[index].value = val;
+		}
+		setSelectedSubjects(selectedSubjects);
+	}
+
+	const addToHome = async () => {
+		const data = await api(selectedSubjects, securedLocalStorage.baseUrl + 'common/ref', 'post');
+		if (data.status === 200) {
+			setSelectedSubjects(sample);
+			setOpenSnackBar(true);
+			const data = {
+				type: "success",
+				message: "Added to home successfully!.."
+			}
+			setSnackBarData(data);
+		}
+		else {
+			setOpenSnackBar(true);
+			const data = {
+				type: "success",
+				message: "Adding home failed!..."
+			}
+			setSnackBarData(data);
+
+		}
+	}
+
+	function closeSnakBar() {
+		setOpenSnackBar(false)
+	}
+
 	return (
 		<div>
 			{showTable && <div style={{ width: "60%", textAlign: "right", paddingBottom: '2rem' }}>
+				<button disabled={!readAndWriteAccess} style={{ height: '2rem' }} onClick={() => addToHome()}>Add to home </button> &nbsp;
 				<button style={{ height: '2rem' }} disabled={!readAndWriteAccess} onClick={() => setShowTable(false)}>Upload new Document</button>
 			</div>}
 			{showTable && <table>
 				<tr>
+					<th>Select</th>
 					<th>S.No.</th>
 					<th>Subject</th>
 					<th>Url</th>
 				</tr>
 				{list?.map((c, i) => {
 					return (<tr>
+						<td>
+							<FormControlLabel
+								control={
+									<Checkbox
+										checked={c.is_home_ref}
+										disabled={!readAndWriteAccess}
+										onChange={(e) => selectedList(c)}
+									/>
+								}
+							/>
+						</td>
 						<td>{i + 1}</td>
 						<td>{c.name}</td>
 						<td>{c.location_url}</td>
@@ -149,7 +217,11 @@ export default function FileUpload() {
 						</button>
 					</div>
 					{fileData()}
-				</div>}
+				</div>
+			}
+			{openSnackBar &&
+				<SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />
+			}
 		</div>
 	);
 }

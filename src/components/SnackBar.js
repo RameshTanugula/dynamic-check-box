@@ -19,7 +19,7 @@ export default function SnackBar(props) {
     }
 
     return (
-        <Snackbar open={open} autoHideDuration={6000} onClose={closeSnakBar} anchorOrigin={{ vertical, horizontal }} key={vertical + horizontal}>
+        <Snackbar open={open} autoHideDuration={7000} onClose={closeSnakBar} anchorOrigin={{ vertical, horizontal }} key={vertical + horizontal}>
             <Alert onClose={closeSnakBar} severity={props.data.type} sx={{ width: '100%' }}>
                 {props.data.message}
             </Alert>
