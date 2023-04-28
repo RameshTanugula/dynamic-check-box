@@ -381,12 +381,13 @@ export default function CeateCourse() {
         { field: 'category', headerName: 'Category', minWidth: 150, },
         { field: 'description', headerName: 'Description', minWidth: 250, },
         {
-            field: '', headerName: 'Action', minWidth: 370,
+            field: '', headerName: 'Action', minWidth: 570,
             renderCell: (params) => {
                 return (
                     <Stack direction="row" spacing={1}>
                         <Button variant="outlined" onClick={() => editCourse(params.row)} disabled={!readAndWriteAccess}>Edit Course</Button>
                         <Button variant="outlined" onClick={() => editCourseDeatails(params.row)} disabled={!readAndWriteAccess} >Edit Course Details</Button>
+                        <Button variant="outlined" onClick={() => deleteCouse(params.row)} disabled={!readAndWriteAccess}>Delet Course</Button>
                     </Stack>)
             }
         },
@@ -524,6 +525,28 @@ export default function CeateCourse() {
             else {
                 setCourseSection(defaultCourseSection)
             }
+        }
+        else {
+            setOpenSnackBar(true);
+            const data = {
+                type: "error",
+                message: resp.response.data.error
+            }
+            setSnackBarData(data);
+        }
+    }
+
+    async function deleteCouse(row) {
+        const url = serverUrl + "delete/" + row.id;
+        const resp = await api(null, url, 'delete');
+        if (resp.status === 200) {
+            setOpenSnackBar(true);
+            const data = {
+                type: "success",
+                message: row.title + " deleted successfully...!"
+            }
+            setSnackBarData(data);
+            getCourseList();
         }
         else {
             setOpenSnackBar(true);
