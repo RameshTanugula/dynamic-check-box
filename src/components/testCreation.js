@@ -212,8 +212,11 @@ export default function TestCreation() {
             no_of_attempts: testForm.nuberOfAttempts,
             scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
             question_ids: selectedQuestionsList,
-            is_online:isOnline, is_omr:isOMR,
-            is_active: 1, created_by: 1, update_by: 1
+            is_online: isOnline, 
+            is_omr: isOMR,
+            is_active: 1,
+            created_by: 1,
+            update_by: 1
         }
         setShowLoader(true);
         const data = await api(payload, serverUrl + 'add/test', 'post');
@@ -270,7 +273,38 @@ export default function TestCreation() {
         }
         fetchData();
     }, []);
-
+    const getQuestions = (qData) => {
+        return (
+            <>
+                <span>Question: {qData.question}</span>
+                <br />
+                <span>Answer: {qData.answer}</span>
+            </>
+        )
+    }
+    const getMCQ2Questions = (qData) => {
+        return (
+            <>
+                <span>Question: {qData.question}</span> <br/>
+                <span>A: {qData.part_a}</span> <br />
+                <span>B: {qData.part_b}</span>
+                <br />
+                <span>Answer: {qData.answer}</span>
+            </>
+        )
+    }
+    const getImageQuestions = (qData) => {
+        return (
+            <>
+                <img style={{
+                    height: '10rem',
+                    width: 'auto'
+                }} src={qData.QUrls} />
+                : <span>Question: {qData.question}</span> <br />
+                <span>Answer: {qData.answer}</span>
+            </>
+        )
+    }
     return (
         <div>
             {!showForm &&
@@ -304,11 +338,25 @@ export default function TestCreation() {
 
                                         <div>
                                             <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={selectedQuestionsList.includes(qData.q_id)} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
+                                            {/* <div style={{
+                                                paddingTop: '5px',
+                                                border: '1px solid blue'
+                                            }}> 
+                                            
+                                            {(qData.type==='MCQ2') && <span>{qData.part_a}</span>}
+
+                                             {(qData.QUrls && qData.QUrls !=='' ) ?  <img style={{height: '10rem',
+                                                width: 'auto'}} src={qData.QUrls}/>
+                                                : <span>Question: {qData.question}</span>} <br />
+                                                <span>Answer: {qData.answer}</span> 
+                                            </div> */}
                                             <div style={{
                                                 paddingTop: '5px',
                                                 border: '1px solid blue'
-                                            }}><span>Question: {qData.question}</span> <br />
-                                                <span>Answer: {qData.answer}</span>
+                                            }}>
+                                                {(!qData.type) && getQuestions(qData)}
+                                                {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
+                                                {(qData.type === 'IMG') && getImageQuestions(qData)}
                                             </div>
                                         </div>
 
