@@ -296,11 +296,14 @@ export default function TestCreation() {
     const getImageQuestions = (qData) => {
         return (
             <>
+            <div>Question: {qData.question}</div>
+            <div>
                 <img style={{
                     height: '10rem',
                     width: 'auto'
                 }} src={qData.QUrls} />
-                : <span>Question: {qData.question}</span> <br />
+                </div>
+                  <br />
                 <span>Answer: {qData.answer}</span>
             </>
         )

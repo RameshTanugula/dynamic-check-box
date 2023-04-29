@@ -623,12 +623,14 @@ export default function QuestionCreation() {
                     "files", selectedFile[0],
                 );
             }
-            const createOptins = []
+            const createOptins = [];
+            if(chekedOptins?.length > 0 ){
             chekedOptins.forEach(ele => {
                 createOptins.push({ checked: false, value: ele, label: '' })
             });
             let foundIndex = createOptins.findIndex(element => element.value === radioButtonValue)
             createOptins[foundIndex].checked = true;
+        }
             const optionArray = manual === true ? options : createOptins;
             formData.append("title", questionValue);
             formData.append("solution", solutionValue);
@@ -661,6 +663,8 @@ export default function QuestionCreation() {
         const data = await api({ catIds: checked }, serverUrl + 'get/data', 'post');
         if (data.status === 200) {
             setQuestionData(data.data?.res)
+            setShowForm(false);
+            setShowTree(false);
         }
         setShowLoader(false);
     }
@@ -733,7 +737,8 @@ export default function QuestionCreation() {
                     <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => hideQuestions()}>Hide Questions</Button>
                 }
                 &nbsp;&nbsp;<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => {
-                    setShowForm(!showForm);
+                    setShowForm(true);
+                    setShowTree(false)
                     setManual(false);
                     setOptions(defaultOptions);
                     setChekedOptins([]);

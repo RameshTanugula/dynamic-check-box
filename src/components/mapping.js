@@ -97,6 +97,41 @@ export default function Mapping() {
       alert('please try with from and to values')
     }
   }
+  const getOtherQuestions = (qData) => {
+    return (
+        <>
+            <span>Question: {qData.question}</span>
+            <br />
+            <span>Answer: {qData.answer}</span>
+        </>
+    )
+}
+const getMCQ2Questions = (qData) => {
+    return (
+        <>
+            <span>Question: {qData.question}</span> <br/>
+            <span>A: {qData.part_a}</span> <br />
+            <span>B: {qData.part_b}</span>
+            <br />
+            <span>Answer: {qData.answer}</span>
+        </>
+    )
+}
+const getImageQuestions = (qData) => {
+    return (
+        <>
+        <div>Question: {qData.question}</div>
+        <div>
+            <img style={{
+                height: '10rem',
+                width: 'auto'
+            }} src={qData.QUrls} />
+            </div>
+              <br />
+            <span>Answer: {qData.answer}</span>
+        </>
+    )
+}
   const onClickCheckBox = (id, index) => {
     if (id && index >= 0) {
       setAllCheckBoxValue(false);
@@ -311,8 +346,12 @@ export default function Mapping() {
                       border: '1px solid blue'
                     }}>
 
-                      <span>Question: {qData.question}</span> <br />
-                      <span>Answer: {qData.answer}</span>
+                      {/* <span>Question: {qData.question}</span> <br />
+                      <span>Answer: {qData.answer}</span> */}
+                          {(!qData.type) && getOtherQuestions(qData)}
+                                                {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
+                                                {(qData.type === 'IMG') && getImageQuestions(qData)}
+                                            
                     </div>
                   </div>
                   <div style={{ display: 'flex' }}>
