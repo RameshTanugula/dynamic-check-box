@@ -212,7 +212,7 @@ export default function TestCreation() {
             no_of_attempts: testForm.nuberOfAttempts,
             scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
             question_ids: selectedQuestionsList,
-            is_online: isOnline, 
+            is_online: isOnline,
             is_omr: isOMR,
             is_active: 1,
             created_by: 1,
@@ -282,10 +282,37 @@ export default function TestCreation() {
             </>
         )
     }
+    const getMCQ1Questions = (row) => {
+        return (
+            <><span>Question: {row.question}</span>
+                <br />
+                {row.part_a && row.part_b && <div>
+
+                    <span className='mcq1-left'>PART A</span>
+
+                    <span className='mcq1-left'>PART B</span>
+                </div>}
+                {row.part_a && row.part_b && row.part_a?.split(',').map((a, i) => {
+                    return (<div >
+                        <br />
+                        <div style={{ width: "100%" }} >
+                            <span className='mcq1-left'>{i + 1}. {a} </span>
+                            <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {i + 1}. {row.part_b?.split(',')[i]} </span>
+                        </div>
+                    </div>)
+                })
+                }
+                <br />
+                <div style={{ paddingTop: '6rem', fontWeight: 600 }}>
+                    <span>Answer: {row.answer}</span>
+                </div>
+            </>
+        )
+    }
     const getMCQ2Questions = (qData) => {
         return (
             <>
-                <span>Question: {qData.question}</span> <br/>
+                <span>Question: {qData.question}</span> <br />
                 <span>A: {qData.part_a}</span> <br />
                 <span>B: {qData.part_b}</span>
                 <br />
@@ -296,14 +323,14 @@ export default function TestCreation() {
     const getImageQuestions = (qData) => {
         return (
             <>
-            <div>Question: {qData.question}</div>
-            <div>
-                <img style={{
-                    height: '10rem',
-                    width: 'auto'
-                }} src={qData.QUrls} />
+                <div>Question: {qData.question}</div>
+                <div>
+                    <img style={{
+                        height: '10rem',
+                        width: 'auto'
+                    }} src={qData.QUrls} />
                 </div>
-                  <br />
+                <br />
                 <span>Answer: {qData.answer}</span>
             </>
         )
@@ -358,6 +385,7 @@ export default function TestCreation() {
                                                 border: '1px solid blue'
                                             }}>
                                                 {(!qData.type) && getQuestions(qData)}
+                                                {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
                                                 {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
                                                 {(qData.type === 'IMG') && getImageQuestions(qData)}
                                             </div>

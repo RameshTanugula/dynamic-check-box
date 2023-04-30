@@ -6,7 +6,18 @@ form {
   border: 2px solid green;
   padding: 30px;
 }
-
+.mcq1-left{
+  width: 50%;
+    float: left;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+.mcq1-right{
+  width: 50%;
+    float: right;
+    font-weight: 600;
+    margin-top: 1rem;
+}
 .App-header {
   background-color: white;
   min-height: 100vh;

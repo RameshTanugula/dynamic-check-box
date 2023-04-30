@@ -99,39 +99,67 @@ export default function Mapping() {
   }
   const getOtherQuestions = (qData) => {
     return (
-        <>
-            <span>Question: {qData.question}</span>
-            <br />
-            <span>Answer: {qData.answer}</span>
-        </>
+      <>
+        <span>Question: {qData.question}</span>
+        <br />
+        <span>Answer: {qData.answer}</span>
+      </>
     )
-}
-const getMCQ2Questions = (qData) => {
+  }
+  const getMCQ1Questions = (row) => {
     return (
-        <>
-            <span>Question: {qData.question}</span> <br/>
-            <span>A: {qData.part_a}</span> <br />
-            <span>B: {qData.part_b}</span>
+      <><span>Question: {row.question}</span>
+        <br />
+        {row.part_a && row.part_b && <div>
+
+          <span className='mcq1-left'>PART A</span>
+
+          <span className='mcq1-left'>PART B</span>
+        </div>}
+        {row.part_a && row.part_b && row.part_a?.split(',').map((a, i) => {
+          return (<div >
             <br />
-            <span>Answer: {qData.answer}</span>
-        </>
+            <div style={{ width: "100%" }} >
+              <span className='mcq1-left'>{i + 1}. {a} </span>
+              <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {i + 1}. {row.part_b?.split(',')[i]} </span>
+            </div>
+          </div>)
+        })
+        }
+        <br />
+        <div style={{ paddingTop: '6rem', fontWeight: 600 }}>
+          <span>Answer: {row.answer}</span>
+        </div>
+      </>
     )
-}
-const getImageQuestions = (qData) => {
+  }
+  const getMCQ2Questions = (qData) => {
     return (
-        <>
+      <>
+        <span>Question: {qData.question}</span> <br />
+        <span>A: {qData.part_a}</span> <br />
+        <span>B: {qData.part_b}</span>
+        <br />
+        <span>Answer: {qData.answer}</span>
+      </>
+    )
+  }
+
+  const getImageQuestions = (qData) => {
+    return (
+      <>
         <div>Question: {qData.question}</div>
         <div>
-            <img style={{
-                height: '10rem',
-                width: 'auto'
-            }} src={qData.QUrls} />
-            </div>
-              <br />
-            <span>Answer: {qData.answer}</span>
-        </>
+          <img style={{
+            height: '10rem',
+            width: 'auto'
+          }} src={qData.QUrls} />
+        </div>
+        <br />
+        <span>Answer: {qData.answer}</span>
+      </>
     )
-}
+  }
   const onClickCheckBox = (id, index) => {
     if (id && index >= 0) {
       setAllCheckBoxValue(false);
@@ -343,15 +371,17 @@ const getImageQuestions = (qData) => {
                       <input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
                     <div style={{
                       paddingTop: '5px',
-                      border: '1px solid blue'
+                      border: '1px solid blue',
+                      width: '80%'
                     }}>
 
                       {/* <span>Question: {qData.question}</span> <br />
                       <span>Answer: {qData.answer}</span> */}
-                          {(!qData.type) && getOtherQuestions(qData)}
-                                                {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
-                                                {(qData.type === 'IMG') && getImageQuestions(qData)}
-                                            
+                      {(!qData.type) && getOtherQuestions(qData)}
+                      {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
+                      {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
+                      {(qData.type === 'IMG') && getImageQuestions(qData)}
+
                     </div>
                   </div>
                   <div style={{ display: 'flex' }}>

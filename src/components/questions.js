@@ -296,18 +296,65 @@ export default function Questions() {
                                             height: '10rem',
                                             width: 'auto'
                                         }} src={row.QUrls} />}
+                                        {row.part_a && row.part_b && <div>
+
+                                            <span className='mcq1-left'>PART A</span>
+
+                                            <span className='mcq1-left'>PART B</span>
+                                        </div>}
+                                        {row.part_a && row.part_b && row.part_a?.split(',').map((a, i) => {
+                                            return (<div >
+                                                <br />
+                                                <div style={{ width: "100%" }} >
+                                                    <span className='mcq1-left'>{i + 1}. {a} </span>
+                                                    <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {i + 1}. {row.part_b?.split(',')[i]} </span>
+                                                </div>
+                                            </div>)
+                                        })
+                                        }
+                                        {/* <div >
+                                            <br />{row.part_a && row.part_b &&
+                                                <div style={{ width: "100%" }}>
+                                                    <span className='mcq1-left'> {row.part_a.split(',')[1]} </span>
+                                                    <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {row.part_b?.split(',')[1]} </span>
+                                                </div>}
+                                        </div> */}
                                     </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
-                                        {row.Option1}
+                                        {row.type === 'MCQ1' ? row.Option1?.split(',')?.map((o, i) => {
+                                            return (
+                                                <>
+                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                </>
+                                            )
+                                        }) : row.Option1}
                                     </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
-                                        {row.Option2}
+                                        {row.type === 'MCQ1' ? row.Option2?.split(',')?.map((o, i) => {
+                                            return (
+                                                <>
+                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                </>
+                                            )
+                                        }) : row.Option2}
                                     </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
-                                        {row.Option3}
+                                        {row.type === 'MCQ1' ? row.Option3?.split(',')?.map((o, i) => {
+                                            return (
+                                                <>
+                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                </>
+                                            )
+                                        }) : row.Option3}
                                     </TableCell>
                                     <TableCell style={{ width: 160 }} align="right">
-                                        {row.Option4}
+                                        {row.type === 'MCQ1' ? row.Option4?.split(',')?.map((o, i) => {
+                                            return (
+                                                <>
+                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                </>
+                                            )
+                                        }) : row.Option4}
                                     </TableCell>
                                 </TableRow>
                             ))}
