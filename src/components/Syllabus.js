@@ -7,14 +7,20 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 export default function Syllabus() {
-    const serverUrl = securedLocalStorage.baseUrl + 'course/';
+    const serverUrl = securedLocalStorage.baseUrl + 'syllabus/';
     const syllabusFields = {
         title: "",
+        course: ""
     }
     const errorseFields = {
         title: "",
+        course: ""
 
     }
     const [errors, setErrors] = React.useState(errorseFields);
@@ -22,8 +28,17 @@ export default function Syllabus() {
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [selectedFile, setSelectedFile] = React.useState([]);
     const [fileError, setFileError] = React.useState("");
-
+    const courseList = ['DSC', 'GROUPS'];
     function handleChange(e) {
+        const newData = {
+            ...syllabusForm,
+            [e.target.name]: e.target.value
+
+        }
+        setSyllabusForm(newData);
+        checkIsValid(e.target.name, e.target.value)
+    }
+    function handleChangeCourse(e) {
         const newData = {
             ...syllabusForm,
             [e.target.name]: e.target.value
@@ -60,7 +75,7 @@ export default function Syllabus() {
         document.getElementById("file").value = "";
     }
 
-   async function save() {
+    async function save() {
         if (selectedFile.length === 0) {
             setFileError("File is required");
         }
@@ -72,9 +87,15 @@ export default function Syllabus() {
                     "files", selectedFile[i],
                 );
             }
-            formData.append('title',
+            formData.append('data',
                 JSON.stringify(syllabusForm))
-            const resp = await api(formData, serverUrl + "syllabus", 'post');
+            try {
+                const resp = await api(formData, serverUrl + "save", 'post');
+                alert('Syllabus saved succesfully!');
+                resetForm();
+            } catch (err) {
+                alert('Something went wrong!')
+            }
         }
     }
 
@@ -88,8 +109,7 @@ export default function Syllabus() {
     return (
         <div>
             <Grid container spacing={1} >
-                <Grid item xs={1} />
-                <Grid item xs={3} >
+                <Grid item xs={4} >
                     <TextField
                         required
                         label="Title"
@@ -103,7 +123,36 @@ export default function Syllabus() {
                         disabled={!readAndWriteAccess}
                     />
                 </Grid>
-                <Grid item xs={3} >
+                <Grid item xs={4} >
+                    <>
+                    <FormControl sx={{ minWidth: 300 }} style={{ marginLeft: "16px" }}>
+                    <InputLabel id="demo-simple-select-label">Course</InputLabel>
+                    <Select
+                        sx={{ minWidth: 300 }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={syllabusForm.course}
+                        // placeholder='Course'
+                        label="Course"
+                        name="course"
+                        onChange={handleChangeCourse}
+                    >
+                        <MenuItem value="">
+                            <em>None</em>
+                        </MenuItem>
+                        {courseList.map((data, i) => (
+                            <MenuItem key={i} value={data}>
+                                {data}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                </>
+                </Grid>
+            </Grid>
+            <br />
+            <Grid container spacing={4} >
+                <Grid item xs={6} >
                     <span>File *</span>
                     <div >
                         <input id="file" type="file" multiple onChange={onFileChange} disabled={!readAndWriteAccess} />
