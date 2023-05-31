@@ -7,6 +7,9 @@ import Loader from './Loader';
 import Link from '@mui/material/Link';
 import { DataGrid } from '@mui/x-data-grid';
 import Stack from '@mui/material/Stack';
+import SnackBar from './SnackBar';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function TestDashBoard() {
     const serverUrl = securedLocalStorage.baseUrl;
@@ -15,8 +18,31 @@ export default function TestDashBoard() {
     const [showLoader, setShowLoader] = React.useState(false);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showSreen, setShowSreen] = React.useState("Grid");
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const [snackBarData, setSnackBarData] = React.useState();
+    const sample = {
+        type: "testdashboard",
+        list: []
+    }
+    const [selectedSubjects, setSelectedSubjects] = React.useState(sample);
 
     const columns = [
+        {
+            field: 'select', headerName: 'Select', minWidth: 20,
+            renderCell: (params) => {
+                return (
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={params.row.is_home_ref}
+                                disabled={!readAndWriteAccess}
+                                onChange={(e) => selectedList(params.row)}
+                            />
+                        }
+                    />)
+            }
+        },
+
         {
             field: 'test_name', headerName: 'Test Name', minWidth: 250,
             renderCell: (params) => {
@@ -41,6 +67,51 @@ export default function TestDashBoard() {
         { field: 'price', headerName: 'Price', minWidth: 200, },
         { field: 'created_at', headerName: 'Created Date', minWidth: 250, },
     ];
+
+
+    function selectedList(row) {
+        let val = 0;
+        if (row.is_home_ref === 0) {
+            val = 1;
+        }
+        var foundIndex = testData.findIndex(x => x.id == row.id);
+        testData[foundIndex].is_home_ref = val;
+        setTestData([...testData]);
+        const index = selectedSubjects.list.findIndex(x => x.id == row.id);
+        if (index === -1) {
+            selectedSubjects.list.push({ id: row.id, value: val })
+        }
+        else {
+            selectedSubjects.list[index].value = val;
+        }
+        setSelectedSubjects(selectedSubjects);
+    }
+
+    const addToHome = async () => {
+        const data = await api(selectedSubjects, securedLocalStorage.baseUrl + 'common/ref', 'post');
+        if (data.status === 200) {
+            setSelectedSubjects(sample);
+            setOpenSnackBar(true);
+            const data = {
+                type: "success",
+                message: "Added to home successfully!.."
+            }
+            setSnackBarData(data);
+        }
+        else {
+            setOpenSnackBar(true);
+            const data = {
+                type: "success",
+                message: "Adding home failed!..."
+            }
+            setSnackBarData(data);
+
+        }
+    }
+
+    function closeSnakBar() {
+        setOpenSnackBar(false)
+    }
 
 
     function getTestType(row) {
@@ -103,14 +174,18 @@ export default function TestDashBoard() {
         <div>
 
             {showSreen === "Grid" &&
-                <div style={{ height: 370, width: '100%', marginTop: "5px" }}>
-                    <DataGrid
-                        rows={testData}
-                        columns={columns}
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
-                        getRowId={(row) => row.id}
-                    />
+                <div>
+                    <button disabled={!readAndWriteAccess} style={{ height: '2rem' }} onClick={() => addToHome()}>Add to home </button> 
+                    <br />
+                    <div style={{ height: 370, width: '100%', marginTop: "5px" }}>
+                        <DataGrid
+                            rows={testData}
+                            columns={columns}
+                            pageSize={5}
+                            rowsPerPageOptions={[5]}
+                            getRowId={(row) => row.id}
+                        />
+                    </div>
                 </div>
             }
             {showSreen === "Questions" &&
@@ -133,6 +208,9 @@ export default function TestDashBoard() {
             }
             {showLoader &&
                 <Loader />
+            }
+            {openSnackBar &&
+                <SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />
             }
         </div>
     )
