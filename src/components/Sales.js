@@ -159,10 +159,10 @@ export default function Sales() {
     }
 
     function applayPagination(page, pageSize) {
-        setPaginationModel({
-            page: page,
-            pageSize: pageSize
-        })
+        paginationModel.page=page;
+        paginationModel.pageSize=pageSize;
+        setPaginationModel({...paginationModel})
+        getSalesData();
     }
 
     function generateRandomNumber() {
@@ -295,6 +295,7 @@ export default function Sales() {
                         pageSize={paginationModel.pageSize}
                         rowsPerPageOptions={[5, 10, 20]}
                         page={paginationModel.page}
+                        paginationMode="server"
                         getRowId={(row) => generateRandomNumber()}
                         onPageChange={(newPage) => applayPagination(newPage, paginationModel.pageSize)}
                         onPageSizeChange={(newPageSize) => applayPagination(paginationModel.page, newPageSize)}
