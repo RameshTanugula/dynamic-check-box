@@ -14,7 +14,7 @@ export const remove = (key) => {
     ls.remove(key)
 }
 
-export const baseUrl = "http://65.0.6.119:8080/";
+export const baseUrl = "http://65.0.6.118:8080/";
 export const subjectsUrl = baseUrl + 'files/get/subjects';
 
 export const categoriesUrl = baseUrl + 'get/categories';
