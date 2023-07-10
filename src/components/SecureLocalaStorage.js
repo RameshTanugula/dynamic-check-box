@@ -15,7 +15,7 @@ export const remove = (key) => {
 }
 
 // export const baseUrl = "http://65.0.6.118:8080/";
-export const baseUrl = "http://13.233.129.122/:8080/";
+export const baseUrl = "http://3.6.38.169/:8080/";
 export const subjectsUrl = baseUrl + 'files/get/subjects';
 
 export const categoriesUrl = baseUrl + 'get/categories';
