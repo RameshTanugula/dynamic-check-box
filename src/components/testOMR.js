@@ -79,7 +79,7 @@ export default function TestOMR() {
                         "rollNo": parseInt(studentId)
 
                     }
-                    const response = await api(payload, 'http://3.110.197.70/submit', 'post');
+                    const response = await api(payload, securedLocalStorage.omrScriptUrl+ 'submit', 'post');
                     if (response?.data) {
                         setLoaded(true);
                         setIsTestSubmitted(true);
