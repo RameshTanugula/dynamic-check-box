@@ -15,8 +15,8 @@ export const remove = (key) => {
 }
 
 // export const baseUrl = "http://65.0.6.118:8080/";
-export const baseUrl = "http://13.127.234.197:8080/";
-export const omrScriptUrl = "http://13.127.234.197:5000/"
+export const baseUrl = "http://3.110.56.37:8080/";
+export const omrScriptUrl = "http://3.110.56.37:5000/"
 export const subjectsUrl = baseUrl + 'files/get/subjects';
 
 export const categoriesUrl = baseUrl + 'get/categories';
