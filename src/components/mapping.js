@@ -377,7 +377,7 @@ export default function Mapping() {
 
                       {/* <span>Question: {qData.question}</span> <br />
                       <span>Answer: {qData.answer}</span> */}
-                      {(!qData.type) && getOtherQuestions(qData)}
+                      {(!qData.type || (qData.type === "null")) && getOtherQuestions(qData)}
                       {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
                       {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
                       {(qData.type === 'IMG') && getImageQuestions(qData)}
