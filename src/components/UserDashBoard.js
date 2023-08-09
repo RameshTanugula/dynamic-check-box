@@ -26,7 +26,7 @@ export default function UserDashBoard() {
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
             setShowLoader(false);
-            resp.data = resp.data.map(r=>r.resp.id);
+            resp.data = resp.data?.map(r=>r.id);
             setUsersList(resp.data)
         }
     }
