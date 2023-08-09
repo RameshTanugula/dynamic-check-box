@@ -25,8 +25,14 @@ export default function UserDashBoard() {
         const url = serverUrl + "question/count/all/users/" + CheckAccess.getRole() + "/" + CheckAccess.getUserId();
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
+            const arr=[]
             setShowLoader(false);
-            setUsersList(resp.data)
+            resp.data.forEach(ele => {
+              if(ele.user_id!==null) {
+                arr.push(ele);
+              } 
+            });
+            setUsersList(arr)
         }
     }
     React.useEffect(() => {
