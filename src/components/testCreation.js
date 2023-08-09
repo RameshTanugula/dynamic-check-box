@@ -384,7 +384,7 @@ export default function TestCreation() {
                                                 paddingTop: '5px',
                                                 border: '1px solid blue'
                                             }}>
-                                                {(!qData.type) && getQuestions(qData)}
+                                                {((!qData.type) || (qData.type === "null")) && getQuestions(qData)}
                                                 {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
                                                 {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
                                                 {(qData.type === 'IMG') && getImageQuestions(qData)}
