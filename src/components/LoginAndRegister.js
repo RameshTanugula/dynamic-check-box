@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Link from '@mui/material/Link';
 import api from '../services/api';
 
 import * as securedLocalStorage from "./SecureLocalaStorage";
@@ -12,16 +13,20 @@ export default function App(props) {
     const serverUrl = securedLocalStorage.baseUrl;
     const loginFields = {
         email: "",
-        password: ""
+        password: "",
+        confirmpassword: ""
     }
     const errorObj = {
         email: "",
-        password: ""
+        password: "",
+        confirmpassword: "",
     }
     const [loginForm, setLoginForm] = React.useState(loginFields);
+    const [buttonName, setButtonName] = React.useState('login');
     const [errors, setErrors] = React.useState(errorObj);
     const [isValid, setIsValid] = React.useState(false);
     const [loginFiledMsg, setLoginFiledMsg] = React.useState("");
+    const [successMsg, setSuccessMsg] = React.useState("");
 
     function handleChange(e) {
         const newData = {
@@ -32,7 +37,8 @@ export default function App(props) {
         setLoginForm(newData);
         checkValidation(e.target.name, e.target.value);
         if (loginFiledMsg !== "") {
-            setLoginFiledMsg("")
+            setLoginFiledMsg("");
+            setSuccessMsg("");
         }
     }
 
@@ -59,6 +65,9 @@ export default function App(props) {
     function valid() {
         let retunValue = false;
         let result = [];
+        if (buttonName === "login") {
+            delete loginForm['confirmpassword'];
+        }
         result = Object.keys(loginForm).filter(ele => !loginForm[ele]);
         if (result.length === 0) {
             if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(loginForm.email)) {
@@ -75,9 +84,15 @@ export default function App(props) {
             retunValue = false;
             setIsValid(true)
         }
+        if (buttonName !== "login") {
+            if (loginForm.password !== loginForm.confirmpassword) {
+                retunValue = false;
+                setLoginFiledMsg("Passwords dose not Match")
+                setIsValid(true)
+            }
+        }
 
         return retunValue;
-
     }
 
     function resetForms() {
@@ -95,6 +110,24 @@ export default function App(props) {
                 props.loginData();
             }
             else {
+                setLoginFiledMsg("Invalid Credentials..!");
+            }
+
+        }
+    }
+
+    async function forGotPassword() {
+        setLoginFiledMsg("");
+        if (valid()) {
+            delete loginForm['confirmpassword'];
+            const resp = await api(loginForm, serverUrl + "users/forgot/password", 'post');
+            if (resp.status === 200) {
+                setLoginFiledMsg("");
+                setSuccessMsg(resp.data.message);
+                resetForms();
+            }
+            else {
+                setSuccessMsg("")
                 setLoginFiledMsg("Invalid Credentials..!");
             }
 
@@ -133,8 +166,8 @@ export default function App(props) {
                                         required
                                         sx={{ width: '75%' }}
                                         id="outlined-start-adornment"
-                                        label="Password"
-                                        type="password"
+                                        label={buttonName === "login" ? "Password" : "New Password"}
+                                        type={buttonName === "login" ? "password" : "text"}
                                         name="password"
                                         variant="standard"
                                         value={loginForm.password}
@@ -145,15 +178,66 @@ export default function App(props) {
                                         helperText={errors.password !== "" ? <span style={{ fontSize: 20 }} >{errors.password}</span> : ' '}
                                     />
                                 </Grid>
+                                {buttonName !== "login" &&
+                                    <Grid item xs={2}></Grid>
+                                }
+                                {buttonName !== "login" &&
+                                    <Grid item xs={10}>
+                                        <TextField
+                                            required
+                                            sx={{ width: '75%' }}
+                                            id="outlined-start-adornment"
+                                            label="Confirm Password"
+                                            type="password"
+                                            name="confirmpassword"
+                                            variant="standard"
+                                            value={loginForm.confirmpassword}
+                                            onChange={handleChange}
+                                            inputProps={{ style: { fontSize: 20 } }}
+                                            InputLabelProps={{ shrink: true, style: { fontSize: 25 } }}
+                                            error={errors.confirmpassword !== ""}
+                                            helperText={errors.confirmpassword !== "" ? <span style={{ fontSize: 20 }} >{errors.confirmpassword}</span> : ' '}
+                                        />
+                                    </Grid>
+                                }
                                 <Grid item xs={3}></Grid>
                                 <Grid item xs={9}  >
                                     {(loginFiledMsg !== "") &&
                                         <span style={{ color: "red", fontSize: 20, fontWidth: 500, }}>{loginFiledMsg}</span>
                                     }
+                                      {(successMsg !== "") &&
+                                        <span style={{ color: "green", fontSize: 20, fontWidth: 500, }}>{successMsg}...!</span>
+                                    }
                                 </Grid>
                                 <Grid item xs={2}></Grid>
+                                {buttonName === "login" &&
+                                    <Grid item xs={10} >
+                                        <Button sx={{ width: '75%' }} color="success" variant="contained" onClick={() => login()}>Login</Button>
+                                    </Grid>
+                                }
+                                {buttonName !== "login" &&
+                                    <Grid item xs={10} >
+                                        <Button sx={{ width: '75%' }} color="success" variant="contained" onClick={() => forGotPassword()}>Submit</Button>
+                                    </Grid>
+                                }
+
+                                <Grid item xs={2}></Grid>
                                 <Grid item xs={10} >
-                                    <Button sx={{ width: '75%' }} color="success" variant="contained" onClick={() => login()}>Login</Button>
+                                    Clik here to  <Link
+                                        component="button"
+                                        variant="body2"
+                                        onClick={() => {
+                                            setButtonName(buttonName === "login" ? "forgotpassword" : "login");
+                                            setLoginForm(loginFields);
+                                            setLoginFiledMsg("");
+                                            setErrors(errorObj);
+                                            setSuccessMsg("");
+                                        }}
+                                    >
+                                        {buttonName === "login" ? "Forgot password" : "Login"
+
+                                        }
+                                    </Link>
                                 </Grid>
                             </Grid>
                         </CardContent>

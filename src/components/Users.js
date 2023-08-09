@@ -184,7 +184,7 @@ export default function Users() {
                 if (updateRow.password !== useForm.password) {
                     pwdUpdated = true;
                 }
-                useForm["id"] = updateRow.id;
+                useForm["id"] = updateRow.user_id;
                 useForm["isPasswordUpdated"] = pwdUpdated;
                 useForm["is_active"] = isActive;
                 message = "updated"
