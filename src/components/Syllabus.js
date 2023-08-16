@@ -11,6 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import { convertBase64 } from "../common/commonFun";
 
 export default function Syllabus() {
     const serverUrl = securedLocalStorage.baseUrl + 'syllabus/';
@@ -75,6 +76,8 @@ export default function Syllabus() {
         document.getElementById("file").value = "";
     }
 
+
+
     async function save() {
         if (selectedFile.length === 0) {
             setFileError("File is required");
@@ -87,6 +90,8 @@ export default function Syllabus() {
                     "files", selectedFile[i],
                 );
             }
+            const paylod = syllabusForm;
+            paylod["base64"] = await convertBase64(selectedFile[0]);
             formData.append('data',
                 JSON.stringify(syllabusForm))
             try {
@@ -125,29 +130,29 @@ export default function Syllabus() {
                 </Grid>
                 <Grid item xs={4} >
                     <>
-                    <FormControl sx={{ minWidth: 300 }} style={{ marginLeft: "16px" }}>
-                    <InputLabel id="demo-simple-select-label">Course</InputLabel>
-                    <Select
-                        sx={{ minWidth: 300 }}
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={syllabusForm.course}
-                        // placeholder='Course'
-                        label="Course"
-                        name="course"
-                        onChange={handleChangeCourse}
-                    >
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        {courseList.map((data, i) => (
-                            <MenuItem key={i} value={data}>
-                                {data}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                </>
+                        <FormControl sx={{ minWidth: 300 }} style={{ marginLeft: "16px" }}>
+                            <InputLabel id="demo-simple-select-label">Course</InputLabel>
+                            <Select
+                                sx={{ minWidth: 300 }}
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={syllabusForm.course}
+                                // placeholder='Course'
+                                label="Course"
+                                name="course"
+                                onChange={handleChangeCourse}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                {courseList.map((data, i) => (
+                                    <MenuItem key={i} value={data}>
+                                        {data}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </>
                 </Grid>
             </Grid>
             <br />
