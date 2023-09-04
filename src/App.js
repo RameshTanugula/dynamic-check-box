@@ -49,6 +49,7 @@ import Sales from './components/Sales';
 import Books from './components/Books';
 import TestDashBoard from './components/TestDashBoard';
 import Syllabus from './components/Syllabus';
+import BitbankSetCreation from './components/BitBankSetCreation';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -235,6 +236,7 @@ export default function App() {
                 <Route exact path="/create statements" element={<Statements />} />
                 <Route exact path="/create questions from statements" element={<QuestionCreationFromStatements />} />
                <Route exact path="/create a test" element={<TestCreation />} />
+               <Route exact path="Create Bitbank set" element={<BitbankSetCreation />} />
                 <Route exact path="/upload files" element={<FileUpload />} />
                 <Route exact path="/testOMR" element={<TestOMR />} />
                 <Route exact path="/flash cards" element={<FlashCard />} />
