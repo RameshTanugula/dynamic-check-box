@@ -5,15 +5,25 @@ import './common.css';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import Badge from '@mui/material/Badge';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
+import { Badge, Stack, Button, Grid, TextField, Checkbox, Box, Typography, Modal } from '@mui/material';
+// import Stack from '@mui/material/Stack';
+// import Button from '@mui/material/Button';
+// import Grid from '@mui/material/Grid';
+// import TextField from '@mui/material/TextField';
 import SnackBar from './SnackBar';
 import Loader from './Loader';
-import Checkbox from '@mui/material/Checkbox';
-
+// import Checkbox from '@mui/material/Checkbox';
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
 export default function BitbankSetCreation() {
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -28,7 +38,11 @@ export default function BitbankSetCreation() {
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [showLoader, setShowLoader] = React.useState(false);
-    const [numberOfQuestions, setNumberOfQuestions] = React.useState(0)
+    const [openModal, setOpenModal] = React.useState(false);
+    const fields = {
+        title: ""
+    }
+    const [formData, setFormData] = React.useState(fields);
 
     async function fetchData() {
         setShowLoader(true);
@@ -40,9 +54,10 @@ export default function BitbankSetCreation() {
         // if (data.status === 200) {
         //     setQuestionData(data.data?.res)
         // }
-        setShowLoader(false);
     }
-
+    const onCloseMOdal = () => {
+        setOpenModal(false);
+    }
 
 
     const prepareCatIds = () => {
@@ -88,40 +103,34 @@ export default function BitbankSetCreation() {
         return [ids1, ids2, ids3, ids4]
     }
     const onClickCheckBox = (id, index) => {
-        if (id && index >= 0) {
-            setAllCheckBoxValue(false);
-            if (selectedQuestionsList.includes(id)) {
-                var Index = selectedQuestionsList.findIndex(x => x === id);
-                selectedQuestionsList.splice(Index, 1);
-                setSelectedQuestionsList([...selectedQuestionsList]);
-            }
-            else {
-                if (selectedQuestionsList.length < parseInt(numberOfQuestions)) {
-                    selectedQuestionsList.push(id)
-                    setSelectedQuestionsList([...selectedQuestionsList]);
-                }
-                else {
-                    alert(`You are able select maximum ${numberOfQuestions} questions only.`)
-                }
-
-            }
-        } else {
-            setAllCheckBoxValue(!allCheckBoxValue)
-            questionData.map(q => q.checked = !allCheckBoxValue)
+        if (selectedQuestionsList.includes(id)) {
+            var Index = selectedQuestionsList.findIndex(x => x === id);
+            selectedQuestionsList.splice(Index, 1);
+            setSelectedQuestionsList([...selectedQuestionsList]);
         }
+        else {
+            selectedQuestionsList.push(id)
+            setSelectedQuestionsList([...selectedQuestionsList]);
+
+        }
+        setAllCheckBoxValue(!allCheckBoxValue)
+        questionData.map(q => q.checked = !allCheckBoxValue)
         setQuestionData(questionData);
     }
-
+    const oepnModalPopup = () => {
+        setOpenModal(true);
+    }
     const addToTestHandler = async () => {
+        setOpenModal(false)
         const payload = {
-            title: "",
-
-            no_of_questions: 10,
+            title:formData.title,
+            payload: JSON.stringify(selectedQuestionsList),
         }
         setShowLoader(true);
-        const data = await api(payload, serverUrl + 'add/test', 'post');
+        const data = await api(payload, serverUrl + 'bitbank/set', 'post');
         if (data.status === 200) {
             setSelectedQuestionsList([]);
+            setFormData(fields)
             setOpenSnackBar(true);
             const message = {
                 type: "success",
@@ -144,6 +153,16 @@ export default function BitbankSetCreation() {
         setOpenSnackBar(false)
     }
 
+
+    function handleChange(e) {
+        const newData = {
+            ...formData,
+            [e.target.name]: e.target.value
+
+        }
+        setFormData(newData);
+    }
+
     React.useEffect(() => {
         const flat = ({ hostNames, children = [], ...o }) => [o, ...children.flatMap(flat)];
         const tmpData = { viewData: catagoryData }
@@ -151,6 +170,15 @@ export default function BitbankSetCreation() {
         // setResult([...tmpResult])
     }, [catagoryData]);
 
+
+
+    React.useEffect(() => {
+        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+            setReadAndWriteAccess(true);
+        }
+        fetchData();
+    }, []);
     React.useEffect(() => {
         async function getData() {
             const catIds = prepareCatIds();
@@ -170,14 +198,6 @@ export default function BitbankSetCreation() {
         }
         getData();
     }, [checked]);
-
-    React.useEffect(() => {
-        const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
-        if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
-            setReadAndWriteAccess(true);
-        }
-        fetchData();
-    }, []);
     const getQuestions = (qData) => {
         return (
             <>
@@ -201,15 +221,15 @@ export default function BitbankSetCreation() {
                                 label="Set Name"
                                 required
                                 id="outlined-start-adornment"
-                                value={""}
-                                onChange={null}
-                                name="setName"
+                                value={formData.title}
+                                onChange={handleChange}
+                                name="title"
                                 error={false}
                                 helperText={"" !== "" ? 'Test Name is reuired' : ' '}
                                 disabled={!readAndWriteAccess}
                             />
-                            <Button variant="contained" style={{ height: 'max-content' }} disabled={selectedQuestionsList.length !== parseInt(numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
-                            <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/" + parseInt(numberOfQuestions)}>
+                            <Button variant="contained" style={{ height: 'max-content' }} disabled={formData.title === "" || selectedQuestionsList.length===0} onClick={() => oepnModalPopup()}>Add Test</Button>
+                            <Badge color="secondary" badgeContent={selectedQuestionsList.length}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
                             </Badge>
                         </Stack>
@@ -262,6 +282,22 @@ export default function BitbankSetCreation() {
             {showLoader &&
                 <Loader />
             }
+
+            <Modal
+                open={openModal}
+                onClose={onCloseMOdal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        You have selected {selectedQuestionsList.length} questons...!
+                    </Typography>
+
+                    <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => onCloseMOdal()}>close</Button> &nbsp;
+                    <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => addToTestHandler()}>Save</Button>
+                </Box>
+            </Modal>
 
         </div>
     )
