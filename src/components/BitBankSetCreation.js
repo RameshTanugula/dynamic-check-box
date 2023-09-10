@@ -124,10 +124,10 @@ export default function BitbankSetCreation() {
         setOpenModal(false)
         const payload = {
             title:formData.title,
-            selected_bitbank_ids: selectedQuestionsList,
+            payload: JSON.stringify(selectedQuestionsList),
         }
         setShowLoader(true);
-        const data = await api(payload, serverUrl + 'add/test_bitbank', 'post');
+        const data = await api(payload, serverUrl + 'bitbank/set', 'post');
         if (data.status === 200) {
             setSelectedQuestionsList([]);
             setFormData(fields)
