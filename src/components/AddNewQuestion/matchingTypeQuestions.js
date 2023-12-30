@@ -18,7 +18,7 @@ import * as securedLocalStorage from '../SecureLocalaStorage';
 import Loader from '../Loader';
 import SnackbarView from '../../common/SnackBar';
 
-const MatchingTypeQuestions = () => {
+const MatchingTypeQuestions = ({onUpdate}) => {
   const serverUrl = securedLocalStorage.baseUrl;
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
   const [snackBarData, setSnackBarData] = React.useState();
@@ -33,6 +33,7 @@ const MatchingTypeQuestions = () => {
     { id: 2, parts_a: '', Option: '', parts_b: '' },
     { id: 3, parts_a: '', Option: '', parts_b: '' },
     { id: 4, parts_a: '', Option: '', parts_b: '' },
+
   ]);
 
   const [errors, setErrors] = useState({
@@ -64,7 +65,7 @@ const MatchingTypeQuestions = () => {
   };
 
   const handleAddStatement = () => {
-    if (question.length >= 4) {
+    if (question.length > 4) {
       alert('You can choose a maximum of four statements only!');
     } else {
       setQuestion((prevQuestions) => [
@@ -90,44 +91,30 @@ const MatchingTypeQuestions = () => {
 
   const checkIsValid = (fieldName, value) => {
     switch (fieldName) {
-      case 'title':
-      case 'parts_a':
-      case 'parts_b':
-      case 'solution':
-        // Regex pattern for alphanumeric characters, spaces, and special characters
+        case 'title':
+        case 'parts_a':
+        case 'parts_b':
+        case 'solution':
+        // Regex pattern for solution (alphanumeric characters, spaces, and special characters)
         const alphanumericRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+{}\[\]:;<>,.?~\\/=-]+$/;
-  
-        // Check if the field is empty or doesn't match the regex pattern
         setErrors((prevErrors) => ({
           ...prevErrors,
-          [fieldName]:
-            value.trim() === ''
-              ? `${fieldName} is required`
-              : !alphanumericRegex.test(value)
-              ? `Invalid ${fieldName}`
-              : '',
+          [fieldName]: value.trim() === '' ? `${fieldName} is required` : !alphanumericRegex.test(value) ? `Invalid ${fieldName}` : '',
         }));
         break;
       case 'Option':
         // Regex pattern for Option (only accepts "1", "2", or "3")
         const optionRegex = /^[0-4]$/;
-  
-        // Check if the field is empty or doesn't match the regex pattern
         setErrors((prevErrors) => ({
           ...prevErrors,
-          [fieldName]:
-            value.trim() === ''
-              ? 'Option is required'
-              : !optionRegex.test(value)
-              ? 'Invalid option'
-              : '',
+          [fieldName]: value.trim() === '' ? 'Option is required' : !optionRegex.test(value) ? 'Invalid option' : '',
         }));
         break;
       default:
         break;
     }
   };
-  
+
   const onchangeTitle = (e) => {
     if (e.blocks.length > 0) {
       setTitle(e.blocks[0].text);
@@ -139,54 +126,32 @@ const MatchingTypeQuestions = () => {
       setSolution(e.blocks[0].text);
     }
   };
-  
   const doValidation = () => {
     let valid = true;
-  
+
     // Validate title
     checkIsValid('title', title);
-  
+
     // Validate each question
     question.forEach((q) => {
       checkIsValid('parts_a', q.parts_a);
       checkIsValid('parts_b', q.parts_b);
       checkIsValid('Option', q.Option);
     });
-  
+
     // Validate solution
     checkIsValid('solution', solution);
-  
-    // Check if any field is empty
-    if (
-      title.trim() === '' ||
-      question.some((q) => q.parts_a.trim() === '' || q.parts_b.trim() === '' || q.Option.trim() === '') ||
-      solution.trim() === ''
-    ) {
-      valid = false;
-    }
-  
-    // Set the overall validation status
-    setErrors((prevErrors) => {
-      let hasErrors = false;
-  
-      // Check if any error exists in the updated state
-      for (const key in prevErrors) {
-        if (prevErrors[key] !== '') {
-          hasErrors = true;
-          break;
-        }
+
+    // Check if any error exists
+    for (const key in errors) {
+      if (errors[key] !== '') {
+        valid = false;
+        break;
       }
-  
-      // Set the overall validation status
-      valid = !hasErrors;
-  
-      return prevErrors;
-    });
-  
-    // Return the overall validation status
+    }
+
     return valid;
   };
-  
 
   const handleSubmit = async () => {
     if (doValidation()) {
@@ -197,38 +162,25 @@ const MatchingTypeQuestions = () => {
       let options = [optionArray.join(', ')];
       for(let i=0; i < 3; i++){
         options.push(shuffleOptions(['1', '2', '3', '4']).join(', '))
-      } 
-
-      console.log({
+      }     
+      const payload = {
         title: title,
         solution: solution,
         part_a: statementArray.join(', '),
         part_b: matchArray.join(', '),
         options: options,
         ans: 1,
-        type: 'MCQ1',
-      });
-  
-      // Reset states or perform any other necessary actions
-      setEditorState(EditorState.createEmpty());
-      setExplanationEditorState(EditorState.createEmpty());
-      setQuestion([{ id: 1, parts_a: '', Option: '', parts_b: '' }]);
-  
-      // Display success message (replace this with your actual logic)
-      setOpenSnackBar(true);
-      const data = {
-        type: 'success',
-        message: 'Matching Type Questions added successfully!....',
-        open: true,
+        type:'MCQ1'
       };
-      setSnackBarData(data);
+      onUpdate(payload);
     }
   };
-  
 
   const closeSnackBar = () => {
     setOpenSnackBar(false);
   };
+
+
 
   return (
     <Container>

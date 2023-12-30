@@ -21,9 +21,7 @@ import api from '../../services/api';
 import * as securedLocalStorage from '../SecureLocalaStorage';
 import SnackbarView from '../../common/SnackBar';
 import Loader from '../Loader';
-
-const MultipleChoiceQuestions = () => {
-  const serverUrl = securedLocalStorage.baseUrl + 'question/';
+const MultipleChoiceQuestions = ({ onUpdate }) => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarData, setSnackBarData] = useState();
   const [showLoader, setShowLoader] = useState(false);
@@ -120,7 +118,7 @@ const MultipleChoiceQuestions = () => {
   };
 
   const doValidation = () => {
-    return true; 
+    return true;
   };
 
 
@@ -128,39 +126,22 @@ const MultipleChoiceQuestions = () => {
     if (doValidation()) {
       const statementArray = questions.map((q) => q.statement);
       const correctAnswer = questions.find((q) => q.selectedOption);
-      
+
       let options = [];
-      for(let i=0; i<questions.length; i++){
+      for (let i = 0; i < questions.length; i++) {
         options.push(questions[i].statement);
       }
-      
-      console.log('Submitting data manually:', {
+
+      const payload = {
         title: title,
         solution: solution,
-        options: statementArray,
+        options: options,
         ans: correctAnswer.selectedOption,
-        type: 'MCQ',
-      });
-  
-      // Reset form state after successful submission
-      setOpenSnackBar(true);
-      const data = {
-        type: 'success',
-        message: 'Multiple Choice Questions added successfully!....',
-        open: true,
+        type: ''
       };
-      setQuestions([
-        { id: 1, statement: '', selectedOption: null },
-        { id: 2, statement: '', selectedOption: null },
-        { id: 3, statement: '', selectedOption: null },
-        { id: 4, statement: '', selectedOption: null },
-      ]);
-      setSnackBarData(data);
-      setEditorState(EditorState.createEmpty());
-      setExplanationEditorState(EditorState.createEmpty());
+      onUpdate(payload);
     }
   };
-  
 
   const closeSnackBar = () => {
     setOpenSnackBar(false);
@@ -172,25 +153,25 @@ const MultipleChoiceQuestions = () => {
         Multiple Choice Questions
       </Typography>
       <form className="container">
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={12}>
-        <InputLabel>Type your question</InputLabel>
-        <FormControl fullWidth variant="outlined">
-          <Editor
-            editorState={editorState}
-            onEditorStateChange={handleEditorChange}
-            wrapperClassName="wrapper-class"
-            editorClassName="editor-class"
-            toolbarClassName="toolbar-class"
-            value={title}
-            onChange={(e) => onchangeTitle(e)}
-          />
-        </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={12} style={{ marginBottom: '5px' }}>
-      {questions.map((question, index) => (
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={12}>
+            <InputLabel>Type your question</InputLabel>
+            <FormControl fullWidth variant="outlined">
+              <Editor
+                editorState={editorState}
+                onEditorStateChange={handleEditorChange}
+                wrapperClassName="wrapper-class"
+                editorClassName="editor-class"
+                toolbarClassName="toolbar-class"
+                value={title}
+                onChange={(e) => onchangeTitle(e)}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={12} style={{ marginBottom: '5px' }}>
+            {questions.map((question, index) => (
               <Grid container spacing={2} key={question.id}>
-                <Grid item xs={12} sm={8} style={{ marginBottom: '8px' , display: 'flex'}}>
+                <Grid item xs={12} sm={8} style={{ marginBottom: '8px', display: 'flex' }}>
                   <Radio
                     value={question.selectedOption}
                     checked={question.selectedOption !== null}
@@ -206,30 +187,28 @@ const MultipleChoiceQuestions = () => {
                 </Grid>
               </Grid>
             ))}
-
-      </Grid>
-      <Grid item xs={12} sm={12}>
-        <InputLabel>Add Explanation</InputLabel>
-        <FormControl fullWidth variant="outlined">
-          <Editor
-            editorState={explanationEditorState}
-            onEditorStateChange={handleExplanationEditorChange}
-            wrapperClassName="wrapper-class"
-            editorClassName="editor-class"
-            toolbarClassName="toolbar-class"
-            value={solution}
-            onChange={(e) => onChangeSolution(e)}
-          />
-        </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={12}>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
-      </Grid>
-    </Grid>
-  </form>
-
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <InputLabel>Add Explanation</InputLabel>
+            <FormControl fullWidth variant="outlined">
+              <Editor
+                editorState={explanationEditorState}
+                onEditorStateChange={handleExplanationEditorChange}
+                wrapperClassName="wrapper-class"
+                editorClassName="editor-class"
+                toolbarClassName="toolbar-class"
+                value={solution}
+                onChange={(e) => onChangeSolution(e)}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
       {openSnackBar && (
         <SnackbarView {...snackBarData} onClose={closeSnackBar} />
       )}
@@ -237,5 +216,6 @@ const MultipleChoiceQuestions = () => {
     </Container>
   );
 };
+
 
 export default MultipleChoiceQuestions;

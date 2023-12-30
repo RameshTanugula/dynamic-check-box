@@ -55,6 +55,8 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
   const [correctAnswer, setCorrectAnswer] = useState({ selectedOption: 1 });
   const [savedQuestions, setSavedQuestions] = useState([]);
 
+  const [finalArr, setFinalArr] = useState([]);
+
 
   const [formData, setFormData] = useState({
     'StatementTypeQuestion': {},
@@ -68,7 +70,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         label: 'Statement type question',
         component: (
           <StatementTypeQuestion
-            onUpdate={(data) => updateFormData('StatementTypeQuestion', data)}
+            onUpdate={(data) => updateFormData(data)}
           />
         ),
       },
@@ -76,7 +78,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         label: 'Matching type questions',
         component: (
           <MatchingTypeQuestions
-            onUpdate={(data) => updateFormData('MatchingTypeQuestions', data)}
+            onUpdate={(data) => updateFormData(data)}
           />
         ),
       },
@@ -84,7 +86,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         label: 'Multiple Choice Questions',
         component: (
           <MultipleChoiceQuestions
-            onUpdate={(data) => updateFormData('MultipleChoiceQuestions', data)}
+            onUpdate={(data) => updateFormData(data)}
           />
         ),
       },
@@ -95,18 +97,18 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
     setSelectedTab(newValue);
   };
 
-  const updateFormData = (key, data) => {
-    console.log(key, 'onupdate', data)
-    setFormData((prevData) => ({
-      ...prevData,
-      [key]: data,
-    }));
+  const updateFormData = (data) => {
+    console.log('onupdate', data)
+    finalArr.push(data);
+    setFinalArr([...finalArr]);
+    console.log(finalArr)
   };
 
 
   const handleSubmit = async () => {
     let payload = {}
     console.log(formData, '*****formdata')
+    console.log(selectedTab)
     if (selectedTab === 0) {
       payload = {
         title: formData.StatementTypeQuestion.title,
@@ -142,15 +144,14 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
   };
 
   function closePopUp() {
-    console.log(savedQuestions)
-    onClose(savedQuestions);
+    onClose(finalArr);
   };
 
   return (
     <Grid item xs={12} style={{ width: '100%', }}>
       <Dialog open={isOpen} onClose={closePopUp} fullWidth={true} maxWidth="xl">
         <DialogContent>
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', widows:'100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', widows: '100%' }}>
             <div style={{ display: 'flex', flexGrow: 1 }}>
               <Tabs
                 orientation="vertical"
@@ -172,11 +173,11 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
                 ))}
               </Box>
             </div>
-            <div style={{ padding: 3, textAlign: 'end' }}>
+            {/* <div style={{ padding: 3, textAlign: 'end' }}>
               <Button variant="contained" onClick={handleSubmit}>
                 Submit
               </Button>
-            </div>
+            </div> */}
           </div>
           <Button variant="contained" onClick={closePopUp}>
             Close
