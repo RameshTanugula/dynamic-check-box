@@ -104,45 +104,6 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
     console.log(finalArr)
   };
 
-
-  const handleSubmit = async () => {
-    let payload = {}
-    console.log(formData, '*****formdata')
-    console.log(selectedTab)
-    if (selectedTab === 0) {
-      payload = {
-        title: formData.StatementTypeQuestion.title,
-        solution: formData.StatementTypeQuestion.solution,
-        part_a: formData.StatementTypeQuestion.statementArray.join(', '),
-        options: formData.StatementTypeQuestion.options,
-        ans: 1,
-        type: 'MCQ2',
-      };
-    } else if (selectedTab === 1) {
-      payload = {
-        title: formData.MatchingTypeQuestions.title,
-        solution: formData.MatchingTypeQuestions.solution,
-        part_a: formData.MatchingTypeQuestions.statementArray.join(', '),
-        part_b: formData.MatchingTypeQuestions.matchArray.join(', '),
-        options: formData.MatchingTypeQuestions.options,
-        ans: 1,
-        type: 'MCQ1',
-      };
-    } else if (selectedTab === 2) {
-      payload = {
-        title: formData.MultipleChoiceQuestions.title,
-        solution: formData.MultipleChoiceQuestions.solution,
-        options: statementArray,
-        ans: formData.MultipleChoiceQuestions.correctAnswer.selectedOption,
-        type: 'MCQ',
-      };
-    }
-
-    console.log(payload, '**');
-    setSavedQuestions(savedQuestions.push(payload))
-    // Perform other actions as needed
-  };
-
   function closePopUp() {
     onClose(finalArr);
   };
