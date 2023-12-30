@@ -1,0 +1,26 @@
+.MuiDialogTitle- {
+    padding: 30px !important;
+}
+.button Button{
+    margin: 10px;
+}
+.button{
+    margin-top: 50px;
+}
+
+
+/* .table{
+    margin-left: 50% !important;
+} */
+.css-q8hpuo-MuiFormControl-root{
+    border: 1px solid rgb(180, 176, 176) !important;
+}
+form {
+    border: 0px solid black  !important;
+}
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper{
+    width: 90% !important;
+    height: 90% ;
+    max-width: 85%;
+}
+

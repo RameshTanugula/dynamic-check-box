@@ -18,6 +18,8 @@ import Loader from './Loader';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
+import AddNewQuestions from './AddNewQuestion';
+import './test.css';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -38,6 +40,7 @@ export default function TestCreation() {
     const [isOnline, setIsOnline] = React.useState(false);
     const [isOMR, setIsOMR] = React.useState(false);
     const [testTypeError, setTestTypeError] = React.useState("");
+    const [isAddNewQuestionsModalOpen, setAddNewQuestionsModalOpen] = React.useState(false);
 
     const defaultTestFields = {
         testName: "",
@@ -335,12 +338,20 @@ export default function TestCreation() {
             </>
         )
     }
+    const openAddNewQuestionsModal = () => {
+        setAddNewQuestionsModalOpen(true);
+      };
+      const closeAddNewQuestionsModal = (data) => {
+        
+        setAddNewQuestionsModalOpen(false);
+      };
     return (
         <div>
             {!showForm &&
                 <Grid container spacing={1} >
                     <Grid item xs={12} style={{ position: "absolute", right: "50px" }}>
                         <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
+                            <Button variant="contained" onClick={openAddNewQuestionsModal}>Add New Question</Button>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
                             <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/" + parseInt(testForm.numberOfQuestions)}>
@@ -348,6 +359,10 @@ export default function TestCreation() {
                             </Badge>
                         </Stack>
                     </Grid>
+                    {isAddNewQuestionsModalOpen && (
+                <AddNewQuestions isOpen={isAddNewQuestionsModalOpen} onClose={closeAddNewQuestionsModal} />
+            )}
+                    
                     <Grid item xs={1} style={{ width: '100%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
                         {catagoryData?.length > 0 && <CheckboxTree
                             // nodes={treeViewData}
