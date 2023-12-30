@@ -10,6 +10,7 @@ import StatementTypeQuestion from './statementTypeQuestion';
 import MultipleChoiceQuestions from './multipleChoiceQuestions';
 import MatchingTypeQuestions from './matchingTypeQuestions';
 import { Button, Dialog, DialogContent } from '@mui/material';
+import Grid from '@mui/material/Grid';
 
 const TabPanel = (props) => {
   const { children, index, value, ...other } = props;
@@ -67,7 +68,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         label: 'Statement type question',
         component: (
           <StatementTypeQuestion
-           onUpdate={(data) => updateFormData('StatementTypeQuestion', data)}
+            onUpdate={(data) => updateFormData('StatementTypeQuestion', data)}
           />
         ),
       },
@@ -101,34 +102,34 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
       [key]: data,
     }));
   };
-  
+
 
   const handleSubmit = async () => {
-    let payload = { }
-console.log(formData, '*****formdata')
+    let payload = {}
+    console.log(formData, '*****formdata')
     if (selectedTab === 0) {
       payload = {
-        title:formData.StatementTypeQuestion.title,
-        solution:formData.StatementTypeQuestion.solution,
+        title: formData.StatementTypeQuestion.title,
+        solution: formData.StatementTypeQuestion.solution,
         part_a: formData.StatementTypeQuestion.statementArray.join(', '),
-        options:formData.StatementTypeQuestion.options,
+        options: formData.StatementTypeQuestion.options,
         ans: 1,
         type: 'MCQ2',
       };
     } else if (selectedTab === 1) {
       payload = {
-        title:formData.MatchingTypeQuestions.title,
-        solution:formData.MatchingTypeQuestions.solution,
+        title: formData.MatchingTypeQuestions.title,
+        solution: formData.MatchingTypeQuestions.solution,
         part_a: formData.MatchingTypeQuestions.statementArray.join(', '),
         part_b: formData.MatchingTypeQuestions.matchArray.join(', '),
-        options:formData.MatchingTypeQuestions.options,
+        options: formData.MatchingTypeQuestions.options,
         ans: 1,
         type: 'MCQ1',
       };
     } else if (selectedTab === 2) {
       payload = {
-        title:formData.MultipleChoiceQuestions.title,
-        solution:formData.MultipleChoiceQuestions.solution,
+        title: formData.MultipleChoiceQuestions.title,
+        solution: formData.MultipleChoiceQuestions.solution,
         options: statementArray,
         ans: formData.MultipleChoiceQuestions.correctAnswer.selectedOption,
         type: 'MCQ',
@@ -140,42 +141,49 @@ console.log(formData, '*****formdata')
     // Perform other actions as needed
   };
 
+  function closePopUp() {
+    console.log(savedQuestions)
+    onClose(savedQuestions);
+  };
+
   return (
-    <Dialog open={isOpen} onClose={onClose} sx={{ maxWidth: '80%' }}>
-      <DialogContent>
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-          <div style={{ display: 'flex', flexGrow: 1 }}>
-            <Tabs
-              orientation="vertical"
-              variant="scrollable"
-              value={selectedTab}
-              onChange={handleChangeTab}
-              aria-label="Vertical tabs example"
-              sx={{ borderRight: 1, borderColor: 'divider' }}
-            >
-              {tabsConfig.QuestionsEntry.map((tab, index) => (
-                <Tab key={index} className="tab" label={tab.label} {...a11yProps(index)} />
-              ))}
-            </Tabs>
-            <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', padding: 3 }}>
-              {tabsConfig.QuestionsEntry.map((tab, index) => (
-                <TabPanel key={index} value={selectedTab} index={index}>
-                  {tab.component}
-                </TabPanel>
-              ))}
-            </Box>
+    <Grid item xs={12} style={{ width: '100%', }}>
+      <Dialog open={isOpen} onClose={closePopUp} fullWidth={true} maxWidth="xl">
+        <DialogContent>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', widows:'100%' }}>
+            <div style={{ display: 'flex', flexGrow: 1 }}>
+              <Tabs
+                orientation="vertical"
+                variant="scrollable"
+                value={selectedTab}
+                onChange={handleChangeTab}
+                aria-label="Vertical tabs example"
+                sx={{ borderRight: 1, borderColor: 'divider' }}
+              >
+                {tabsConfig.QuestionsEntry.map((tab, index) => (
+                  <Tab key={index} className="tab" label={tab.label} {...a11yProps(index)} />
+                ))}
+              </Tabs>
+              <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', padding: 3 }}>
+                {tabsConfig.QuestionsEntry.map((tab, index) => (
+                  <TabPanel key={index} value={selectedTab} index={index}>
+                    {tab.component}
+                  </TabPanel>
+                ))}
+              </Box>
+            </div>
+            <div style={{ padding: 3, textAlign: 'end' }}>
+              <Button variant="contained" onClick={handleSubmit}>
+                Submit
+              </Button>
+            </div>
           </div>
-          <div style={{ padding: 3, textAlign: 'end' }}>
-            <Button variant="contained" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </div>
-        </div>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
-      </DialogContent>
-    </Dialog>
+          <Button variant="contained" onClick={closePopUp}>
+            Close
+          </Button>
+        </DialogContent>
+      </Dialog>
+    </Grid>
   );
 };
 

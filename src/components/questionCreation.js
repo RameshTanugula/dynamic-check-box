@@ -27,7 +27,7 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 
-import TextareaAutosize from '@mui/base/TextareaAutosize';
+import {TextareaAutosize} from '@mui/base/TextareaAutosize';
 
 import api from '../services/api';
 import './common.css';

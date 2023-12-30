@@ -19,7 +19,6 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import AddNewQuestions from './AddNewQuestion';
-import './test.css';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -342,6 +341,7 @@ export default function TestCreation() {
         setAddNewQuestionsModalOpen(true);
       };
       const closeAddNewQuestionsModal = (data) => {
+        console.log(data)
         
         setAddNewQuestionsModalOpen(false);
       };

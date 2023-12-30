@@ -14,8 +14,8 @@ export const remove = (key) => {
     ls.remove(key)
 }
 
-export const baseUrl = "http://localhost:8080/";
-// export const baseUrl = "http://139.59.46.40:8080/";
+// export const baseUrl = "http://localhost:8080/";
+export const baseUrl = "http://139.59.46.40:8080/";
 export const omrScriptUrl = "http://139.59.46.40:5000/"
 export const subjectsUrl = baseUrl + 'files/get/subjects';
 
