@@ -21,7 +21,7 @@ import api from '../../services/api';
 import * as securedLocalStorage from '../SecureLocalaStorage';
 import SnackbarView from '../../common/SnackBar';
 import Loader from '../Loader';
-const MultipleChoiceQuestions = ({ onUpdate }) => {
+const MultipleChoiceQuestions = ({ onUpdate, onClose }) => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarData, setSnackBarData] = useState();
   const [showLoader, setShowLoader] = useState(false);
@@ -140,6 +140,7 @@ const MultipleChoiceQuestions = ({ onUpdate }) => {
         type: ''
       };
       onUpdate(payload);
+      onClose();
     }
   };
 

@@ -40,7 +40,7 @@ export default function TestCreation() {
     const [isOMR, setIsOMR] = React.useState(false);
     const [testTypeError, setTestTypeError] = React.useState("");
     const [isAddNewQuestionsModalOpen, setAddNewQuestionsModalOpen] = React.useState(false);
-
+    const [manualQuestions, setManualQuestions] = React.useState([])
     const defaultTestFields = {
         testName: "",
         testDescription: "",
@@ -206,6 +206,17 @@ export default function TestCreation() {
     }
 
     const addToTestHandler = async () => {
+
+        setShowLoader(true);
+        let manualQIds = [];
+        if (manualQuestions?.length > 0) {
+            for (let i = 0; i < manualQuestions.length; i++) {
+                const data1 = await api(manualQuestions[i], securedLocalStorage.baseUrl + 'question/' + 'create/questions/mcq', 'post');
+                if (data1.status === 200) {
+                    manualQIds.push(data1.data.res.insertId)
+                }
+            }
+        }
         const payload = {
             test_name: testForm.testName,
             test_duration: testForm.testDuration,
@@ -213,14 +224,13 @@ export default function TestCreation() {
             no_of_questions: testForm.numberOfQuestions,
             no_of_attempts: testForm.nuberOfAttempts,
             scheduled_date: scheduledDate !== null ? CheckAccess.getDateInFormat(scheduledDate) : null,
-            question_ids: selectedQuestionsList,
+            question_ids: selectedQuestionsList.concat(manualQIds),
             is_online: isOnline,
             is_omr: isOMR,
             is_active: 1,
             created_by: 1,
             update_by: 1
         }
-        setShowLoader(true);
         const data = await api(payload, serverUrl + 'add/test', 'post');
         if (data.status === 200) {
             setShowForm(true);
@@ -339,30 +349,29 @@ export default function TestCreation() {
     }
     const openAddNewQuestionsModal = () => {
         setAddNewQuestionsModalOpen(true);
-      };
-      const closeAddNewQuestionsModal = (data) => {
-        console.log(data)
-        
+    };
+    const closeAddNewQuestionsModal = (data) => {
+        setManualQuestions(manualQuestions.concat(data))
         setAddNewQuestionsModalOpen(false);
-      };
+    };
     return (
         <div>
             {!showForm &&
                 <Grid container spacing={1} >
                     <Grid item xs={12} style={{ position: "absolute", right: "50px" }}>
                         <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
-                            <Button variant="contained" onClick={openAddNewQuestionsModal}>Add New Question</Button>
+                            <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={openAddNewQuestionsModal}>Add New Question</Button>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
-                            <Button variant="contained" disabled={selectedQuestionsList.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
-                            <Badge color="secondary" badgeContent={selectedQuestionsList.length + "/" + parseInt(testForm.numberOfQuestions)}>
+                            <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
+                            <Badge color="secondary" badgeContent={selectedQuestionsList.length + manualQuestions.length + "/" + parseInt(testForm.numberOfQuestions)}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
                             </Badge>
                         </Stack>
                     </Grid>
                     {isAddNewQuestionsModalOpen && (
-                <AddNewQuestions isOpen={isAddNewQuestionsModalOpen} onClose={closeAddNewQuestionsModal} />
-            )}
-                    
+                        <AddNewQuestions isOpen={isAddNewQuestionsModalOpen} onClose={closeAddNewQuestionsModal} />
+                    )}
+
                     <Grid item xs={1} style={{ width: '100%', float: 'left', paddingLeft: '5%', paddingTop: '5%' }}>
                         {catagoryData?.length > 0 && <CheckboxTree
                             // nodes={treeViewData}

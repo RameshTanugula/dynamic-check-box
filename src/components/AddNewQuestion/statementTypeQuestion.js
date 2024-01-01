@@ -21,7 +21,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SnackbarView from '../../common/SnackBar';
 import Loader from '../Loader';
 
-const StatementTypeQuestion = ({ onUpdate }) => {
+const StatementTypeQuestion = ({ onUpdate, onClose }) => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarData, setSnackBarData] = useState();
   const [showLoader, setShowLoader] = useState(false);
@@ -157,6 +157,7 @@ const StatementTypeQuestion = ({ onUpdate }) => {
     };
 
     onUpdate(payload)
+    onClose()
   };
 
   const closeSnackBar = () => {

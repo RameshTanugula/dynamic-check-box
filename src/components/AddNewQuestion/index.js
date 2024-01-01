@@ -71,6 +71,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         component: (
           <StatementTypeQuestion
             onUpdate={(data) => updateFormData(data)}
+            onClose={closePopUp}
           />
         ),
       },
@@ -79,6 +80,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         component: (
           <MatchingTypeQuestions
             onUpdate={(data) => updateFormData(data)}
+            onClose={closePopUp}
           />
         ),
       },
@@ -87,6 +89,7 @@ const AddNewQuestions = ({ isOpen, onClose }) => {
         component: (
           <MultipleChoiceQuestions
             onUpdate={(data) => updateFormData(data)}
+            onClose={closePopUp}
           />
         ),
       },

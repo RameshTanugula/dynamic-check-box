@@ -18,7 +18,7 @@ import * as securedLocalStorage from '../SecureLocalaStorage';
 import Loader from '../Loader';
 import SnackbarView from '../../common/SnackBar';
 
-const MatchingTypeQuestions = ({onUpdate}) => {
+const MatchingTypeQuestions = ({onUpdate, onClose}) => {
   const serverUrl = securedLocalStorage.baseUrl;
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
   const [snackBarData, setSnackBarData] = React.useState();
@@ -173,6 +173,7 @@ const MatchingTypeQuestions = ({onUpdate}) => {
         type:'MCQ1'
       };
       onUpdate(payload);
+      onClose()
     }
   };
 
