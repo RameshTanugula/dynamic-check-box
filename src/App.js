@@ -50,6 +50,7 @@ import Books from './components/Books';
 import TestDashBoard from './components/TestDashBoard';
 import Syllabus from './components/Syllabus';
 import BitbankSetCreation from './components/BitBankSetCreation';
+import AddQuestions from './components/AddQuestion';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -235,8 +236,8 @@ export default function App() {
                 <Route exact path="/create pairs" element={<CreatePairs />} />
                 <Route exact path="/create statements" element={<Statements />} />
                 <Route exact path="/create questions from statements" element={<QuestionCreationFromStatements />} />
-               <Route exact path="/create a test" element={<TestCreation />} />
-               <Route exact path="Create Bitbank set" element={<BitbankSetCreation />} />
+                <Route exact path="/create a test" element={<TestCreation />} />
+                <Route exact path="Create Bitbank set" element={<BitbankSetCreation />} />
                 <Route exact path="/upload files" element={<FileUpload />} />
                 <Route exact path="/testOMR" element={<TestOMR />} />
                 <Route exact path="/flash cards" element={<FlashCard />} />
@@ -251,6 +252,7 @@ export default function App() {
                 <Route exact path="/Books" element={<Books />} />
                 <Route exact path="/Test Dashboard" element={<TestDashBoard />} />
                 <Route exact path="/Syllabus" element={<Syllabus />} />
+                <Route exact path="/Add Questions" element={<AddQuestions />}/>
               </Routes>
             </Main>
           </BrowserRouter>

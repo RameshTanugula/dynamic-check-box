@@ -225,9 +225,11 @@ export default function QuestionCreationFromStatements() {
             }
             if(element?.falseList?.length>0){
                 element.falseList.forEach(falseElement=>{
+                    if(element['StatementId'] !== falseElement['StatementId']){
                     if(falseElement?.checked){
                         selectedStatements.push({id:falseElement.id, statement: falseElement.statement, isTrueStatement: false})
                     }
+                }
                 })
             }
         })
