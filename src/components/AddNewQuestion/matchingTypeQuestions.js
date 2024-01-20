@@ -159,10 +159,18 @@ const MatchingTypeQuestions = ({onUpdate, onClose}) => {
       const optionArray = question.map((q) => q.Option);
       const matchArray = question.map((q) => q.parts_b);
 
+      // let options = [optionArray.join(', ')];
+      // for(let i=0; i < 3; i++){
+      //   options.push(shuffleOptions(['1', '2', '3', '4']).join(', '))
+      // }  
       let options = [optionArray.join(', ')];
-      for(let i=0; i < 3; i++){
-        options.push(shuffleOptions(['1', '2', '3', '4']).join(', '))
-      }     
+      console.log(options, 'options');
+     for (let i = 0; i < 3; i++) {
+      options.push(shuffleOptions([...optionArray]).join(', '));
+      console.log(options);
+     }
+    console.log(options, "options111"); 
+   
       const payload = {
         title: title,
         solution: solution,
@@ -211,7 +219,7 @@ const MatchingTypeQuestions = ({onUpdate, onClose}) => {
             {question.map(({ id, parts_a, Option, parts_b }) => (
               <Grid container spacing={2} key={id}>
                 <Grid item xs={5} sm={5} lg={5} style={{ display: 'flex', alignItems: 'center' }}>
-                  <InputLabel>{id} </InputLabel>
+                  <InputLabel>{String.fromCharCode(65 + id - 1)}</InputLabel>
                   <TextField
                     required
                     value={parts_a}
@@ -223,7 +231,7 @@ const MatchingTypeQuestions = ({onUpdate, onClose}) => {
                   />
                 </Grid>
                 <Grid item xs={5} sm={5} lg={5} style={{ display: 'flex', alignItems: 'center' }}>
-                  <InputLabel>{String.fromCharCode(65 + id - 1)}</InputLabel>
+                  <InputLabel>{id} </InputLabel>
                   <TextField
                     value={parts_b}
                     onChange={(e) => handleStatementChange(id, e.target.value, 'parts_b')}

@@ -26,8 +26,10 @@ import api from '../services/api';
 import './common.css';
 import { TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Loader from './Loader';
+import SnackBar from './SnackBar';
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT =  48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
     PaperProps: {
@@ -85,7 +87,7 @@ const BpCheckedIcon = styled(BpIcon)({
 /**
  * add manual question ends
  */
-const style = {
+const style = { 
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -176,19 +178,30 @@ export default function Questions() {
     const [to, setTo] = React.useState(null);
     const [users, setUsers] = React.useState([]);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const [snackBarData, setSnackBarData] = React.useState();
+    const [showLoader, setShowLoader] = React.useState(false);
 
     React.useEffect(() => {
         async function fetchData() {
+            setShowLoader(true)
+            
             const userData = await api(null, securedLocalStorage.allActiveUsersUrl, 'get');
             if (userData.status === 200) {
                 setUsers(userData.data)
+                setShowLoader(false)
+
             }
+            setShowLoader(true)
             const data = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
             if (data.status === 200) {
                 setSelectedUser(null);
                 setQuestionData(data.data?.res)
+                setShowLoader(false)
+
             }
         }
+
         fetchData()
     }, [])
 
@@ -209,32 +222,67 @@ export default function Questions() {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
+    // const onClickCheckBox = (index) => {
+    //     console.log(index);
+    //     questionData[index]['checked'] = !questionData[index]['checked'];
+    //     setQuestionData([...questionData]);
+    // }   
     const onClickCheckBox = (index) => {
-        questionData[index]['checked'] = !questionData[index]['checked'];
-        setQuestionData([...questionData]);
+        const globalIndex = page * rowsPerPage + index;
+         console.log(globalIndex, 'globalIndex');
+        setQuestionData((prevQuestionData) => {
+            const updatedQuestionData = [...prevQuestionData];
+            updatedQuestionData[globalIndex] = {
+                ...updatedQuestionData[globalIndex],
+                checked: !updatedQuestionData[globalIndex].checked,
+            };
+            return updatedQuestionData;
+        });
     }
+
+
     const getQuestions = async () => {
+        setShowLoader(true)
         const qData = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
+        console.log(qData , 'data');
+        setShowLoader(false)
         if (qData.status === 200) {
             setSelectedUser(null);
-            setQuestionData(qData.data?.res);
+             setQuestionData(qData.data?.resp)
         }
     }
     const getQuestionsByUser = async (value) => {
+        setShowLoader(true)
         setSelectedUser(value);
         const qData = await api(null, serverUrl + 'get/data/by/user/' + value, 'get');
+        setShowLoader(false)
         if (qData.status === 200) {
             setQuestionData(qData.data?.res);
         }
     }
     const handleQuestions = async (status) => {
         const selectedIds = questionData?.filter(q => q.checked)?.map(qq => qq.QuestionId);
+        setShowLoader(true)
         const data = await api({ selectedIds: selectedIds, type: 'questions', status }, serverUrl + 'status/change', 'post');
-
+        setShowLoader(false)
+        console.log(data , 'status');
         if (data.status === 200) {
-            getQuestionsByUser(selectedUser);
-        }
-    }
+            //  getQuestionsByUser(selectedUser);
+             const updatedQuestions = await getQuestionsByUser(selectedUser)
+             console.log(updatedQuestions ,'kj');
+             if (!updatedQuestions && selectedUser === null) {
+                setShowLoader(true)
+                const allQuestions = await api(null, serverUrl + 'get/data/' + from + '/' + to, 'get');
+                setShowLoader(false)
+                if (allQuestions.status === 200) {
+                  setQuestionData(allQuestions.data?.res);                
+                console.log(allQuestions , 'allQuestions,,,,');
+             }
+            }
+    }}
+    function closeSnackBar() {
+        setOpenSnackBar(false);
+      }
     return (
         <div>
             <div>
@@ -246,21 +294,21 @@ export default function Questions() {
                     id="demo-simple-select-standard"
                     value={selectedUser}
                     onChange={(e) => getQuestionsByUser(e.target.value)}
-                    disabled={!readAndWriteAccess}
+                    // disabled={!readAndWriteAccess}
                 >
                     <MenuItem value="">Select User</MenuItem>
                     {users.map((tl) => { return (<MenuItem value={tl.id}>{tl.first_name} {tl.last_name}</MenuItem>) })}
                 </Select>
-                &nbsp;&nbsp;{<Button disabled={!readAndWriteAccess} variant="contained" onClick={() => { getQuestions() }}>Get Questions</Button>}
+                &nbsp;&nbsp;{<Button variant="contained" onClick={() => { getQuestions() }}>Get Questions</Button>}
                 <br />
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('1')}>Accept Questions</Button>
+                    <Button  variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('1')}>Accept Questions</Button>
                 }
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('3')}>Reject Questions</Button>
+                    <Button  variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('3')}>Reject Questions</Button>
                 }
                 &nbsp;&nbsp;{questionData?.filter(q => q.checked)?.length > 0 &&
-                    <Button disabled={!readAndWriteAccess} variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('2')}>Edit Questions</Button>
+                    <Button  variant="contained" sx={{ marginBottom: '1rem' }} onClick={() => handleQuestions('2')}>Edit Questions</Button>
                 }
                 {selectedUser && <div><b>No.of Questions:</b>{questionData?.length}</div>}
             </div>
@@ -270,8 +318,8 @@ export default function Questions() {
                         <TableHead>
                             <TableRow>
                                 <TableCell>S.No</TableCell>
-                                <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">Action</TableCell>
+                                <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">Option1</TableCell>
                                 <TableCell align="center">Option2</TableCell>
                                 <TableCell align="center">Option3</TableCell>
@@ -285,10 +333,11 @@ export default function Questions() {
                             ).map((row, i) => (
                                 <TableRow key={i}>
                                     <TableCell component="th" scope="row">
-                                        {i + 1}
+                                        {/* {i + 1} */}
+                                        {(page * rowsPerPage) + i + 1}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        <input disabled={!readAndWriteAccess} checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
+                                        <input  checked={row.checked} onClick={() => onClickCheckBox(i)} type="checkbox" />
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         {row.QuestionTitle && row.QuestionTitle}
@@ -296,22 +345,22 @@ export default function Questions() {
                                             height: '10rem',
                                             width: 'auto'
                                         }} src={row.QUrls} />}
-                                        {row.part_a && row.part_b && <div>
+                                        {row.type !== ''?<span> {row.part_a && row.part_b && <div>
 
                                             <span className='mcq1-left'>PART A</span>
 
-                                            <span className='mcq1-left'>PART B</span>
+                                           {row.type !=='MCQ2' ?  <span className='mcq1-left'>PART B</span> : ''}
                                         </div>}
                                         {row.part_a && row.part_b && row.part_a?.split(',').map((a, i) => {
                                             return (<div >
                                                 <br />
                                                 <div style={{ width: "100%" }} >
-                                                    <span className='mcq1-left'>{i + 1}. {a} </span>
-                                                    <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {i + 1}. {row.part_b?.split(',')[i]} </span>
+                                                   { row.type !=='MCQ2' ?  <span className='mcq1-left'> {String.fromCharCode(65 + i)}.{a} </span> :<span> {String.fromCharCode(65 + i)}.{a} </span> }
+                                                    {row.type !=='MCQ2' ?  <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {i + 1}. {row.part_b?.split(',')[i]} </span> : '' }
                                                 </div>
                                             </div>)
                                         })
-                                        }
+                                        }</span>:''}
                                         {/* <div >
                                             <br />{row.part_a && row.part_b &&
                                                 <div style={{ width: "100%" }}>
@@ -324,7 +373,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option1?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
                                                 </>
                                             )
                                         }) : row.Option1}
@@ -333,7 +382,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option2?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
                                                 </>
                                             )
                                         }) : row.Option2}
@@ -342,7 +391,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option3?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
                                                 </>
                                             )
                                         }) : row.Option3}
@@ -351,7 +400,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option4?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{i + 1}</span>-<span>{parseInt(o) + 1}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
                                                 </>
                                             )
                                         }) : row.Option4}
@@ -382,7 +431,7 @@ export default function Questions() {
                                     onPageChange={handleChangePage}
                                     onRowsPerPageChange={handleChangeRowsPerPage}
                                     ActionsComponent={TablePaginationActions}
-                                    disabled={!readAndWriteAccess}
+                                    // disabled={!readAndWriteAccess}
                                 />
                             </TableRow>
                         </TableFooter>
@@ -392,6 +441,9 @@ export default function Questions() {
             {questionData?.length === 0 && <div>
                 <p>No Questions available</p>
             </div>}
+
+            {openSnackBar && <SnackBar data={snackBarData} closeSnackBar={closeSnackBar} />}
+      {showLoader && <Loader />}
         </div>
     );
 }

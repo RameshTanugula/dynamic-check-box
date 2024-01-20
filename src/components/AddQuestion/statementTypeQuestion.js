@@ -10,7 +10,6 @@ import {
   InputLabel,
   Radio,
   RadioGroup,
-  Switch,
   TextField,
   Typography,
 } from '@mui/material';
@@ -36,9 +35,6 @@ const StatementTypeQuestion = () => {
   const [questions, setQuestions] = useState([
     { id: 1, statement: '', isTrueFalse: false },
     { id: 2, statement: '', isTrueFalse: false },
-    { id: 3, statement: '', isTrueFalse: false },
-    { id: 4, statement: '', isTrueFalse: false },
-
   ]);
 
   const [errors, setErrors] = useState({
@@ -51,13 +47,13 @@ const StatementTypeQuestion = () => {
 
   const handleEditorChange = (editorState) => {
     setEditorState(editorState);
+    const newTitle = editorState.getCurrentContent().getPlainText('\u0001');
+    setTitle(newTitle);
   };
 
   const handleExplanationEditorChange = (explanationEditorState) => {
     setExplanationEditorState(explanationEditorState);
-    setSolution(
-      explanationEditorState.getCurrentContent().getPlainText('\u0001')
-    );
+    setSolution(explanationEditorState.getCurrentContent().getPlainText('\u0001'));
   };
 
   const handleRadioChange = (index, value) => {
@@ -71,17 +67,14 @@ const StatementTypeQuestion = () => {
     validateQuestion(index);
   };
 
-  const onchangeTitle = (e) => {
-    setTitle(e.blocks[0].text);
-  };
-
-
   const handleStatementChange = (id, value, field) => {
     setQuestions((prevQuestions) =>
       prevQuestions.map((q) =>
         q.id === id ? { ...q, [field]: value } : q
       )
     );
+    // Validate the changed field
+    validateQuestion(id - 1);
   };
 
   const handleAddStatement = () => {
@@ -130,12 +123,31 @@ const StatementTypeQuestion = () => {
 
     setErrors((prevErrors) => ({
       ...prevErrors,
-      explanation: explanationErrors,
+      explanation: explanationErrors.explanation,
     }));
   };
 
+  const doValidation = () => {
+    let isValid = true;
+
+    // Validate each question
+    const questionErrors = questions.map((question, index) => {
+      validateQuestion(index);
+      return errors.question[index]?.statement;
+    });
+    if (
+      questionErrors.some((error) => error) ||
+      errors.explanation.explanation !== ''
+    ) {
+      isValid = false;
+    }
+
+
+    return isValid;
+  };
+
   const shuffleArray = (array) => {
-    const shuffledArray = array.slice();    
+    const shuffledArray = array.slice();
     for (let i = shuffledArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
@@ -151,9 +163,13 @@ const StatementTypeQuestion = () => {
 
       setShowLoader(true);
       let options = [optionArray.join(', ')];
+ console.log(options, 'options%%%');
+
       for (let i = 0; i < 3; i++) {
-        options.push(shuffleArray(optionArray).join(', '));
+        options.push(shuffleArray([...optionArray]).join(', '));
       }
+
+      console.log(options, 'optionssata');
       const payload = {
         title: title,
         solution: solution,
@@ -178,6 +194,7 @@ const StatementTypeQuestion = () => {
         setExplanationEditorState(EditorState.createEmpty());
         setQuestions([
           { id: 1, statement: '', isTrueFalse: false },
+          { id: 2, statement: '', isTrueFalse: false },
         ]);
       } else {
         setOpenSnackBar(true);
@@ -191,6 +208,7 @@ const StatementTypeQuestion = () => {
     // }
   };
 
+
   const closeSnackBar = () => {
     setOpenSnackBar(false);
   };
@@ -198,7 +216,7 @@ const StatementTypeQuestion = () => {
   return (
     <Container>
       <Typography variant="h5" align="center" gutterBottom>
-      Statement Type Questions
+        Statement Type Questions
       </Typography>
       <form className="container">
         <Grid container spacing={2}>
@@ -212,7 +230,6 @@ const StatementTypeQuestion = () => {
                 editorClassName="editor-class"
                 toolbarClassName="toolbar-class"
                 value={title}
-                onChange={(e) => onchangeTitle(e)}
               />
             </FormControl>
           </Grid>
@@ -230,6 +247,8 @@ const StatementTypeQuestion = () => {
                     }
                     placeholder="Statement"
                     required
+                    error={Boolean(errors.question[index]?.statement)}
+                    helperText={errors.question[index]?.statement}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>

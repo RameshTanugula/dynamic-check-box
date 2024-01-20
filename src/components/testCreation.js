@@ -7,18 +7,24 @@ import * as CheckAccess from "./CheckAccess";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import SnackBar from './SnackBar';
 import Loader from './Loader';
-import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import AddNewQuestions from './AddNewQuestion';
+import { Dialog, DialogContent } from '@mui/material';
+import { Button, Checkbox, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TableFooter, Box, IconButton } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import QuestionPreview from './questionPreview';
 
 export default function TestCreation() {
     // const serverUrl = `http://localhost:8080/test/`
@@ -41,6 +47,127 @@ export default function TestCreation() {
     const [testTypeError, setTestTypeError] = React.useState("");
     const [isAddNewQuestionsModalOpen, setAddNewQuestionsModalOpen] = React.useState(false);
     const [manualQuestions, setManualQuestions] = React.useState([])
+    const [preViewForm, setPreViewForm] = React.useState(false)
+    const [isPreviewOpen, setPreviewOpen] = React.useState(false);
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [selectedQuestionsData, setSelectedQuestionsData] = React.useState([])
+
+    //pagination
+
+    // const emptyRows =
+    // page > 0 ? Math.max(0, (1 + page) * rowsPerPage - questionData.length) : 0;
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const BpIcon = styled('span')(({ theme }) => ({
+        borderRadius: '50%',
+        width: '65%',
+        height: 16,
+        boxShadow:
+            theme.palette.mode === 'dark'
+                ? '0 0 0 1px rgb(16 22 26 / 40%)'
+                : 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
+        backgroundColor: theme.palette.mode === 'dark' ? '#394b59' : '#f5f8fa',
+        backgroundImage:
+            theme.palette.mode === 'dark'
+                ? 'linear-gradient(180deg,hsla(0,0%,100%,.05),hsla(0,0%,100%,0))'
+                : 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
+        '.Mui-focusVisible &': {
+            outline: '2px auto rgba(19,124,189,.6)',
+            outlineOffset: 2,
+        },
+        'input:hover ~ &': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#30404d' : '#ebf1f5',
+        },
+        'input:disabled ~ &': {
+            boxShadow: 'none',
+            background:
+                theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
+        },
+    }));
+
+    const BpCheckedIcon = styled(BpIcon)({
+        backgroundColor: '#137cbd',
+        backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
+        '&:before': {
+            display: 'block',
+            width: 16,
+            height: 16,
+            backgroundImage: 'radial-gradient(#fff,#fff 28%,transparent 32%)',
+            content: '""',
+        },
+        'input:hover ~ &': {
+            backgroundColor: '#106ba3',
+        },
+    });
+
+    function TablePaginationActions(props) {
+        const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+        const theme = useTheme();
+        const { count, page, rowsPerPage, onPageChange } = props;
+
+        const handleFirstPageButtonClick = (event) => {
+            onPageChange(event, 0);
+        };
+
+        const handleBackButtonClick = (event) => {
+            onPageChange(event, page - 1);
+        };
+
+        const handleNextButtonClick = (event) => {
+            onPageChange(event, page + 1);
+        };
+
+        const handleLastPageButtonClick = (event) => {
+            onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+        };
+        React.useEffect(() => {
+            const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+            if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+                setReadAndWriteAccess(true);
+            }
+        }, []);
+
+        return (
+            <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+                <IconButton
+                    onClick={handleFirstPageButtonClick}
+                    disabled={page === 0 && !readAndWriteAccess}
+                    aria-label="first page"
+                >
+                    {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+                </IconButton>
+                <IconButton
+                    onClick={handleBackButtonClick}
+                    disabled={page === 0 && !readAndWriteAccess}
+                    aria-label="previous page"
+                >
+                    {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                </IconButton>
+                <IconButton
+                    onClick={handleNextButtonClick}
+                    disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
+                    aria-label="next page"
+                >
+                    {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+                </IconButton>
+                <IconButton
+                    onClick={handleLastPageButtonClick}
+                    disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
+                    aria-label="last page"
+                >
+                    {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+                </IconButton>
+            </Box>
+        );
+    }
     const defaultTestFields = {
         testName: "",
         testDescription: "",
@@ -136,18 +263,27 @@ export default function TestCreation() {
         }
         return [ids1, ids2, ids3, ids4]
     }
-    const onClickCheckBox = (id, index) => {
+    
+    const onClickCheckBox = (id, i) => {
+        console.log(id, 'id');
+        const index = page * rowsPerPage + i;
+
+        console.log(index, 'index');
+        // const Data = 
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
             if (selectedQuestionsList.includes(id)) {
                 var Index = selectedQuestionsList.findIndex(x => x === id);
                 selectedQuestionsList.splice(Index, 1);
                 setSelectedQuestionsList([...selectedQuestionsList]);
+                console.log(selectedQuestionsList, 'selectedQuestionsList1');
             }
             else {
-                if (selectedQuestionsList.length < parseInt(testForm.numberOfQuestions)) {
-                    selectedQuestionsList.push(id)
+                if ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions)) {
+                    selectedQuestionsList.push(id) //,  qData
+                    // setSelectedQuestionsList(prevList => [...prevList, id]);
                     setSelectedQuestionsList([...selectedQuestionsList]);
+                    console.log(selectedQuestionsList, 'selectedQuestionsList');
                 }
                 else {
                     alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
@@ -157,9 +293,14 @@ export default function TestCreation() {
         } else {
             setAllCheckBoxValue(!allCheckBoxValue)
             questionData.map(q => q.checked = !allCheckBoxValue)
+            console.log();
         }
         setQuestionData(questionData);
+
     }
+
+
+
 
     function valid() {
         let retunValue = false;
@@ -308,7 +449,7 @@ export default function TestCreation() {
                     return (<div >
                         <br />
                         <div style={{ width: "100%" }} >
-                            <span className='mcq1-left'>{i + 1}. {a} </span>
+                            <span className='mcq1-left'>{String.fromCharCode(65 + i)}. {a} </span>
                             <span className='mcq1-right'>  &nbsp;&nbsp;&nbsp;&nbsp; {i + 1}. {row.part_b?.split(',')[i]} </span>
                         </div>
                     </div>)
@@ -325,8 +466,19 @@ export default function TestCreation() {
         return (
             <>
                 <span>Question: {qData.question}</span> <br />
-                <span>A: {qData.part_a}</span> <br />
-                <span>B: {qData.part_b}</span>
+                <div>
+                  {qData.part_a && qData.part_a?.split(',').map((a, i) => (
+                   <div key={i}>
+                        <br />
+                       <div style={{ width: "100%" }}>
+                      <span>{String.fromCharCode(65 + i)}.{a}</span>
+         
+                       </div>
+                   </div>
+                   ))}
+                 </div>
+                <br />
+                {/* <span>B: {qData.part_b}</span> */}
                 <br />
                 <span>Answer: {qData.answer}</span>
             </>
@@ -354,6 +506,58 @@ export default function TestCreation() {
         setManualQuestions(manualQuestions.concat(data))
         setAddNewQuestionsModalOpen(false);
     };
+
+    const closePreviewForm = () => {
+        setPreviewOpen(false);
+    };
+
+
+    const handleDeleteQuestion = (questionId, questionTitle) => {
+        console.log(questionId, 'questionId');
+        console.log(questionTitle, 'questionTitle');
+        // Update state by removing the deleted question
+          const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
+        //    console.log(isQuestionExist, 'isQuestionExist');
+           if (isQuestionExist) {
+
+            const updatedQuestionsList = selectedQuestionsList.filter(id => id !== questionId);
+            console.log(updatedQuestionsList, 'updatedQuestionsList11111');
+            const updatedQuestionsData = selectedQuestionsData.filter(question => question.q_id !== questionId);
+            setSelectedQuestionsList(updatedQuestionsList);
+            setSelectedQuestionsData(updatedQuestionsData);
+            // console.log(selectedQuestionsData, 'manualSelectedQuestionsData');
+        } else {
+
+            // Remove manual question with matching title
+            const updatedQuestionsListByTitle = selectedQuestionsList.filter(question => question.title !== questionId);
+            // console.log(updatedQuestionsListByTitle, 'updatedQuestionsListByTitle');
+            const updatedQuestionsDataByTitle = selectedQuestionsData.filter(question => question.title !== questionId);
+            // console.log(updatedQuestionsDataByTitle, '***updatedQuestionsDataByTitle*****')
+
+            const Questions = manualQuestions.filter((q)=>q.title !== questionId)
+
+            setSelectedQuestionsList(updatedQuestionsListByTitle);
+            setSelectedQuestionsData(updatedQuestionsDataByTitle);
+            setManualQuestions(Questions)
+            
+        }
+    };
+
+
+    const openPreviewForm = () => {
+        if (selectedQuestionsList.length > 0) {
+            const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id));
+            console.log(selectedQData, 'selectedQData');
+            setSelectedQuestionsData(selectedQData.concat(manualQuestions));
+            console.log(selectedQuestionsData, 'setSelectedQuestionsData');
+            setPreviewOpen(true);
+        } else {
+            console.error("selectedQuestionsList is empty.");
+        }
+    };
+
+
+
     return (
         <div>
             {!showForm &&
@@ -362,6 +566,7 @@ export default function TestCreation() {
                         <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={openAddNewQuestionsModal}>Add New Question</Button>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
+                            <Button variant="contained" onClick={openPreviewForm} >Preview</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
                             <Badge color="secondary" badgeContent={selectedQuestionsList.length + manualQuestions.length + "/" + parseInt(testForm.numberOfQuestions)}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
@@ -386,13 +591,73 @@ export default function TestCreation() {
 
                     <Grid item xs={12} style={{ overflow: "auto", height: "900px", marginTop: "10px" }} >
                         {questionData?.length > 0 &&
+                            <TableContainer component={Paper}>
+                                <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell align="center">
+                                                Action
+                                            </TableCell>
+                                            <TableCell align="center">Questions </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+
+                                        {(rowsPerPage > 0 ? questionData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : questionData
+                                        ).map((qData, i) => (
+                                            <TableRow key={i}>
+                                                <TableCell align="center">
+                                                    <span>
+                                                        <input
+                                                            style={{ cursor: "pointer" }}
+                                                            disabled={!readAndWriteAccess}
+                                                            checked={selectedQuestionsList.includes(qData.q_id)}
+                                                            onClick={() => onClickCheckBox(qData.q_id, i)}
+                                                            type="checkbox"
+                                                        />
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {/* Render your statements here based on the question type */}
+                                                    {((!qData.type) || (qData.type === "null")) && getQuestions(qData)}
+                                                    {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
+                                                    {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
+                                                    {(qData.type === 'IMG') && getImageQuestions(qData)}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                        }
+                                    </TableBody>
+                                    <TableFooter>
+                                        <TableRow>
+                                            <TablePagination
+                                                rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
+                                                colSpan={4}
+                                                count={questionData.length}
+                                                rowsPerPage={rowsPerPage}
+                                                page={page}
+                                                SelectProps={{
+                                                    inputProps: {
+                                                        'aria-label': 'questionData per page',
+                                                    },
+                                                    native: true,
+                                                }}
+                                                onPageChange={handleChangePage}
+                                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                                ActionsComponent={TablePaginationActions}
+                                            />
+                                        </TableRow>
+                                    </TableFooter>
+                                </Table>
+                            </TableContainer>}
+                        {/* {questionData?.length > 0 &&
                             questionData?.map((qData, i) => {
                                 return (
                                     <div style={{ padding: '5px' }}>
 
                                         <div>
-                                            <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={selectedQuestionsList.includes(qData.q_id)} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
-                                            {/* <div style={{
+                                            <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={selectedQuestionsList.includes(qData.q_id)} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div> */}
+                        {/* <div style={{
                                                 paddingTop: '5px',
                                                 border: '1px solid blue'
                                             }}> 
@@ -403,7 +668,7 @@ export default function TestCreation() {
                                                 width: 'auto'}} src={qData.QUrls}/>
                                                 : <span>Question: {qData.question}</span>} <br />
                                                 <span>Answer: {qData.answer}</span> 
-                                            </div> */}
+                                            </div>
                                             <div style={{
                                                 paddingTop: '5px',
                                                 border: '1px solid blue'
@@ -417,7 +682,7 @@ export default function TestCreation() {
 
                                     </div>)
                             })
-                        }
+                        } */}
                     </Grid>
                 </Grid>}
             {showForm &&
@@ -551,6 +816,13 @@ export default function TestCreation() {
                     </Stack>
                 </Grid>
             }
+            {/* QuestionPreviewDialog */}
+            <Dialog open={isPreviewOpen} onClose={closePreviewForm} maxWidth="md" fullWidth>
+                <DialogContent>
+                    <QuestionPreview selectedQuestionsList={selectedQuestionsData} onClose={closePreviewForm} onDelete={handleDeleteQuestion} />
+                </DialogContent>
+            </Dialog>
+
 
             {openSnackBar && <SnackBar data={snackBarData} closeSnakBar={closeSnakBar} />}
             {showLoader &&

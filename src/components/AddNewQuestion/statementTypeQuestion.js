@@ -145,7 +145,7 @@ const StatementTypeQuestion = ({ onUpdate, onClose }) => {
     const statementArray = questions.map((q) => q.statement);
     let options = [optionArray.join(', ')];
     for (let i = 0; i < 3; i++) {
-      options.push(shuffleArray(optionArray).join(', '));
+      options.push(shuffleArray([...optionArray]).join(', '));
     }
     const payload = {
       title: title,

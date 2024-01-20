@@ -33,7 +33,6 @@ const MatchingTypeQuestions = () => {
     { id: 2, parts_a: '', Option: '', parts_b: '' },
     { id: 3, parts_a: '', Option: '', parts_b: '' },
     { id: 4, parts_a: '', Option: '', parts_b: '' },
-
   ]);
 
   const [errors, setErrors] = useState({
@@ -65,7 +64,7 @@ const MatchingTypeQuestions = () => {
   };
 
   const handleAddStatement = () => {
-    if (question.length > 4) {
+    if (question.length >= 4) {
       alert('You can choose a maximum of four statements only!');
     } else {
       setQuestion((prevQuestions) => [
@@ -82,6 +81,7 @@ const MatchingTypeQuestions = () => {
 
   const shuffleOptions = (Option = question.map((q) => q.Option)) => {
     // Fisher-Yates shuffle algorithm
+    // debugger
     for (let i = Option.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [Option[i], Option[j]] = [Option[j], Option[i]];
@@ -91,30 +91,44 @@ const MatchingTypeQuestions = () => {
 
   const checkIsValid = (fieldName, value) => {
     switch (fieldName) {
-        case 'title':
-        case 'parts_a':
-        case 'parts_b':
-        case 'solution':
-        // Regex pattern for solution (alphanumeric characters, spaces, and special characters)
+      case 'title':
+      case 'parts_a':
+      case 'parts_b':
+      case 'solution':
+        // Regex pattern for alphanumeric characters, spaces, and special characters
         const alphanumericRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+{}\[\]:;<>,.?~\\/=-]+$/;
+  
+        // Check if the field is empty or doesn't match the regex pattern
         setErrors((prevErrors) => ({
           ...prevErrors,
-          [fieldName]: value.trim() === '' ? `${fieldName} is required` : !alphanumericRegex.test(value) ? `Invalid ${fieldName}` : '',
+          [fieldName]:
+            value.trim() === ''
+              ? `${fieldName} is required`
+              : !alphanumericRegex.test(value)
+              ? `Invalid ${fieldName}`
+              : '',
         }));
         break;
       case 'Option':
         // Regex pattern for Option (only accepts "1", "2", or "3")
         const optionRegex = /^[0-4]$/;
+  
+        // Check if the field is empty or doesn't match the regex pattern
         setErrors((prevErrors) => ({
           ...prevErrors,
-          [fieldName]: value.trim() === '' ? 'Option is required' : !optionRegex.test(value) ? 'Invalid option' : '',
+          [fieldName]:
+            value.trim() === ''
+              ? 'Option is required'
+              : !optionRegex.test(value)
+              ? 'Invalid option'
+              : '',
         }));
         break;
       default:
         break;
     }
   };
-
+  
   const onchangeTitle = (e) => {
     if (e.blocks.length > 0) {
       setTitle(e.blocks[0].text);
@@ -126,45 +140,73 @@ const MatchingTypeQuestions = () => {
       setSolution(e.blocks[0].text);
     }
   };
+  
   const doValidation = () => {
     let valid = true;
-
+  
     // Validate title
     checkIsValid('title', title);
-
+  
     // Validate each question
     question.forEach((q) => {
       checkIsValid('parts_a', q.parts_a);
       checkIsValid('parts_b', q.parts_b);
       checkIsValid('Option', q.Option);
     });
-
+  
     // Validate solution
     checkIsValid('solution', solution);
-
-    // Check if any error exists
-    for (const key in errors) {
-      if (errors[key] !== '') {
-        valid = false;
-        break;
-      }
+  
+    // Check if any field is empty
+    if (
+      title.trim() === '' ||
+      question.some((q) => q.parts_a.trim() === '' || q.parts_b.trim() === '' || q.Option.trim() === '') ||
+      solution.trim() === ''
+    ) {
+      valid = false;
     }
-
+  
+    // Set the overall validation status
+    setErrors((prevErrors) => {
+      let hasErrors = false;
+  
+      // Check if any error exists in the updated state
+      for (const key in prevErrors) {
+        if (prevErrors[key] !== '') {
+          hasErrors = true;
+          break;
+        }
+      }
+  
+      // Set the overall validation status
+      valid = !hasErrors;
+  
+      return prevErrors;
+    });
+  
+    // Return the overall validation status
     return valid;
   };
+  
 
   const handleSubmit = async () => {
+    debugger
     if (doValidation()) {
       const statementArray = question.map((q) => q.parts_a);
       const optionArray = question.map((q) => q.Option);
       const matchArray = question.map((q) => q.parts_b);
 
       setShowLoader(true);
+
       let options = [optionArray.join(', ')];
-      for(let i=0; i < 3; i++){
-        options.push(shuffleOptions(['1', '2', '3', '4']).join(', '))
-      }     
-      const payload = {
+      console.log(options, 'options');
+     for (let i = 0; i < 3; i++) {
+      options.push(shuffleOptions([...optionArray]).join(', '));
+      console.log(options);
+     }
+    console.log(options, "options111"); 
+
+        const payload = {
         title: title,
         solution: solution,
         part_a: statementArray.join(', '),
@@ -181,20 +223,23 @@ const MatchingTypeQuestions = () => {
         setOpenSnackBar(true);
         const data = {
           type: 'success',
-          message: 'MatchingTypeQuestions added successfully!....',
+          message: 'Matching Type Questions added successfully!....',
           open: true,
         };
         setSnackBarData(data);
-        setEditorState(EditorState.createEmpty());
-        setExplanationEditorState(EditorState.createEmpty());
         setQuestion([
           { id: 1, parts_a: '', Option: '', parts_b: '' },
+          { id: 2, parts_a: '', Option: '', parts_b: '' },
+          { id: 3, parts_a: '', Option: '', parts_b: '' },
+          { id: 4, parts_a: '', Option: '', parts_b: '' },
         ]);
+        setEditorState(EditorState.createEmpty());
+        setExplanationEditorState(EditorState.createEmpty());
       } else {
         setOpenSnackBar(true);
         const data = {
           type: 'error',
-          message: 'MatchingTypeQuestions added failed.',
+          message: 'Matching Type Questions added failed.',
           open: true,
         };
         setSnackBarData(data);
@@ -205,8 +250,6 @@ const MatchingTypeQuestions = () => {
   const closeSnackBar = () => {
     setOpenSnackBar(false);
   };
-
-
 
   return (
     <Container>
@@ -236,7 +279,7 @@ const MatchingTypeQuestions = () => {
             {question.map(({ id, parts_a, Option, parts_b }) => (
               <Grid container spacing={2} key={id}>
                 <Grid item xs={5} sm={5} lg={5} style={{ display: 'flex', alignItems: 'center' }}>
-                  <InputLabel>{id} </InputLabel>
+                  <InputLabel>{String.fromCharCode(65 + id - 1)} </InputLabel>
                   <TextField
                     required
                     value={parts_a}
@@ -248,7 +291,7 @@ const MatchingTypeQuestions = () => {
                   />
                 </Grid>
                 <Grid item xs={5} sm={5} lg={5} style={{ display: 'flex', alignItems: 'center' }}>
-                  <InputLabel>{String.fromCharCode(65 + id - 1)}</InputLabel>
+                  <InputLabel>{id}</InputLabel>
                   <TextField
                     value={parts_b}
                     onChange={(e) => handleStatementChange(id, e.target.value, 'parts_b')}
@@ -266,8 +309,8 @@ const MatchingTypeQuestions = () => {
                     onChange={(e) => handleStatementChange(id, e.target.value, 'Option')}
                     placeholder="Option"
                     required={true}
-                    error={errors.Option !== ''}
-                    helperText={errors.Option !== '' ? 'Option is required' : ' '}
+                    // error={errors.Option !== ''}
+                    // helperText={errors.Option !== '' ? 'Option is required' : ' '}
                   />
                 </Grid>
               </Grid>
