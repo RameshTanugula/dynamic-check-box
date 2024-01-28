@@ -33,8 +33,6 @@ const StatementTypeQuestion = ({ onUpdate, onClose }) => {
   const [questions, setQuestions] = useState([
     { id: 1, statement: '', isTrueFalse: false },
     { id: 2, statement: '', isTrueFalse: false },
-    { id: 3, statement: '', isTrueFalse: false },
-    { id: 4, statement: '', isTrueFalse: false },
 
   ]);
 
@@ -131,28 +129,107 @@ const StatementTypeQuestion = ({ onUpdate, onClose }) => {
     }));
   };
 
-  const shuffleArray = (array) => {
-    const shuffledArray = array.slice();
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  const shuffledSets_2 = ['true, false','false, true', 'true, true', 'false, false'];
+const shuffledSets_3 = ['true, false, false', 
+'false, true, false',
+'false, false, true',
+'true, true, false',
+'true, false, true',
+'false, true, true',
+'true, true, true',
+'false, false, false'];
+const shuffledSets_4 = ['true, false, false, false',
+'false, true, false, false',
+'false, false, true, false',
+'false, false, false, true',
+'true, true, false, false',
+'true, false, true, false',
+'true, false, false, true',
+'false, true, true, false',
+'false, true, false, true',
+'false, false, true, true',
+'true, true, true, false',
+'true, true, false, true',
+'true, false, true, true',
+'false, true, true, true',
+'true, true, true, true',
+'false, false, false, false'];
+function generateOptions(list, originalArray) {
+console.log(originalArray.length, 'ori', originalArray)
+  // if (count === 2) {
+    // shuffledSets =['true, false','false, true', 'true, true', 'false, false'];
+    const find = list.filter((s)=> s !== originalArray)
+    console.log(find.length, 'find***')
+    if(list.length !== 4){
+    const pickedItems = pickRandomItems(find, 3, list.length);
+    return shuffleArray(pickedItems.concat(originalArray));
+    } else {
+      return shuffleArray(find.concat(originalArray));
     }
-    return shuffledArray;
-  };
+}
+
+
+function pickRandomItems(array, count, subsetSize) {
+  const result = [];
+  const shuffledArray = array.slice(0, subsetSize); // Create a copy of the subset
+
+  // Shuffle the subset array (Fisher-Yates algorithm)
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+
+  // Pick the first 'count' items from the shuffled subset
+  for (let i = 0; i < count; i++) {
+    result.push(shuffledArray[i]);
+  }
+
+  return result;
+}
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
   const handleSubmit =  () => {
     const optionArray = questions.map((q) => q.isTrueFalse);
     const statementArray = questions.map((q) => q.statement);
     let options = [optionArray.join(', ')];
-    for (let i = 0; i < 3; i++) {
-      options.push(shuffleArray([...optionArray]).join(', '));
-    }
+    const optionsArray = questions.map((q) => q.isTrueFalse);
+    console.log(optionsArray, 'optionsArray**');
+          let originalOption = [optionsArray.join(', ')];
+     console.log(originalOption, 'originalOption');
+    let list
+    if (optionsArray.length === 2) {      
+     list = generateOptions(shuffledSets_2, optionsArray.join(', '));
+    //  console.log(list, 'list');
+    }else if(optionsArray.length === 3){
+    list = generateOptions(shuffledSets_3, optionsArray.join(', '));
+    // console.log(list, 'list');
+  }else if(optionsArray.length === 4){
+     list = generateOptions(shuffledSets_4, optionsArray.join(', '));
+    // console.log(list, 'list');
+  }
+      //  const list = generateOptions(shuffledSets_3, optionsArray.join(', '));
+      //  console.log(list)
+       const indexValue  = list.findIndex((l)=>l===optionsArray.join(', '));
+       const correctAnswer = indexValue + 1;
+       console.log(correctAnswer)
+      // let indexValue
+      //  if (correctAnswer !== -1) {
+      //    indexValue = list[correctAnswer];
+      //   console.log(indexValue);
+      // }
+
     const payload = {
       title: title,
       solution: solution,
       part_a: statementArray.join(', '),
-      options: options,
-      ans: 1,
+      options: list,
+      ans: correctAnswer,
       type: 'MCQ2'
     };
 

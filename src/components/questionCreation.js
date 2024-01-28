@@ -757,7 +757,7 @@ export default function QuestionCreation() {
 
             </div>
             }
-            {!showForm && !showTree && questionData?.length > 0 && <div>
+            {!showForm && !showTree && questionData?.length > 0 && <div style={{width: '80%', height: '30rem', overflow: 'auto'}}>
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                         <TableHead>

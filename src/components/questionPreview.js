@@ -33,9 +33,120 @@ const QuestionPreview = ({ selectedQuestionsList, onDelete, onClose }) => {
           </TableHead>
           <TableBody>
           {selectedQuestionsList.map((question, index , id) => (
-  <TableRow key={index}>
+    <TableRow key={index}>
     <TableCell>{question.q_id?question.q_id:index+1 }</TableCell>
-    <TableCell>{question.question || question.title}</TableCell>
+    {/* <TableCell>{question.question || question.title}</TableCell> */}
+    <TableCell>
+  {question.question && (
+    <>
+      {question.question && (
+        <>
+          {question.question}
+          {question.type !== '' && question.part_a && question.part_b && (
+            <div>
+              <span className='mcq1-left'>PART A</span>
+              {question.type !== 'MCQ2' && <span className='mcq1-left'>PART B</span>}
+            </div>
+          )}
+          {question.type === 'IMG' && question.QUrls && (
+            <img
+              style={{
+                height: '10rem',
+                width: 'auto',
+              }}
+              src={question.QUrls}
+              alt="Question Image"
+            />
+          )}
+          {question.type !== '' && question.part_a &&
+            question.part_b &&
+            question.part_a?.split(',').map((a, i) => (
+              <div key={i}>
+                <br />
+                <div style={{ width: '100%' }}>
+                  {question.type !== 'MCQ2' ? (
+                    <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+                  ) : (
+                    <span>{String.fromCharCode(65 + i)}.{a}</span>
+                  )}
+                  {question.type !== 'MCQ2' && (
+                    <span className='mcq1-right'>&nbsp;&nbsp;&nbsp;&nbsp;{i + 1}. {question.part_b?.split(',')[i]}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+        </>
+      )}
+    </>
+  ) ||
+    (question.title && (
+      <>
+        {question.title}
+        {question.part_b ? (
+          <>
+            {question.part_a?.split(',').map((a, i) => (
+              <div key={i}>
+                <br />
+                <div style={{ width: '100%' }}>
+                  <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+                  {question.part_b?.split(',')[i] && (
+                    <span className='mcq1-right'>&nbsp;&nbsp;&nbsp;&nbsp;{i + 1}. {question.part_b?.split(',')[i]}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <span className='mcq1-left'>{question.part_a?.split(',').map((a, i) => (
+            <div key={i}>
+              <br />
+              <div style={{ width: '100%' }}>
+                <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+              </div>
+            </div>
+          )) || ''}</span>
+        )}
+      </>
+    ))}
+</TableCell>
+
+  {/* <TableCell>
+  {question.question || (
+    <>
+      {question.title && (
+        <>
+          {question.title}
+          {question.part_b ? (
+            <>
+              {question.part_a?.split(',').map((a, i) => (
+                <div key={i}>
+                  <br />
+                  <div style={{ width: "100%" }}>
+                    <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+                    {question.part_b?.split(',')[i] && (
+                      <span className='mcq1-right'>&nbsp;&nbsp;&nbsp;&nbsp;{i + 1}. {question.part_b?.split(',')[i]}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <span className='mcq1-left'>
+              {question.part_a?.split(',').map((a, i) => (
+                <div key={i}>
+                  <br />
+                  <div style={{ width: "100%" }}>
+                    <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+                  </div>
+                </div>
+              )) || ''}
+            </span>
+          )}
+        </>
+      )}
+    </>
+  )}
+</TableCell> */}
     <TableCell>{question.answer || question.ans}</TableCell>
     <TableCell>
       <Button

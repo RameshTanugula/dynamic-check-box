@@ -125,18 +125,22 @@ const MultipleChoiceQuestions = ({ onUpdate, onClose }) => {
   const handleSubmit = async () => {
     if (doValidation()) {
       const statementArray = questions.map((q) => q.statement);
-      const correctAnswer = questions.find((q) => q.selectedOption);
+      // const correctAnswer = questions.find((q) => q.selectedOption);
 
+      const ans = questions.find((q) => q.selectedOption);
       let options = [];
-      for (let i = 0; i < questions.length; i++) {
+      for(let i=0; i<questions.length; i++){
         options.push(questions[i].statement);
       }
+      let correctAnswer = ans.selectedOption
+
+
 
       const payload = {
         title: title,
         solution: solution,
         options: options,
-        ans: correctAnswer.selectedOption,
+        ans: correctAnswer,
         type: ''
       };
       onUpdate(payload);

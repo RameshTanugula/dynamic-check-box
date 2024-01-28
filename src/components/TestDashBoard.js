@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import SnackBar from './SnackBar';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import * as XLSX from 'xlsx';
 
 export default function TestDashBoard() {
     const serverUrl = securedLocalStorage.baseUrl;
@@ -18,14 +19,16 @@ export default function TestDashBoard() {
     const [showLoader, setShowLoader] = React.useState(false);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showSreen, setShowSreen] = React.useState("Grid");
+    const [editData, setEditData] = React.useState();
+    const [buttonName, setButtonName] = React.useState("submit");
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
+
     const sample = {
         type: "testdashboard",
         list: []
     }
-    const [selectedSubjects, setSelectedSubjects] = React.useState(sample);
-
+    const [selectedSubjects, setSelectedSubjects] = React.useState(sample)
     const columns = [
         {
             field: 'select', headerName: 'Select', minWidth: 20,
@@ -66,8 +69,88 @@ export default function TestDashBoard() {
         { field: 'no_of_questions', headerName: 'Number OF Questions', minWidth: 200, },
         { field: 'price', headerName: 'Price', minWidth: 200, },
         { field: 'created_at', headerName: 'Created Date', minWidth: 250, },
+        // {
+        //     field: 'editTest', headerName: 'Edit Test', minWidth: 150,
+        //     renderCell: (params) => (
+        //         <Button
+        //             variant="outlined"
+        //             onClick={() => editTest(params.row)}
+        //             disabled={!readAndWriteAccess}
+        //         >
+        //             Edit Test
+        //         </Button>
+        //     ),
+        // },
+        {
+            field: 'deleteTest', headerName: 'Delete Test', minWidth: 150,
+            renderCell: (params) => (
+                <Button
+                    variant="outlined"
+                    onClick={() => deleteTest(params.row)}
+                    disabled={!readAndWriteAccess}
+                >
+                    Delete Test
+                </Button>
+            ),
+        },
     ];
 
+
+    const [editTestData, setEditTestData] = React.useState({
+        test_name: "",
+        is_omr: false,
+        is_online: false,
+        no_of_questions: 0,
+        price: 0,
+        created_at: "",
+        // Add other fields as needed
+    });
+
+
+    // Function to handle editing test
+    // const editTest = (row) => {
+    //     setButtonName("update");
+    //     setEditData(row);
+    //     setEditTestData({
+    //         test_name: row?.test_name,
+    //         is_omr: row?.is_omr === 1,
+    //         is_online: row?.is_online === 1,
+    //         no_of_questions: row?.no_of_questions,
+    //         price: row?.price,
+    //         created_at: row?.created_at,
+    //         // Set other fields as needed
+    //     });
+
+    //     setShowSreen("Edit"); // Update this based on your UI structure
+    // };
+
+    // function editTest(row) {
+    //     // setEditData(row);
+    //     setButtonName("update");
+    //     setEditData(row);
+    // }
+
+    async function deleteTest(row) {
+
+        const resp = await api(null, serverUrl + "test/delete/" + row.id, 'delete');
+        if (resp.status === 200) {
+            setOpenSnackBar(true);
+            const data = {
+                type: "success",
+                message: row.test_name + " deleted successfully...!"
+            }
+            setSnackBarData(data);
+            getTestData();
+        }
+        else {
+            setOpenSnackBar(true);
+            const data = {
+                type: "error",
+                message: resp.response.data.error + " to deleted ...!"
+            }
+            setSnackBarData(data);
+        }
+    }
 
     function selectedList(row) {
         let val = 0;
@@ -124,7 +207,55 @@ export default function TestDashBoard() {
         }
         return value;
     }
+    //excel
+    const exportToExcel = () => {
+        // Assuming questionsData is an array of objects with various properties including "answer," "tags," and "book_marked"
+        const questionsDataModified = questionsData.map(({ order_id, question, is_online, is_omr, answer, tags, is_book_marked, part_a, part_b, options, ...rest }) => {
+            let modifiedData = { ...rest }; // Initialize with default values
 
+            if (rest.type === 'MCQ1') {
+                modifiedData.partA = part_a;
+                modifiedData.partB = part_b;
+            } else if (rest.type === 'MCQ2') {
+                modifiedData.partA = part_a;
+                modifiedData.partB = '';
+            } else {
+                modifiedData.partA = '';
+                modifiedData.partB = '';
+            }
+            if (rest.type === 'IMG') {
+                modifiedData.QUrls = rest.QUrls || '';
+                modifiedData.ImageLink = rest.QUrls ? `Click here` : ''; // Display 'Click here' as a hyperlink text
+            }
+
+            return modifiedData;
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(questionsDataModified);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'questionsData');
+        XLSX.writeFile(workbook, 'questionsData.xlsx');
+    }
+
+    //excel
+    // function exportToExcel() {
+    //     var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+    //         "xmlns:x='urn:schemas-microsoft-com:office:excel' " +
+    //         "xmlns='http://www.w3.org/TR/REC-html40'>" +
+    //         "<head><meta charset='utf-8'></head><body>";
+    //     var footer = "</body></html>";
+    //     var sourceHTML = header + document.getElementById("element").innerHTML + footer;
+    //     var source = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    //     var fileDownload = document.createElement("a");
+    //     document.body.appendChild(fileDownload);
+    //     fileDownload.href = source;
+    //     fileDownload.download = 'document.xls';
+    //     fileDownload.click();
+    //     document.body.removeChild(fileDownload);
+    // }
+
+
+    //word
     function exportToWord() {
         var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
             "xmlns:w='urn:schemas-microsoft-com:office:word' " +
@@ -147,11 +278,82 @@ export default function TestDashBoard() {
         const url = serverUrl + "test/list/bytestid/" + row.id;
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
-            setQuestionsData(resp.data);
+            const updatedQuestions = resp.data.map(item => {
+                if (item.type === "MCQ2") {
+                    const newOptions = getOptionsAsStatement([item.Option1, item.Option2, item.Option3, item.Option4]);
+                    return {
+                        ...item,
+                        Option1: newOptions[0],
+                        Option2: newOptions[1],
+                        Option3: newOptions[2],
+                        Option4: newOptions[3],
+                    };
+                } else if(item.type === "MCQ1")  {
+                
+                        const newOptions = getOptionsAsStatementMCQ1([item.Option1, item.Option2, item.Option3, item.Option4]);
+                        return {
+                            ...item,
+                            Option1: newOptions[0],
+                            Option2: newOptions[1],
+                            Option3: newOptions[2],
+                            Option4: newOptions[3],
+                        };
+                }
+                else {
+                    return {
+                        ...item
+                    };
+                }
+            });
+
+            setQuestionsData(updatedQuestions);
             setShowLoader(false);
-            setShowSreen("Questions")
+            setShowSreen("Questions");
+            console.log(questionsData, "questionsData")
         }
     }
+
+
+    const getOptionsAsStatement = (arr) => {
+        const list = arr.map((ele) => {
+            const optionarr = ele.split(",");
+            let trueOptions = [];
+            let falseOptions = [];
+            optionarr.map((newVal, index) => {
+                if (newVal.trim() == 'true') {
+                    trueOptions.push(String.fromCharCode(65 + index));
+                    return trueOptions;
+                }
+                else {
+                    falseOptions.push(String.fromCharCode(65 + index));
+                    return falseOptions;
+                }
+            });
+            // console.log(trueOptions, "trueOptions");
+            // console.log(falseOptions, "falseOptions");
+            const trueStatement = trueOptions.length > 0
+                ? `Statement ${trueOptions.length > 1 ? trueOptions.join(' & ') : trueOptions[0]} true`
+                : '';
+            const falseStatement = falseOptions.length > 0
+                ? `Statement ${falseOptions.length > 1 ? falseOptions.join(' & ') : falseOptions[0]} false`
+                : '';
+
+                return `${trueStatement}${trueStatement && falseStatement ? ', ' : ''}${falseStatement}`.trim();
+
+
+        });
+        return list;
+    }
+
+    const getOptionsAsStatementMCQ1 = (arr) => {
+        return arr.map((ele) => {
+            const optionArr = ele.split(",");
+            const formattedOptions = optionArr.map((option, index) => `${String.fromCharCode(65 + index)}${option.trim()}`);
+            return formattedOptions.join(', ');
+        });
+    }
+
+
 
     const getTestData = async () => {
         setShowLoader(true);
@@ -175,7 +377,7 @@ export default function TestDashBoard() {
 
             {showSreen === "Grid" &&
                 <div>
-                    <button disabled={!readAndWriteAccess} style={{ height: '2rem' }} onClick={() => addToHome()}>Add to home </button> 
+                    <button disabled={!readAndWriteAccess} style={{ height: '2rem' }} onClick={() => addToHome()}>Add to home </button>
                     <br />
                     <div style={{ height: 370, width: '100%', marginTop: "5px" }}>
                         <DataGrid
@@ -188,24 +390,99 @@ export default function TestDashBoard() {
                     </div>
                 </div>
             }
+
             {showSreen === "Questions" &&
                 <span>
                     <Stack style={{ float: "right", top: "110px", position: "sticky" }} direction="row" spacing={1}>
                         <Button variant="outlined" onClick={() => setShowSreen("Grid")} >Back</Button>
-                        <Button variant="outlined" onClick={() => exportToWord()} >Export</Button>
+                        <Button variant="outlined" onClick={() => exportToWord()} >Export as Word</Button>
+                        <Button variant="outlined" onClick={exportToExcel} >Export as Excel</Button>
                     </Stack>
                     <div id="element" style={{ marginTop: "20px" }}>
                         &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style={{ fontSize: "25px" }} >Questions</span>
                         <br />
                         <br />
-                        <span>
-                            {questionsData && questionsData.map((question, i) => {
-                                return (<span key={i}><span style={{ fontWeight: "bold" }}>{i + 1}.{question.QuestionTitle}</span>. <br /> <span>A.{question.Option1}.</span><br /> <span>B.{question.Option2}.</span><br /> <span>C.{question.Option3}.</span> <br /> <span>D.{question.Option4}.</span><br /><br /> </span>)
-                            })}
+                        {
+                    questionsData && questionsData.map((question, i) => (
+                        <span key={i}>
+                            <span style={{ fontWeight: "bold", color:"red" }}>{i + 1}.{question.QuestionTitle}</span>. <br />
+
+                            <span>
+                                {
+                                    question.type !== '' ? (
+                                        (question.type === "MCQ2") ? (
+                                            <div>
+                                                {question.part_a.split(',').map((part, index) => (
+                                                    <div key={index}><strong>{String.fromCharCode(65 + index)}. {part.trim()}</strong></div>
+                                                ))}
+                                            </div>
+                                        ) : question.type === "IMG" ? (
+                                            <span>
+                                                {question.QUrls && <img style={{
+                                                    height: '10rem',
+                                                    width: 'auto'
+                                                }} src={question.QUrls} />}
+                                            </span>
+                                        ) : question.type === "MCQ1" ? (
+                                            <div style={{ width: '300px' }}>
+                                            <table style={{ border: '1px solid black' }}>
+                                            <thead>
+                                        <tr>
+                                            <th>Part-A</th>
+                                            <th>Part-B</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>
+                                                {question.part_a && question.part_a.split(',').map((part, index) => (
+                                                    <div key={index}>
+                                                        {String.fromCharCode(65 + index)}. {part.trim()}
+                                                        {index !== question.part_a.split(',').length - 1 && <hr />}
+                                                    </div>
+                                                ))}
+                                            </td>
+                                            <td>
+                                                {question.part_b && question.part_b.split(',').map((part, index) => (
+                                                    <div key={index}>
+                                                        {(index + 1)}. {part.trim()}
+                                                        {index !== question.part_b.split(',').length - 1 && <hr />}
+                                                    </div>
+                                                ))}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                            </table>
+                                        </div>
+
+                                        ) : ''
+                                    ) : ''
+                                }
+                            </span> <br />
+
+                            <span>
+                                {question.type === 'IMG' ? '' : (
+                                    <span>
+                                        <span>A.{question.Option1}.</span><br />
+                                        <span>B.{question.Option2}.</span><br />
+                                        <span>C.{question.Option3}.</span> <br />
+                                        <span>D.{question.Option4}.</span><br /><br />
+                                    </span>
+                                )}
+                            </span>
                         </span>
+                    ))
+                }
+
                     </div>
                 </span>
             }
+            {/* {(showSreen === "Edit") &&
+                 <span>
+
+                 </span>
+            } */}
+
             {showLoader &&
                 <Loader />
             }

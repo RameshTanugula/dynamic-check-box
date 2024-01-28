@@ -659,7 +659,7 @@ function TablePaginationActions(props) {
               <TableFooter>
                             <TableRow>
                                 <TablePagination
-                                    rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
+                                    rowsPerPageOptions={[10, 25, 50, 100, 1000,  { label: 'All', value: -1 }]}
                                     colSpan={5}
                                     count={questionData.length}
                                     rowsPerPage={rowsPerPage}

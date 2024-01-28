@@ -209,6 +209,7 @@ export default function TestCreation() {
     async function fetchData() {
         setShowLoader(true);
         const data = await api(null, serverUrl + 'get/data', 'get');
+        console.log(data, 'data');
         const catData = await api(null, serverUrl + 'get/categories', 'get');
         if (catData.status === 200) {
             setCategoryData(catData.data);
@@ -353,6 +354,7 @@ export default function TestCreation() {
         if (manualQuestions?.length > 0) {
             for (let i = 0; i < manualQuestions.length; i++) {
                 const data1 = await api(manualQuestions[i], securedLocalStorage.baseUrl + 'question/' + 'create/questions/mcq', 'post');
+                console.log(data1, 'data1');
                 if (data1.status === 200) {
                     manualQIds.push(data1.data.res.insertId)
                 }
@@ -378,6 +380,7 @@ export default function TestCreation() {
             resetForm();
             setSelectedQuestionsList([]);
             setOpenSnackBar(true);
+            setManualQuestions([])
             const message = {
                 type: "success",
                 message: "Test added successfully!..."
@@ -545,7 +548,7 @@ export default function TestCreation() {
 
 
     const openPreviewForm = () => {
-        if (selectedQuestionsList.length > 0) {
+        if (selectedQuestionsList.length + manualQuestions.length > 0) {
             const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id));
             console.log(selectedQData, 'selectedQData');
             setSelectedQuestionsData(selectedQData.concat(manualQuestions));
@@ -566,7 +569,7 @@ export default function TestCreation() {
                         <Stack spacing={4} direction="row" sx={{ color: 'action.active' }}>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={openAddNewQuestionsModal}>Add New Question</Button>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
-                            <Button variant="contained" onClick={openPreviewForm} >Preview</Button>
+                            <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === 0} onClick={openPreviewForm} >Preview</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
                             <Badge color="secondary" badgeContent={selectedQuestionsList.length + manualQuestions.length + "/" + parseInt(testForm.numberOfQuestions)}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>

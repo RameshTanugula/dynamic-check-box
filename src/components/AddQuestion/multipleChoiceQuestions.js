@@ -127,39 +127,53 @@ const MultipleChoiceQuestions = () => {
   const handleSubmit = async () => {
     if (doValidation()) {
       const statementArray = questions.map((q) => q.statement);
-      const correctAnswer = questions.find((q) => q.selectedOption);
-      
+      const ans = questions.find((q) => q.selectedOption);
+      console.log(ans , 'ans');
       let options = [];
       for(let i=0; i<questions.length; i++){
         options.push(questions[i].statement);
       }
-      
+      console.log(options, options);
+      let correctAnswer = ans.selectedOption
+     
       const payload = {
         title: title,
         solution: solution,
         options: options,
-        ans: correctAnswer.selectedOption,
+        ans: correctAnswer,
         type:''
       };
 
+      if (payload.type !== "MCQ1" && payload.type !== "MCQ2") {
+        // Set part_a and part_b to null
+        payload.part_a = null;
+        payload.part_b = null;
+      } 
+
       try {
         const resp = await api(payload, serverUrl + 'create/questions/mcq', 'post');
-
+         
         if (resp.status === 200) {
           setOpenSnackBar(true);
           const data = {
             type: 'success',
-            message: 'MultipleChoiceQuestions added successfully!....',
+            message: 'Multiple Choice Questions added successfully!....',
             open: true,
           };
           setSnackBarData(data);
+          setQuestions([
+            { id: 1, statement: '', selectedOption: null },
+            { id: 2, statement: '', selectedOption: null },
+            { id: 3, statement: '', selectedOption: null },
+            { id: 4, statement: '', selectedOption: null },
+          ]);
           setEditorState(EditorState.createEmpty());
           setExplanationEditorState(EditorState.createEmpty());
         } else {
           setOpenSnackBar(true);
           const data = {
             type: 'error',
-            message: 'MultipleChoiceQuestions added failed.',
+            message: 'Multiple Choice Questions added failed.',
             open: true,
           };
           setSnackBarData(data);
@@ -173,7 +187,7 @@ const MultipleChoiceQuestions = () => {
   };
 
   const closeSnackBar = () => {
-    setOpenSnackBar(false);
+    setOpenSnackBar(false); 
   };
 
   return (
@@ -212,6 +226,8 @@ const MultipleChoiceQuestions = () => {
                     fullWidth
                     onChange={(e) => handleInputChange(index, e.target.value)}
                     required
+                    error={Boolean(errors.question[index]?.statement)}
+                    helperText={errors.question[index]?.statement}
                   />
                 </Grid>
               </Grid>

@@ -79,22 +79,14 @@ const MatchingTypeQuestions = () => {
     }
   };
 
-  const shuffleOptions = (Option = question.map((q) => q.Option)) => {
-    // Fisher-Yates shuffle algorithm
-    // debugger
-    for (let i = Option.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [Option[i], Option[j]] = [Option[j], Option[i]];
-    }
-    return Option;
-  };
+
 
   const checkIsValid = (fieldName, value) => {
     switch (fieldName) {
       case 'title':
       case 'parts_a':
       case 'parts_b':
-      case 'solution':
+      // case 'solution':
         // Regex pattern for alphanumeric characters, spaces, and special characters
         const alphanumericRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+{}\[\]:;<>,.?~\\/=-]+$/;
   
@@ -155,13 +147,12 @@ const MatchingTypeQuestions = () => {
     });
   
     // Validate solution
-    checkIsValid('solution', solution);
+    // checkIsValid('solution', solution);
   
     // Check if any field is empty
     if (
       title.trim() === '' ||
-      question.some((q) => q.parts_a.trim() === '' || q.parts_b.trim() === '' || q.Option.trim() === '') ||
-      solution.trim() === ''
+      question.some((q) => q.parts_a.trim() === '' || q.parts_b.trim() === '' || q.Option.trim() === '')
     ) {
       valid = false;
     }
@@ -189,30 +180,58 @@ const MatchingTypeQuestions = () => {
   };
   
 
+  function shuffleOptions(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+  
+  function createShuffledSets(originalArray, numberOfSets) {
+    const shuffledSets = new Set();
+    
+    while (shuffledSets.size < numberOfSets) {
+      const shuffledArray = shuffleOptions([...originalArray]);
+      shuffledSets.add(shuffledArray.join(','));
+    }
+  
+    return Array.from(shuffledSets);
+  }
+  
+
   const handleSubmit = async () => {
-    debugger
     if (doValidation()) {
       const statementArray = question.map((q) => q.parts_a);
       const optionArray = question.map((q) => q.Option);
       const matchArray = question.map((q) => q.parts_b);
 
       setShowLoader(true);
+    
 
-      let options = [optionArray.join(', ')];
-      console.log(options, 'options');
-     for (let i = 0; i < 3; i++) {
-      options.push(shuffleOptions([...optionArray]).join(', '));
-      console.log(options);
-     }
-    console.log(options, "options111"); 
 
+    let originalOption = [optionArray.join(',')];
+
+    let options = createShuffledSets([...optionArray], 3);
+    // console.log(options, 'options245');
+    let combinedOptions = originalOption.concat(options);
+    // console.log(combinedOptions, 'combined options');
+    let option = shuffleOptions(combinedOptions)
+    // console.log(option, 'combinedOptions***');
+      // const ans = combinedOptions.findIndex(option => option === originalOption[0]) ;
+      //  console.log(ans, '****');
+      const indexValue  = option.findIndex((l)=>l===originalOption.join(', '));
+      //  console.log(correctAnswer)
+      let correctAnswer = indexValue+1
+  
+      
         const payload = {
         title: title,
         solution: solution,
         part_a: statementArray.join(', '),
         part_b: matchArray.join(', '),
-        options: options,
-        ans: 1,
+        options: option,
+        ans: correctAnswer,
         type:'MCQ1'
       };
 
@@ -332,9 +351,6 @@ const MatchingTypeQuestions = () => {
                 toolbarClassName="toolbar-class"
                 value={solution}
                 onChange={(e) => onChangeSolution(e)}
-                required
-                error={errors.solution !== ''}
-                helperText={errors.solution !== '' ? 'Explanation is required' : ' '}
               />
             </FormControl>
           </Grid>
