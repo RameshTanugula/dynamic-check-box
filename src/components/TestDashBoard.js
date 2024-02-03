@@ -11,6 +11,7 @@ import SnackBar from './SnackBar';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import * as XLSX from 'xlsx';
+import DraftTest from './draftTest';
 
 export default function TestDashBoard() {
     const serverUrl = securedLocalStorage.baseUrl;
@@ -19,11 +20,17 @@ export default function TestDashBoard() {
     const [showLoader, setShowLoader] = React.useState(false);
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showSreen, setShowSreen] = React.useState("Grid");
-    const [editData, setEditData] = React.useState();
-    const [buttonName, setButtonName] = React.useState("submit");
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
+    const [showKey , setShowKey] = React.useState(false)
 
+    const handleEditTestClick = (params) => {
+        
+        const id = params.row.id;
+
+        window.location.href = `/draft-test/${id}`;
+        // deleteTest(params.row);
+      };
     const sample = {
         type: "testdashboard",
         list: []
@@ -69,18 +76,35 @@ export default function TestDashBoard() {
         { field: 'no_of_questions', headerName: 'Number OF Questions', minWidth: 200, },
         { field: 'price', headerName: 'Price', minWidth: 200, },
         { field: 'created_at', headerName: 'Created Date', minWidth: 250, },
-        // {
-        //     field: 'editTest', headerName: 'Edit Test', minWidth: 150,
-        //     renderCell: (params) => (
-        //         <Button
-        //             variant="outlined"
-        //             onClick={() => editTest(params.row)}
-        //             disabled={!readAndWriteAccess}
-        //         >
-        //             Edit Test
-        //         </Button>
-        //     ),
-        // },
+        { field: 'key', headerName:'Test Key', minWidth:100,
+          renderCell: (params) => (
+            <Button
+               variant='outlined'              
+                disabled={!readAndWriteAccess}
+                onClick={() => showKeyDetails(params.row)}
+                >
+                 Key
+                 
+            </Button>
+          )},
+          {field:'is_active', headerName:'Status', minWidth:100,
+          renderCell: (params) => getStatusText(params.row.is_active)
+        },
+        {
+            field: 'editTest', headerName: 'Edit Test', minWidth: 150,
+            renderCell: (params) => (
+             
+                <Button
+                  variant="outlined"
+                  onClick={() => handleEditTestClick(params)}
+                //   disabled={params.row.is_active === 1}
+                >
+                  Edit Test
+                </Button>
+               
+            ),
+          },
+      
         {
             field: 'deleteTest', headerName: 'Delete Test', minWidth: 150,
             renderCell: (params) => (
@@ -107,29 +131,17 @@ export default function TestDashBoard() {
     });
 
 
-    // Function to handle editing test
-    // const editTest = (row) => {
-    //     setButtonName("update");
-    //     setEditData(row);
-    //     setEditTestData({
-    //         test_name: row?.test_name,
-    //         is_omr: row?.is_omr === 1,
-    //         is_online: row?.is_online === 1,
-    //         no_of_questions: row?.no_of_questions,
-    //         price: row?.price,
-    //         created_at: row?.created_at,
-    //         // Set other fields as needed
-    //     });
-
-    //     setShowSreen("Edit"); // Update this based on your UI structure
-    // };
-
-    // function editTest(row) {
-    //     // setEditData(row);
-    //     setButtonName("update");
-    //     setEditData(row);
-    // }
-
+    function getStatusText(isActive) {
+        return  isActive === 1 ? 'Active' : 'Draft'
+        //     <Button variant="outlined" color={isActive ? 'primary' : 'secondary'}>
+            
+        //   </Button>
+        
+      }
+    const showKeyDetails = (row) => {
+        setShowKey(true);
+        setShowSreen("Key");
+    };
     async function deleteTest(row) {
 
         const resp = await api(null, serverUrl + "test/delete/" + row.id, 'delete');
@@ -383,13 +395,34 @@ export default function TestDashBoard() {
                         <DataGrid
                             rows={testData}
                             columns={columns}
+                            rowsPerPageOptions={[5, 10, 25, 50, 100, { label: 'All', value: -1 }]}
                             pageSize={5}
-                            rowsPerPageOptions={[5]}
+                            // rowsPerPageOptions={[10]}
                             getRowId={(row) => row.id}
                         />
                     </div>
                 </div>
             }
+             {showSreen === "Key" &&  ( 
+                <span>
+                    <Stack style={{ float: "right", top: "110px", position: "sticky" }} direction="row" spacing={1}>
+                        <Button variant="outlined" onClick={() => setShowSreen("Grid")} >Back</Button>
+                        {/* <Button variant="outlined" onClick={() => exportToWord()} >Export as Word</Button>
+                        <Button variant="outlined" onClick={exportToExcel} >Export as Excel</Button> */}
+                    </Stack>
+                 <div style={{ marginTop:"20px" }}>
+                    <span style={{fontSize:"25px" , marginBottom:"10px"}}>TEST KEY</span>
+                    <br/>
+                   {  questionsData.map((ques , i) => (
+                    <span key={i}>
+                      <span style={{ fontWeight: "bold" }}>{i + 1}.{ques.answer || ques.ans}</span>. <br />
+                    </span>
+                   ))
+                   }
+
+                 </div>
+                </span>
+           ) }
 
             {showSreen === "Questions" &&
                 <span>
