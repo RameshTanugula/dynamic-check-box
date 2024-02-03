@@ -332,6 +332,7 @@ export default function TestCreation() {
     }
 
     function submitTestForm() {
+        console.log(scheduledDate , 'scheduledDate');
         if (valid()) {
             setShowForm(false)
         }
@@ -347,9 +348,10 @@ export default function TestCreation() {
         setIsValid(false)
     }
 
-    const addToTestHandler = async () => {
+    const addToTestHandler = async (isDraft) => {
+        // const addToTestHandler = async () => {
 
-        setShowLoader(true);
+            setShowLoader(true);
         let manualQIds = [];
         if (manualQuestions?.length > 0) {
             for (let i = 0; i < manualQuestions.length; i++) {
@@ -357,7 +359,7 @@ export default function TestCreation() {
                 console.log(data1, 'data1');
                 if (data1.status === 200) {
                     manualQIds.push(data1.data.res.insertId)
-                }
+                }   
             }
         }
         const payload = {
@@ -370,10 +372,11 @@ export default function TestCreation() {
             question_ids: selectedQuestionsList.concat(manualQIds),
             is_online: isOnline,
             is_omr: isOMR,
-            is_active: 1,
+            is_active: isDraft ? 2 : 1, // 2 for draft, 1 for active,
             created_by: 1,
             update_by: 1
         }
+        console.log(payload, 'payload');
         const data = await api(payload, serverUrl + 'add/test', 'post');
         if (data.status === 200) {
             setShowForm(true);
@@ -383,8 +386,10 @@ export default function TestCreation() {
             setManualQuestions([])
             const message = {
                 type: "success",
-                message: "Test added successfully!..."
-            }
+                message: isDraft ? "Test draft created successfully!" : "Test added successfully!..."
+                // message: "Test added successfully!..."
+            };
+    
             setSnackBarData(message);
         }
         else {
@@ -438,7 +443,7 @@ export default function TestCreation() {
             </>
         )
     }
-    const getMCQ1Questions = (row) => {
+   const getMCQ1Questions = (row) => {
         return (
             <><span>Question: {row.question}</span>
                 <br />
@@ -520,7 +525,6 @@ export default function TestCreation() {
         console.log(questionTitle, 'questionTitle');
         // Update state by removing the deleted question
           const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
-        //    console.log(isQuestionExist, 'isQuestionExist');
            if (isQuestionExist) {
 
             const updatedQuestionsList = selectedQuestionsList.filter(id => id !== questionId);
@@ -528,17 +532,12 @@ export default function TestCreation() {
             const updatedQuestionsData = selectedQuestionsData.filter(question => question.q_id !== questionId);
             setSelectedQuestionsList(updatedQuestionsList);
             setSelectedQuestionsData(updatedQuestionsData);
-            // console.log(selectedQuestionsData, 'manualSelectedQuestionsData');
         } else {
 
             // Remove manual question with matching title
             const updatedQuestionsListByTitle = selectedQuestionsList.filter(question => question.title !== questionId);
-            // console.log(updatedQuestionsListByTitle, 'updatedQuestionsListByTitle');
             const updatedQuestionsDataByTitle = selectedQuestionsData.filter(question => question.title !== questionId);
-            // console.log(updatedQuestionsDataByTitle, '***updatedQuestionsDataByTitle*****')
-
             const Questions = manualQuestions.filter((q)=>q.title !== questionId)
-
             setSelectedQuestionsList(updatedQuestionsListByTitle);
             setSelectedQuestionsData(updatedQuestionsDataByTitle);
             setManualQuestions(Questions)
@@ -570,6 +569,7 @@ export default function TestCreation() {
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={openAddNewQuestionsModal}>Add New Question</Button>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === 0} onClick={openPreviewForm} >Preview</Button>
+                            <Button variant='contained' disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={()=>addToTestHandler(true)} >Draft Test</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
                             <Badge color="secondary" badgeContent={selectedQuestionsList.length + manualQuestions.length + "/" + parseInt(testForm.numberOfQuestions)}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>

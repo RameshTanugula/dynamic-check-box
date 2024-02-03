@@ -32,7 +32,6 @@ export default function DraftTest() {
 
     // const serverUrl = `http://localhost:8080/test/`
     const serverUrl1 = securedLocalStorage.baseUrl;
-
     const serverUrl = securedLocalStorage.baseUrl + 'test/';
     const [checked, setChecked] = React.useState([]);
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
@@ -42,17 +41,11 @@ export default function DraftTest() {
     const [catagoryData, setCategoryData] = React.useState([]);
     const [result, setResult] = React.useState([]);
     // const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
-    const [scheduledDate, setScheduledDate] = React.useState(null);
-    const [isValid, setIsValid] = React.useState(false);
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [showLoader, setShowLoader] = React.useState(false);
-    const [isOnline, setIsOnline] = React.useState(false);
-    const [isOMR, setIsOMR] = React.useState(false);
-    const [testTypeError, setTestTypeError] = React.useState("");
     const [isAddNewQuestionsModalOpen, setAddNewQuestionsModalOpen] = React.useState(false);
     const [manualQuestions, setManualQuestions] = React.useState([])
-    const [preViewForm, setPreViewForm] = React.useState(false)
     const [isPreviewOpen, setPreviewOpen] = React.useState(false);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -60,31 +53,6 @@ export default function DraftTest() {
     const [draftData, setDraftData] = React.useState([]);
     const [openFormModal, setOpenFormModal] = React.useState(false);
 
-
-    // React.useEffect( () => {
-    //     const fetchData = async () => {
-
-    //     console.log('mm' , 'kk', serverUrl);
-    //         setShowLoader(true);
-    //         const data = await api(null, serverUrl + 'list/bytestid/' + id, 'get');
-    //         console.log(data.data, 'data');
-    //         if (data.status === 200) {
-    //             setSelectedQuestionsList([...data.data])
-    //             console.log(selectedQuestionsList, 'list **69');
-    //             setSelectedQuestionsData([...data.data])
-    //             console.log(selectedQuestionsData, '**70');
-    //         }
-    //         setShowLoader(false);
-    //     }
-    //         fetchData();
-       
-    // },  [id]);
-    // console.log(selectedQuestionsData, '***********selectedQ**************');
-
-    //pagination
-
-    // const emptyRows =
-    // page > 0 ? Math.max(0, (1 + page) * rowsPerPage - questionData.length) : 0;
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -246,19 +214,13 @@ export default function DraftTest() {
         React.useEffect(() => {
         async function fetchData() {
             setShowLoader(true);
-            const data = await api(null, serverUrl + 'get/data', 'get');
-            console.log(data , '**data **198');
-            
-            // setShowLoader(true);
+            const data = await api(null, serverUrl + 'get/data', 'get');            
+            setShowLoader(true);
             const catData = await api(null, serverUrl + 'get/categories', 'get');
             if (catData.status === 200) {
                 setCategoryData(catData.data);
-                console.log(catagoryData, '****216');
             }
-            // setShowLoader(true);
-            // const data1 = await api(null, serverUrl1 + 'test/list/bytestid/' + id, 'get');
-            const data1 = await api(null, serverUrl + 'list/bytestid/' + id, 'get');
-            console.log(data1.data, 'data');
+            const data1 = await api(null, serverUrl + 'list/draft/bytestid/' + id, 'get');
             setSelectedQuestionsList([])
             if (data1.status === 200) {
                 // const editTestData = data1.find((q) => q.id === id)
@@ -267,12 +229,12 @@ export default function DraftTest() {
                     
                 return d;
                 })
-                setSelectedQuestionsList([...data1.data?.map(q=>q=q.id)]);   //instead  id ...QuestionTitle
-                // setSelectedQuestionsList([...data1.data])
-                console.log(selectedQuestionsList, 'list **69');
+                setSelectedQuestionsList([...data1.data?.map(q=>q=q.id)]); 
+                // console.log(selectedQuestionsList, 'list **69');
                 setDraftData([...data1.data])
-                console.log(draftData, '**70');
-
+                console.log(draftData,'&&&&');
+                //  setSelectedQuestionsData(draftData)
+                //  console.log(selectedQuestionsData, 'hfgcf');
                
             }   
             if (data.status === 200) {
@@ -286,14 +248,24 @@ export default function DraftTest() {
         ;// Call the fetchData function
         },[]);
 
-
+        React.useEffect(() => {
+            async function getData() {
+                const catIds = prepareCatIds();
+                setShowLoader(true);
+                const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
+                if (data.status === 200) {
+                    setQuestionData(data.data?.res)
+                }
+                setShowLoader(false);
+            }
+            getData();
+        }, [checked]);
+    
 
     
     const onClickCheckBox = (id, i) => {
         console.log(id, 'id');
         const index = page * rowsPerPage + i;
-
-        console.log(index, 'index');
         // const Data = 
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
@@ -301,17 +273,14 @@ export default function DraftTest() {
                 var Index = selectedQuestionsList.findIndex(x => x === id);
                 selectedQuestionsList.splice(Index, 1);
                 setSelectedQuestionsList([...selectedQuestionsList]);
-                console.log(selectedQuestionsList, 'selectedQuestionsList1');
             }
             else {
                 if (selectedQuestionsList.length + manualQuestions.length < draftData[0]?.no_of_questions) {
                     selectedQuestionsList.push(id) //,  qData
                     const selectedQuestion = questionData.find((q) => q.q_id === id)
-                    // setSelectedQuestionsList(prevList => [...prevList, id]);
                     setSelectedQuestionsList([...selectedQuestionsList]);
                     selectedQuestionsData.push(selectedQuestion)
                     setSelectedQuestionsData(selectedQuestionsData)
-                    console.log(selectedQuestionsData, 'selectedQuestionsData');
                 }else {
                     alert(`You are able select maximum ${draftData[0].no_of_questions} questions only.`)
                 }
@@ -322,7 +291,6 @@ export default function DraftTest() {
         } else {
             setAllCheckBoxValue(!allCheckBoxValue)
             questionData.map(q => q.checked = !allCheckBoxValue)
-            console.log();
         }
         setQuestionData(questionData);
 
@@ -337,7 +305,6 @@ export default function DraftTest() {
       };
     
       const handleDateChange = (e) => {
-        console.log(CheckAccess.getDateInFormat(e),"event")
         setFormData({
           ...formData,
           scheduled_date: e !== null ? CheckAccess.getDateInFormat(e) : null,
@@ -367,15 +334,9 @@ function formatDate(date) {
   const year = date.getUTCFullYear();
   const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
   const day = date.getUTCDate().toString().padStart(2, '0');
-//   const hours = date.getUTCHours().toString().padStart(2, '0');
-//   const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-//   const seconds = date.getUTCSeconds().toString().padStart(2, '0');
 
   return `${year}-${month}-${day} 00:00:00`;
 }
-
-console.log(formattedDate);
-
     
     
     const [formData, setFormData] = React.useState({
@@ -394,27 +355,17 @@ console.log(formattedDate);
           scheduled_date: formattedDate || null,
         });
       }, [draftData]);
-      
-      console.log(formData, 'formData');
-      
-    
+               
     const addToTestHandler = async (isDraft) => {
-        // const addToTestHandler = async () => {
-
             setShowLoader(true);
 
             const resp = await api(null, serverUrl1 + "test/delete/" + id, 'delete');
-            console.log(resp, 'resp');
             if (resp.status === 200) {
-
-                
-
 
         let manualQIds = [];
         if (manualQuestions?.length > 0) {
             for (let i = 0; i < manualQuestions.length; i++) {
                 const data1 = await api(manualQuestions[i], securedLocalStorage.baseUrl + 'question/' + 'create/questions/mcq', 'post');
-                console.log(data1, 'data1');
                 if (data1.status === 200) {
                     manualQIds.push(data1.data.res.insertId)
                 }   
@@ -430,12 +381,10 @@ console.log(formattedDate);
             is_online: draftData[0].is_online === 1 ? true : false,
             is_omr: draftData[0].is_omr === 1 ? true : false,
             is_active: isDraft ? 2 : 1, // 2 for draft, 1 for active,
-            is_active: 1,
             created_by: 1,
             update_by: 1
         }
         console.log(payload, 'payload***355');
-      
         const data = await api(payload, serverUrl + 'add/test', 'post');
         if (data.status === 200) {
             setSelectedQuestionsList([]);
@@ -567,11 +516,13 @@ console.log(formattedDate);
 
     const openPreviewForm = () => {
         if (selectedQuestionsList.length + manualQuestions.length > 0) {
-            // const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id ));
-            console.log(manualQuestions, draftData, '**473');
+            const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id ));
+            console.log(manualQuestions, draftData,selectedQData, '**473');
             // console.log(selectedQData, 'selectedQData');
-            setSelectedQuestionsData(draftData.concat(manualQuestions, selectedQuestionsData));
-            console.log(selectedQuestionsData, 'setSelectedQuestionsData');
+            // setSelectedQuestionsData(draftData.concat(manualQuestions, selectedQuestionsData));
+            // setSelectedQuestionsData(selectedQuestionsData.concat( manualQuestions, draftData));
+            setSelectedQuestionsData(selectedQData.concat( manualQuestions));
+            console.log(selectedQuestionsData ,"iuhgyhvb");
             setPreviewOpen(true);
         } else {
             console.error("selectedQuestionsList is empty.");
@@ -580,9 +531,6 @@ console.log(formattedDate);
 
 
     const handleDeleteQuestion = (questionId, questionTitle) => {
-        console.log(questionId, 'questionId');
-        console.log(questionTitle, 'questionTitle');
-        // Update state by removing the deleted question
           const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
            console.log(isQuestionExist, 'isQuestionExist', selectedQuestionsList , typeof(selectedQuestionsList[0]));
 
@@ -594,7 +542,6 @@ console.log(formattedDate);
             setSelectedQuestionsList([...updatedQuestionsList]);
             setSelectedQuestionsData([...updatedQuestionsData]);
         } else {
-
             // Remove manual question with matching title
             const updatedQuestionsListByTitle = selectedQuestionsList.filter(question => question.title !== questionId);
             const updatedQuestionsDataByTitle = selectedQuestionsData.filter(question => question.title !== questionId);

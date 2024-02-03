@@ -3,17 +3,10 @@ import React from 'react';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const DraftPreview = ({ selectedQuestionsList, onDelete, onClose }) => {
-//  console.log(selectedQuestionsList ,'selectedQuestionsData');
-
-//  if (!Array.isArray(selectedQuestionsData)) {
-//   console.error('selectedQuestionsList is not an array:', selectedQuestionsData);
-//   return null;
-// }
 console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
-
+console.log(selectedQuestionsList[1].QUrls, '*******selectedQuestionsList(*******')
   const handleDelete = (id) => {
     console.log('Delete button clicked for questionId:', id);
-    // Call the onDelete function to remove the question from selectedQuestionsList
     onDelete(id);
   };
 
@@ -33,6 +26,8 @@ console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
           </TableHead>
           <TableBody>
           {selectedQuestionsList.map((question, index , id) => (
+            console.log(question.QUrls ,'QUrl'),
+            // console.log(question.);
     <TableRow key={index}>
     <TableCell>{question.q_id?question.q_id:index+1 }</TableCell>
     {/* <TableCell>{question.question || question.title || question.QuestionTitle}</TableCell> */}
@@ -42,13 +37,14 @@ console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
       {(question.question || question.QuestionTitle) && (
         <>
           {(question.question || question.QuestionTitle)}
-          {question.type !== '' && question.part_a && question.part_b && (
+          {question.type !== "" && question.part_a && question.part_b && (
             <div>
               <span className='mcq1-left'>PART A</span>
               {question.type !== 'MCQ2' && <span className='mcq1-left'>PART B</span>}
             </div>
           )}
-          {question.type === 'IMG' && question.QUrls && (
+           {question.type === 'IMG' &&question.answer === ""&& question.QUrls && (
+            <div>
             <img
               style={{
                 height: '10rem',
@@ -57,8 +53,9 @@ console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
               src={question.QUrls}
               alt="Question Image"
             />
+            </div>
           )}
-          {question.type !== '' && question.part_a &&
+          {question.type !== "" && question.part_a &&
             question.part_b &&
             question.part_a?.split(',').map((a, i) => (
               <div key={i}>
@@ -109,44 +106,6 @@ console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
       </>
     ))}
 </TableCell>
-
-  {/* <TableCell>
-  {question.question || (
-    <>
-      {question.title && (
-        <>
-          {question.title}
-          {question.part_b ? (
-            <>
-              {question.part_a?.split(',').map((a, i) => (
-                <div key={i}>
-                  <br />
-                  <div style={{ width: "100%" }}>
-                    <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
-                    {question.part_b?.split(',')[i] && (
-                      <span className='mcq1-right'>&nbsp;&nbsp;&nbsp;&nbsp;{i + 1}. {question.part_b?.split(',')[i]}</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <span className='mcq1-left'>
-              {question.part_a?.split(',').map((a, i) => (
-                <div key={i}>
-                  <br />
-                  <div style={{ width: "100%" }}>
-                    <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
-                  </div>
-                </div>
-              )) || ''}
-            </span>
-          )}
-        </>
-      )}
-    </>
-  )}
-</TableCell> */}
     <TableCell>{question.answer || question.ans}</TableCell>
     <TableCell>
       <Button

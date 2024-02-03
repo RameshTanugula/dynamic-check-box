@@ -51,6 +51,7 @@ import TestDashBoard from './components/TestDashBoard';
 import Syllabus from './components/Syllabus';
 import BitbankSetCreation from './components/BitBankSetCreation';
 import AddQuestions from './components/AddQuestion';
+import DraftTest from './components/draftTest';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -253,6 +254,7 @@ export default function App() {
                 <Route exact path="/Test Dashboard" element={<TestDashBoard />} />
                 <Route exact path="/Syllabus" element={<Syllabus />} />
                 <Route exact path="/Add Questions" element={<AddQuestions />}/>
+                <Route  exact path="/draft-test/:id"  element={<DraftTest />} />                  
               </Routes>
             </Main>
           </BrowserRouter>
