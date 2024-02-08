@@ -110,6 +110,9 @@ export default function CeateCourse() {
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
     const [showTestType, setShowTestType] = React.useState(false);
     const [currentRole, setCurrentRole] = React.useState("");
+
+    const [testScheduledDate, setTestScheduledDate] = React.useState(null); // Step 1
+
     const topicTypesList = [
         { id: 1, type: "PDF" },
         { id: 2, type: "Learning Card" },
@@ -203,10 +206,11 @@ export default function CeateCourse() {
         if (e.target.name === "topicType") {
             setmultiSelectList([]);
             if (newData.topicType === 4) {
-                console.log("hi")
+                // console.log(newData,"hi")
                 newData.topicName = null;
                 setShowTestType(true);
                 getTopicssList(newData);
+                // console.log(topicTypesList, 'topic list');
             }
             else {
                 setmultiSelectList([]);
@@ -326,6 +330,7 @@ export default function CeateCourse() {
         }
         setCourseSection([...courseSection])
     }
+    
 
     function AddSubjectData(i, j, k) {
         var data = ""
@@ -341,15 +346,27 @@ export default function CeateCourse() {
                     }
                 })
             });
+
+            console.log(parseInt(data.slice(0, -1), 10),"Data");
+            // console.log(testScheduledDate,"testScheduledDate");
+            const testIdVal = parseInt(data.slice(0, -1), 10);
+            const scheduleNewDate = testScheduledDate.filter((item) => {
+               return item.id == testIdVal
+            });
+
+            // console.log(scheduleNewDate, '**372scheduleNewDate');
+            // console.log(scheduleNewDate[0].scheduled_date,testIdVal,"scheduleNewDate")
             const obj = {
                 id: courseSection[i].subjects[j].topics[k].tapicData.length,
                 topicName: selctForm.topicName,
                 topicType: selctForm.topicType,
                 testType: selctForm.tesType,
+                scheduled_date : scheduleNewDate[0].scheduled_date,
                 selectedData: data,
                 selectedDataShow: showList,
                 url: urls,
             }
+            console.log(obj , 'objNew');
             courseSection[i].subjects[j].topics[k].tapicData = [...courseSection[i].subjects[j].topics[k].tapicData, obj]
             setCourseSection([...courseSection]);
             rsetSelectForm();
@@ -566,6 +583,7 @@ export default function CeateCourse() {
         }
         const url = serverUrl + "add/update";
         const resp = await api(obj, url, 'post');
+        console.log(resp , 'obj579');
         if (resp.status === 200) {
             setShowSreen("Grid");
             setOpenSnackBar(true);
@@ -617,6 +635,8 @@ export default function CeateCourse() {
         if (resp.status === 200) {
             setmultiSelectList(resp.data);
             setSelectedList([]);
+            setTestScheduledDate(resp.data)
+            // console.log(testScheduledDate, 'date');
         }
     }
 
@@ -802,7 +822,7 @@ export default function CeateCourse() {
 
                                 />
                             </LocalizationProvider>
-                            {publishedDateError !== "" ? <span style={{ color: "#d32f2f" }}> Publishe Date is reuired </span> : ""}
+                            {publishedDateError !== "" ? <span style={{ color: "#d32f2f" }}> Publishe Date is required </span> : ""}
                         </Grid>
                         <Grid item xs={2} ></Grid>
                         <Grid item xs={1} ></Grid>
@@ -940,7 +960,7 @@ export default function CeateCourse() {
                 {(showSreen === "Edit") &&
                     <div>
                         <Stack spacing={2} direction="row" >
-                            <Button variant="contained" onClick={() => setShowSreen("Grid")} style={{ marginLeft: "20px" }}>Bakck</Button>
+                            <Button variant="contained" onClick={() => setShowSreen("Grid")} style={{ marginLeft: "20px" }}>Back</Button>
                             <Button variant="contained" onClick={() => saveData()} >Save</Button>
                         </Stack>
                         {courseSection?.map((data, i) => (
