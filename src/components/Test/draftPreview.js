@@ -3,8 +3,8 @@ import React from 'react';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const DraftPreview = ({ selectedQuestionsList, onDelete, onClose }) => {
-console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
-console.log(selectedQuestionsList[1].QUrls, '*******selectedQuestionsList(*******')
+// console.log(selectedQuestionsList, '*******selectedQuestionsList(*******')
+// console.log(selectedQuestionsList[1].QUrls, '*******selectedQuestionsList(*******')
   const handleDelete = (id) => {
     console.log('Delete button clicked for questionId:', id);
     onDelete(id);
@@ -26,12 +26,10 @@ console.log(selectedQuestionsList[1].QUrls, '*******selectedQuestionsList(******
           </TableHead>
           <TableBody>
           {selectedQuestionsList.map((question, index , id) => (
-            console.log(question.QUrls ,'QUrl'),
-            // console.log(question.);
     <TableRow key={index}>
     <TableCell>{question.q_id?question.q_id:index+1 }</TableCell>
     {/* <TableCell>{question.question || question.title || question.QuestionTitle}</TableCell> */}
-    <TableCell>
+    {/* <TableCell>
   {(question.question || question.QuestionTitle) && (
     <>
       {(question.question || question.QuestionTitle) && (
@@ -105,7 +103,85 @@ console.log(selectedQuestionsList[1].QUrls, '*******selectedQuestionsList(******
         )}
       </>
     ))}
-</TableCell>
+</TableCell> */}
+   <TableCell>
+   {(question.type === 'IMG' && question.QUrls) ? (
+  <div>
+    {(question.question || question.QuestionTitle)}
+    <img
+      style={{
+        height: '10rem',
+        width: 'auto',
+      }}
+      src={question.QUrls}
+      alt="Question Image"
+    />
+  </div>
+) : (
+  <>
+    {(question.question || question.QuestionTitle) && (
+      <>
+        {(question.question || question.QuestionTitle)}
+        {question.type !== "" && question.part_a && question.part_b && (
+          <div>
+            <span className='mcq1-left'>PART A</span>
+            {question.type !== 'MCQ2' && <span className='mcq1-left'>PART B</span>}
+          </div>
+        )}
+           
+        {question.type !== "" && question.part_a &&
+          question.part_b &&
+          question.part_a?.split(',').map((a, i) => (
+            <div key={i}>
+              <br />
+              <div style={{ width: '100%' }}>
+                {question.type !== 'MCQ2' ? (
+                  <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+                ) : (
+                  <span>{String.fromCharCode(65 + i)}.{a}</span>
+                )}
+                {question.type !== 'MCQ2' && (
+                  <span className='mcq1-right'>&nbsp;&nbsp;&nbsp;&nbsp;{i + 1}. {question.part_b?.split(',')[i]}</span>
+                )}
+              </div>
+            </div>
+          ))}
+      </>
+    )}
+
+    {question.title && (
+      <>
+        {question.title}
+        {question.part_b ? (
+          <>
+            {question.part_a?.split(',').map((a, i) => (
+              <div key={i}>
+                <br />
+                <div style={{ width: '100%' }}>
+                  <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+                  {question.part_b?.split(',')[i] && (
+                    <span className='mcq1-right'>&nbsp;&nbsp;&nbsp;&nbsp;{i + 1}. {question.part_b?.split(',')[i]}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <span className='mcq1-left'>{question.part_a?.split(',').map((a, i) => (
+            <div key={i}>
+              <br />
+              <div style={{ width: '100%' }}>
+                <span className='mcq1-left'>{String.fromCharCode(65 + i)}.{a}</span>
+              </div>
+            </div>
+          )) || ''}</span>
+        )}
+      </>
+    )}
+  </>
+)}
+
+   </TableCell>
     <TableCell>{question.answer || question.ans}</TableCell>
     <TableCell>
       <Button
@@ -114,11 +190,10 @@ console.log(selectedQuestionsList[1].QUrls, '*******selectedQuestionsList(******
         onClick={() => handleDelete(question.q_id ? question.q_id : question.title || question.QuestionTitle)}
       >
         Delete
-      </Button>
-    </TableCell>
-  </TableRow>
-))}
-
+         </Button>
+        </TableCell>
+        </TableRow>
+         ))}
           </TableBody>
         </Table>
       </TableContainer>

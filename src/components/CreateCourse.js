@@ -37,6 +37,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import SnackBar from './SnackBar';
 import * as securedLocalStorage from "./SecureLocalaStorage";
 import * as CheckAccess from "./CheckAccess";
+import { Autocomplete } from '@mui/material';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 0;
@@ -665,6 +666,18 @@ export default function CeateCourse() {
         setCurrentRole(CheckAccess.getRole());
     }, []);
 
+    // search test by name
+    const [searchText, setSearchText] = React.useState('');
+    const [searchActive, setSearchActive] = React.useState(false);
+
+    const handleSearchFocus = () => {
+        setSearchActive(true);
+    };
+
+    const filteredList = multiSelectList.filter(data => data.title.toLowerCase().includes(searchText.toLowerCase()));
+
+
+
     return (
         <div>
             <span>
@@ -1079,27 +1092,22 @@ export default function CeateCourse() {
                                                                                                 </FormControl>
                                                                                             }
                                                                                             <FormControl sx={{ width: 490 }}>
-                                                                                                <InputLabel id="demo-multiple-checkbox-label">Topic Select</InputLabel>
-                                                                                                <Select
-                                                                                                    labelId="demo-multiple-checkbox-label"
-                                                                                                    id="demo-multiple-checkbox"
-                                                                                                    multiple
-                                                                                                    name="selectedData"
-                                                                                                    value={selectedList}
-                                                                                                    onChange={(e) => handleChangeSelectData(e)}
-                                                                                                    label="selectedData"
-                                                                                                    renderValue={(selected) => selected.join(', ')}
-                                                                                                    MenuProps={MenuProps}
-                                                                                                    disabled={!readAndWriteAccess}
-                                                                                                >
-                                                                                                    {multiSelectList.map((data) => (
-                                                                                                        <MenuItem key={data.id} value={data.id}>
-                                                                                                            <Checkbox checked={selectedList.indexOf(data.id) > -1} />
-                                                                                                            <ListItemText primary={data.title} />
-                                                                                                        </MenuItem>
-                                                                                                    ))}
-                                                                                                </Select>
-                                                                                                <FormHelperText>Please select Subject Name and Type</FormHelperText>
+                                                                                                {/* <InputLabel id="demo-multiple-checkbox-label">Topic Select</InputLabel> */}
+                                                                                                <Autocomplete
+                                                                                                 sx={{ width: '85%' }}
+                                                                                                  disablePortal
+                                                                                                  id="combo-box-demo"
+                                                                                                 options={multiSelectList} 
+                                                                                                 onChange={(event, newValue) => {
+                                                                                                    setSelectedList(newValue.map(option => option.id)); 
+                                                                                                    }}
+                                                                                                 value={multiSelectList.filter(option => selectedList.includes(option.id))} 
+                                                                                                 getOptionLabel={(option) => option.title} 
+                                                                                                 renderInput={(params) => <TextField {...params} label="Topic Select" />}
+                                                                                                 disabled={!readAndWriteAccess}
+                                                                                                  multiple
+                                                                                                />
+                                                                                              <FormHelperText>Please select Subject Name and Type</FormHelperText>
                                                                                             </FormControl>
                                                                                             <br />
 
