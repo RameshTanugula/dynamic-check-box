@@ -171,15 +171,13 @@ console.log(originalArray.length, 'ori', originalArray)
 
 function pickRandomItems(array, count, subsetSize) {
   const result = [];
-  const shuffledArray = array.slice(0, subsetSize); // Create a copy of the subset
+  const shuffledArray = array.slice(0, subsetSize); 
 
-  // Shuffle the subset array (Fisher-Yates algorithm)
   for (let i = shuffledArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
   }
 
-  // Pick the first 'count' items from the shuffled subset
   for (let i = 0; i < count; i++) {
     result.push(shuffledArray[i]);
   }
@@ -194,41 +192,59 @@ function shuffleArray(array) {
   return array;
 }
 
+const getOptionsAsStatement = (arr) =>{
+  const list = arr.map((ele) => {
+    const optionArr = ele.split(',');
+    let trueOptions = [];
+    let falseOptions =[];
+   optionArr.map((newVal , index) => {
+    if (newVal.trim() == 'true') {
+      trueOptions.push(String.fromCharCode(65 + index))   
+      return trueOptions;
+    }else{
+      falseOptions.push(String.fromCharCode(65+index))
+      return falseOptions;
+    }
+  })
+    const trueStatement = trueOptions.length > 0 ? `Statement ${trueOptions.length > 0 ? trueOptions.join(',') : trueOptions[0]} true`:'';
+    const falseStatement = falseOptions.length > 0 ? `Statement ${falseOptions.length > 0 ? falseOptions.join(',') : falseOptions[0]} false` : '';
+    
+    return `${trueStatement}${ trueStatement && falseStatement ? ',' :''}${falseStatement}`.trim();
+
+  });
+  return list
+};
+
   const handleSubmit =  () => {
-    const optionArray = questions.map((q) => q.isTrueFalse);
+
     const statementArray = questions.map((q) => q.statement);
-    let options = [optionArray.join(', ')];
+
     const optionsArray = questions.map((q) => q.isTrueFalse);
-    console.log(optionsArray, 'optionsArray**');
+    // console.log(optionsArray, 'optionsArray**');
           let originalOption = [optionsArray.join(', ')];
-     console.log(originalOption, 'originalOption');
+    //  console.log(originalOption, 'originalOption');
     let list
     if (optionsArray.length === 2) {      
      list = generateOptions(shuffledSets_2, optionsArray.join(', '));
-    //  console.log(list, 'list');
     }else if(optionsArray.length === 3){
     list = generateOptions(shuffledSets_3, optionsArray.join(', '));
-    // console.log(list, 'list');
   }else if(optionsArray.length === 4){
      list = generateOptions(shuffledSets_4, optionsArray.join(', '));
-    // console.log(list, 'list');
   }
-      //  const list = generateOptions(shuffledSets_3, optionsArray.join(', '));
-      //  console.log(list)
+ 
+   const optionsList = getOptionsAsStatement(list)
+  //  console.log(optionsList, 'optionsList**239');
+
        const indexValue  = list.findIndex((l)=>l===optionsArray.join(', '));
        const correctAnswer = indexValue + 1;
-       console.log(correctAnswer)
-      // let indexValue
-      //  if (correctAnswer !== -1) {
-      //    indexValue = list[correctAnswer];
-      //   console.log(indexValue);
-      // }
+      //  console.log(correctAnswer)
+
 
     const payload = {
       title: title,
       solution: solution,
       part_a: statementArray.join(', '),
-      options: list,
+      options: optionsList,
       ans: correctAnswer,
       type: 'MCQ2'
     };

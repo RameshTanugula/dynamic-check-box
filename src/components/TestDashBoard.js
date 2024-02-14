@@ -23,7 +23,16 @@ export default function TestDashBoard() {
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
     const [showKey , setShowKey] = React.useState(false)
+    const [page, setPage] = React.useState(0);
+    const [pageSize, setPageSize] = React.useState(5);
 
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+    };
     const handleEditTestClick = (params) => {
         
         const id = params.row.id;
@@ -119,16 +128,6 @@ export default function TestDashBoard() {
         },
     ];
 
-
-    const [editTestData, setEditTestData] = React.useState({
-        test_name: "",
-        is_omr: false,
-        is_online: false,
-        no_of_questions: 0,
-        price: 0,
-        created_at: "",
-        // Add other fields as needed
-    });
 
 
     function getStatusText(isActive) {
@@ -290,35 +289,35 @@ export default function TestDashBoard() {
         const url = serverUrl + "test/list/bytestid/" + row.id;
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
-            const updatedQuestions = resp.data.map(item => {
-                if (item.type === "MCQ2") {
-                    const newOptions = getOptionsAsStatement([item.Option1, item.Option2, item.Option3, item.Option4]);
-                    return {
-                        ...item,
-                        Option1: newOptions[0],
-                        Option2: newOptions[1],
-                        Option3: newOptions[2],
-                        Option4: newOptions[3],
-                    };
-                } else if(item.type === "MCQ1")  {
+            // const updatedQuestions = resp.data.map(item => {
+            //     if (item.type === "MCQ2") {
+            //         const newOptions = getOptionsAsStatement([item.Option1, item.Option2, item.Option3, item.Option4]);
+            //         return {
+            //             ...item,
+            //             Option1: newOptions[0],
+            //             Option2: newOptions[1],
+            //             Option3: newOptions[2],
+            //             Option4: newOptions[3],
+            //         };
+            //     } else if(item.type === "MCQ1")  {
                 
-                        const newOptions = getOptionsAsStatementMCQ1([item.Option1, item.Option2, item.Option3, item.Option4]);
-                        return {
-                            ...item,
-                            Option1: newOptions[0],
-                            Option2: newOptions[1],
-                            Option3: newOptions[2],
-                            Option4: newOptions[3],
-                        };
-                }
-                else {
-                    return {
-                        ...item
-                    };
-                }
-            });
+            //             const newOptions = getOptionsAsStatementMCQ1([item.Option1, item.Option2, item.Option3, item.Option4]);
+            //             return {
+            //                 ...item,
+            //                 Option1: newOptions[0],
+            //                 Option2: newOptions[1],
+            //                 Option3: newOptions[2],
+            //                 Option4: newOptions[3],
+            //             };
+            //     }
+            //     else {
+            //         return {
+            //             ...item
+            //         };
+            //     }
+            // });
 
-            setQuestionsData(updatedQuestions);
+            setQuestionsData(resp.data);
             setShowLoader(false);
             setShowSreen("Questions");
             console.log(questionsData, "questionsData")
@@ -326,44 +325,44 @@ export default function TestDashBoard() {
     }
 
 
-    const getOptionsAsStatement = (arr) => {
-        const list = arr.map((ele) => {
-            const optionarr = ele.split(",");
-            let trueOptions = [];
-            let falseOptions = [];
-            optionarr.map((newVal, index) => {
-                if (newVal.trim() == 'true') {
-                    trueOptions.push(String.fromCharCode(65 + index));
-                    return trueOptions;
-                }
-                else {
-                    falseOptions.push(String.fromCharCode(65 + index));
-                    return falseOptions;
-                }
-            });
-            // console.log(trueOptions, "trueOptions");
-            // console.log(falseOptions, "falseOptions");
-            const trueStatement = trueOptions.length > 0
-                ? `Statement ${trueOptions.length > 1 ? trueOptions.join(' & ') : trueOptions[0]} true`
-                : '';
-            const falseStatement = falseOptions.length > 0
-                ? `Statement ${falseOptions.length > 1 ? falseOptions.join(' & ') : falseOptions[0]} false`
-                : '';
+    // const getOptionsAsStatement = (arr) => {
+    //     const list = arr.map((ele) => {
+    //         const optionarr = ele.split(",");
+    //         let trueOptions = [];
+    //         let falseOptions = [];
+    //         optionarr.map((newVal, index) => {
+    //             if (newVal.trim() == 'true') {
+    //                 trueOptions.push(String.fromCharCode(65 + index));
+    //                 return trueOptions;
+    //             }
+    //             else {
+    //                 falseOptions.push(String.fromCharCode(65 + index));
+    //                 return falseOptions;
+    //             }
+    //         });
+    //         // console.log(trueOptions, "trueOptions");
+    //         // console.log(falseOptions, "falseOptions");
+    //         const trueStatement = trueOptions.length > 0
+    //             ? `Statement ${trueOptions.length > 1 ? trueOptions.join(' & ') : trueOptions[0]} true`
+    //             : '';
+    //         const falseStatement = falseOptions.length > 0
+    //             ? `Statement ${falseOptions.length > 1 ? falseOptions.join(' & ') : falseOptions[0]} false`
+    //             : '';
 
-                return `${trueStatement}${trueStatement && falseStatement ? ', ' : ''}${falseStatement}`.trim();
+    //             return `${trueStatement}${trueStatement && falseStatement ? ', ' : ''}${falseStatement}`.trim();
 
 
-        });
-        return list;
-    }
+    //     });
+    //     return list;
+    // }
 
-    const getOptionsAsStatementMCQ1 = (arr) => {
-        return arr.map((ele) => {
-            const optionArr = ele.split(",");
-            const formattedOptions = optionArr.map((option, index) => `${String.fromCharCode(65 + index)}${option.trim()}`);
-            return formattedOptions.join(', ');
-        });
-    }
+    // const getOptionsAsStatementMCQ1 = (arr) => {
+    //     return arr.map((ele) => {
+    //         const optionArr = ele.split(",");
+    //         const formattedOptions = optionArr.map((option, index) => `${String.fromCharCode(65 + index)}${option.trim()}`);
+    //         return formattedOptions.join(', ');
+    //     });
+    // }
 
 
 
@@ -395,10 +394,17 @@ export default function TestDashBoard() {
                         <DataGrid
                             rows={testData}
                             columns={columns}
-                            rowsPerPageOptions={[5, 10, 25, 50, 100, { label: 'All', value: -1 }]}
-                            pageSize={5}
+                            rowsPerPageOptions={[5, 10, 25, 50, 100]} // { label: 'All', value: -1 }
+                            pageSize={pageSize}
+                            pagination
+                            page={page}
                             // rowsPerPageOptions={[10]}
+                            // getRowId={(row) => row.id}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                            rowCount={testData.length}
                             getRowId={(row) => row.id}
+
                         />
                     </div>
                 </div>

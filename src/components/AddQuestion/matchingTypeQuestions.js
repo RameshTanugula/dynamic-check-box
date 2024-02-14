@@ -198,6 +198,14 @@ const MatchingTypeQuestions = () => {
   
     return Array.from(shuffledSets);
   }
+
+  const getOptionsAsStatementMCQ1 = (arr) => {
+    return arr.map((ele) => {
+        const optionArr = ele.split(",");
+        const formattedOptions = optionArr.map((option, index) => `${String.fromCharCode(65 + index)}${option.trim()}`);
+        return formattedOptions.join(', ');
+    });
+}
   
 
   const handleSubmit = async () => {
@@ -208,20 +216,19 @@ const MatchingTypeQuestions = () => {
 
       setShowLoader(true);
     
-
+console.log(optionArray , 'optionArray***211');
 
     let originalOption = [optionArray.join(',')];
+    // console.log(originalOption , 'originalOption***214');
 
     let options = createShuffledSets([...optionArray], 3);
-    // console.log(options, 'options245');
     let combinedOptions = originalOption.concat(options);
-    // console.log(combinedOptions, 'combined options');
     let option = shuffleOptions(combinedOptions)
-    // console.log(option, 'combinedOptions***');
-      // const ans = combinedOptions.findIndex(option => option === originalOption[0]) ;
-      //  console.log(ans, '****');
+
+    let optionsList = getOptionsAsStatementMCQ1(option)
+    // console.log(optionsList, 'optionsList**229');
+
       const indexValue  = option.findIndex((l)=>l===originalOption.join(', '));
-      //  console.log(correctAnswer)
       let correctAnswer = indexValue+1
   
       
@@ -230,11 +237,11 @@ const MatchingTypeQuestions = () => {
         solution: solution,
         part_a: statementArray.join(', '),
         part_b: matchArray.join(', '),
-        options: option,
+        options: optionsList,
         ans: correctAnswer,
         type:'MCQ1'
       };
-
+    // console.log(payload.options, 'oppppp');
       const resp = await api(payload, serverUrl + 'question/create/questions/mcq', 'post');
       setShowLoader(false);
 
@@ -324,10 +331,13 @@ const MatchingTypeQuestions = () => {
                 <Grid item xs={2} sm={2} lg={2}>
                   <InputLabel>Correct</InputLabel>
                   <TextField
+                    type='number'
                     value={Option}
                     onChange={(e) => handleStatementChange(id, e.target.value, 'Option')}
                     placeholder="Option"
                     required={true}
+                    min={1}
+                    max={4}
                     // error={errors.Option !== ''}
                     // helperText={errors.Option !== '' ? 'Option is required' : ' '}
                   />

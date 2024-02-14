@@ -373,7 +373,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option1?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{o}</span><br />
                                                 </>
                                             )
                                         }) : row.Option1}
@@ -382,7 +382,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option2?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{o}</span><br />
                                                 </>
                                             )
                                         }) : row.Option2}
@@ -391,7 +391,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option3?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{o}</span><br />
                                                 </>
                                             )
                                         }) : row.Option3}
@@ -400,7 +400,7 @@ export default function Questions() {
                                         {row.type === 'MCQ1' ? row.Option4?.split(',')?.map((o, i) => {
                                             return (
                                                 <>
-                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{parseInt(o)}</span><br />
+                                                    <span>{String.fromCharCode(65 + i)}</span>-<span>{o}</span><br />
                                                 </>
                                             )
                                         }) : row.Option4}

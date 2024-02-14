@@ -158,6 +158,16 @@ const MatchingTypeQuestions = ({onUpdate, onClose}) => {
   
     return Array.from(shuffledSets);
   }
+
+  const getOptionsAsStatementMCQ1 = (arr) => {
+    return arr.map((ele) => {
+        const optionArr = ele.split(",");
+        const formattedOptions = optionArr.map((option, index) => `${String.fromCharCode(65 + index)}${option.trim()}`);
+        return formattedOptions.join(', ');
+    });
+}
+
+
   const handleSubmit = async () => {
     if (doValidation()) {
       const statementArray = question.map((q) => q.parts_a);
@@ -173,14 +183,15 @@ const MatchingTypeQuestions = ({onUpdate, onClose}) => {
    let correctAnswer  = indexValue+1
    //  console.log(correctAnswer)
    
-
+   let optionsList = getOptionsAsStatementMCQ1(option)
+  //  console.log(optionsList, 'optionsList**229');
 
       const payload = {
         title: title,
         solution: solution,
         part_a: statementArray.join(', '),
         part_b: matchArray.join(', '),
-        options: option,
+        options: optionsList,
         ans: correctAnswer,
         type:'MCQ1'
       };
@@ -255,6 +266,9 @@ const MatchingTypeQuestions = ({onUpdate, onClose}) => {
                     required={true}
                     error={errors.Option !== ''}
                     helperText={errors.Option !== '' ? 'Option is required' : ' '}
+                    type='number'
+                    min={1}
+                    max={4}
                   />
                 </Grid>
               </Grid>
