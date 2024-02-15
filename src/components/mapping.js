@@ -12,10 +12,11 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import EditQuestionDialog from './Map/editQuestionDialog';
 
 export default function Mapping() {
-  // const serverUrl = `http://localhost:8080/`
-  const serverUrl = securedLocalStorage.baseUrl;
+  const serverUrl = `http://localhost:8080/`
+  // const serverUrl = securedLocalStorage.baseUrl;
   const [checked, setChecked] = useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
   const [questionData, setQuestionData] = useState([]);
@@ -33,7 +34,17 @@ export default function Mapping() {
   const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
 
+  const handleEditClick = (question) => {
+    setSelectedQuestion(question);
+    setOpenEditDialog(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setOpenEditDialog(false);
+  };
 
 //pagination
 
@@ -215,6 +226,7 @@ function TablePaginationActions(props) {
     if (from && to) {
       setLoading(true);
       const data = await api(null, serverUrl + 'get/data/' + type + '/' + selectedUser + '/' + from + '/' + to, 'get');
+      console.log(data,'data from to ***');
       if (data.status === 200) {
         setQuestionData(data.data.res);
         setFrom("");
@@ -396,12 +408,15 @@ function TablePaginationActions(props) {
 
   const applyTagsToQset = async () => {
     let selectedQuestions = [];
+    console.log(selectedQuestions, '***404');
+
     questionData.map((q) => {
       if ((q.q_id >= from) && (q.q_id <= to)) {
         selectedQuestions.push(q.q_id);
       }
       return q;
     })
+
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
       // const catIds = generateCategoryIds(checked);
       const catIds = getExpandedKeys();
@@ -435,6 +450,7 @@ function TablePaginationActions(props) {
   //       }
   //     }
   //   }
+
   const onChangeUser = async (user) => {
     setSelectedUser(user);
     setQuestionData([])
@@ -457,6 +473,25 @@ function TablePaginationActions(props) {
       setUser(user.data.res);
     }
   }
+
+  const handleSave = async(updatedQuestionData) => {
+    const { q_id, ...updatedData } = updatedQuestionData;
+
+    const newData = updatedQuestionData
+    console.log(newData, 'newData');
+    console.log(updatedQuestionData, 'updatedQuestionData');
+          const data = await api(updatedData, serverUrl + 'update/data/' + type + '/' + selectedUser + '/' + q_id, 'put');
+
+          // const response = await api.put(`/update/data/questions/${userId}/${q_id}`, updatedData);
+              console.log(data, ' data**483');
+          if (data.status === 200) {
+            setOpenEditDialog(false);
+            console.log('Question updated successfully');
+          } else {
+            console.error('Failed to update question:', data.data.error);
+          }    
+    console.log('Updated question data:', updatedQuestionData);
+  };
   return (
     <>
       {/* {loading && <Loader />} */}
@@ -519,27 +554,7 @@ function TablePaginationActions(props) {
         value={to}
         onChange={(e) => setTo(e.target.value)}
       />&nbsp;&nbsp;
-          {/* <span>
-            <select disabled={!readAndWriteAccess} onChange={(e) => onChangeType(e.target.value)}>
-            {contentTypeList.map((c, i) => {
-              return (
-                <option key={i} value={c.value}>{c.label}</option>
-              )
-            })}
-          </select>
-          </span>
-          &nbsp;&nbsp;<span><select disabled={!readAndWriteAccess} value={selectedUser} onChange={(e) => onChangeUser(e.target.value)}>
-            <option value={""}>Select User</option>
-            {user && user?.map((u, i) => {
-              return (
-                <option key={i} value={u.user}>{u.user}</option>
-              )
-            })}
-          </select>
-          </span>
-          <span><input disabled={!readAndWriteAccess} type="checkbox" checked={isRange} onClick={() => onChangeRange()} /> Select Range</span>
-          {/* <span>Questions:<input type="checkbox" checked={type==="questions"} onClick={()=>setType("questions")}/>
-           BitBank:<input type="checkbox" checked={type==="bitbank"} onClick={()=>setType("bitbank")}/> </span> */}
+         
 
           {/* &nbsp;&nbsp;&nbsp;&nbsp;<input disabled={!readAndWriteAccess} placeholder='From:' type="text" value={from} onChange={(e) => setFrom(e.target.value)} />
           &nbsp;&nbsp;<input disabled={!readAndWriteAccess} type="text" placeholder='To:' value={to} onChange={(e) => setTo(e.target.value)} /> */}
@@ -550,48 +565,6 @@ function TablePaginationActions(props) {
         {/* <button onClick={() => { applyTags() }}>Apply Tags</button> */}
 
         <div style={{ marginTop:'20px', height: '30rem',  width: '65%', float: 'left' , overflow: 'auto' }}>
-
-          {/* <div style={{ marginTop: '2%', paddingLeft: '10%' }}>
-          <span>From:</span><input type="text" value={qFrom} onChange={(e) => setQFrom(e.target.value)} />
-          <span>To:</span><input type="text" value={qTo} onChange={(e) => setQTo(e.target.value)} /><br /><br />
-          <button onClick={() => { applyTagsToQset() }}>Apply Tags </button>
-
-        </div> */}
-           {/* <div>
-          {questionData?.length > 0 &&
-            questionData?.map((qData, i) => {
-              return (
-                <div style={{ padding: '5px' }}>
-
-                  <div style={{ display: 'flex' }}>
-                    <div>
-                      <span>{qData.q_id}.</span>
-                      <input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div>
-                    <div style={{
-                      paddingTop: '5px',
-                      border: '1px solid blue',
-                      width: '80%'
-                    }}> */}
-
-                      {/* <span>Question: {qData.question}</span> <br />
-                      <span>Answer: {qData.answer}</span> */}
-                      {/* {(!qData.type || (qData.type === "null")) && getOtherQuestions(qData)}
-                      {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
-                      {(qData.type === 'MCQ2') && getMCQ2Questions(qData)}
-                      {(qData.type === 'IMG') && getImageQuestions(qData)}
-
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    {qData.tags &&
-                      qData.tags?.split(',')?.sort()?.map((tg, j) =>
-                        <div style={{ paddingRight: '5px' }}>
-                          {tg !== '' && <span><button disabled={!readAndWriteAccess} onClick={() => removeTag(tg, j, qData.q_id)}>{getTagName(tg)} X</button></span>}
-                        </div>)}
-                  </div>
-                </div>)
-            })
-          }</div> */}
 
 
             {/* //mapping table with pagination */}
@@ -626,10 +599,15 @@ function TablePaginationActions(props) {
               color="primary"
             />
           </TableCell>
-          <TableCell>{(!row.type || (row.type === "null")) && getOtherQuestions(row)}
+          {/* <TableCell>edit</TableCell> */}
+          <TableCell>
+            <TableCell>{(!row.type || (row.type === "null")) && getOtherQuestions(row)}
                       {(row.type === 'MCQ1') && getMCQ1Questions(row)}
                       {(row.type === 'MCQ2') && getMCQ2Questions(row)}
-                      {(row.type === 'IMG') && getImageQuestions(row)}
+                      {(row.type === 'IMG') && getImageQuestions(row)}</TableCell>
+                      <TableCell>
+              <Button onClick={() => handleEditClick(row)}>Edit</Button>
+            </TableCell>
             </TableCell>
           <TableCell>
             {row.tags &&
@@ -679,6 +657,12 @@ function TablePaginationActions(props) {
                         </TableFooter>
             </Table>
           </TableContainer>
+          <EditQuestionDialog
+        open={openEditDialog}
+        handleClose={handleCloseEditDialog}
+        questionData={selectedQuestion}
+        handleSave={handleSave} 
+      />
 
           {/* Pagination */}
           {/* <Button onClick={() => setPage(page - 1)} disabled={page === 1}>
@@ -702,6 +686,7 @@ function TablePaginationActions(props) {
             disabled={!readAndWriteAccess}
           />}
         </div>
+
 
       </div>}
     </>
