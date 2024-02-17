@@ -132,10 +132,6 @@ export default function TestDashBoard() {
 
     function getStatusText(isActive) {
         return  isActive === 1 ? 'Active' : 'Draft'
-        //     <Button variant="outlined" color={isActive ? 'primary' : 'secondary'}>
-            
-        //   </Button>
-        
       }
     const showKeyDetails = (row) => {
         setShowKey(true);
@@ -247,24 +243,6 @@ export default function TestDashBoard() {
         XLSX.utils.book_append_sheet(workbook, worksheet, 'questionsData');
         XLSX.writeFile(workbook, 'questionsData.xlsx');
     }
-
-    //excel
-    // function exportToExcel() {
-    //     var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
-    //         "xmlns:x='urn:schemas-microsoft-com:office:excel' " +
-    //         "xmlns='http://www.w3.org/TR/REC-html40'>" +
-    //         "<head><meta charset='utf-8'></head><body>";
-    //     var footer = "</body></html>";
-    //     var sourceHTML = header + document.getElementById("element").innerHTML + footer;
-    //     var source = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(sourceHTML);
-    //     var fileDownload = document.createElement("a");
-    //     document.body.appendChild(fileDownload);
-    //     fileDownload.href = source;
-    //     fileDownload.download = 'document.xls';
-    //     fileDownload.click();
-    //     document.body.removeChild(fileDownload);
-    // }
-
 
     //word
     function exportToWord() {
@@ -390,7 +368,7 @@ export default function TestDashBoard() {
                 <div>
                     <button disabled={!readAndWriteAccess} style={{ height: '2rem' }} onClick={() => addToHome()}>Add to home </button>
                     <br />
-                    <div style={{ height: 370, width: '100%', marginTop: "5px" }}>
+                    <div style={{ height: 600, width: '100%', marginTop: "5px" }}>
                         <DataGrid
                             rows={testData}
                             columns={columns}
@@ -516,11 +494,6 @@ export default function TestDashBoard() {
                     </div>
                 </span>
             }
-            {/* {(showSreen === "Edit") &&
-                 <span>
-
-                 </span>
-            } */}
 
             {showLoader &&
                 <Loader />
