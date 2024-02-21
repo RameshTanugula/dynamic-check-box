@@ -15,8 +15,7 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import EditQuestionDialog from './Map/editQuestionDialog';
 
 export default function Mapping() {
-  const serverUrl = `http://localhost:8080/`
-  // const serverUrl = securedLocalStorage.baseUrl;
+  const serverUrl = securedLocalStorage.baseUrl;
   const [checked, setChecked] = useState([]);
   const [allCheckBoxValue, setAllCheckBoxValue] = useState(false);
   const [questionData, setQuestionData] = useState([]);
