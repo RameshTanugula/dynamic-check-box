@@ -163,9 +163,6 @@ export default function DraftTest() {
     
     //categories
 
-
-
-
     const prepareCatIds = () => {
         let ids1 = [];
         let ids2 = [];
@@ -220,6 +217,7 @@ export default function DraftTest() {
             if (catData.status === 200) {
                 setCategoryData(catData.data);
             }
+            setShowLoader(true);
             const data1 = await api(null, serverUrl + 'list/draft/bytestid/' + id, 'get');
             setSelectedQuestionsList([])
             if (data1.status === 200) {
@@ -230,7 +228,6 @@ export default function DraftTest() {
                 return d;
                 })
                 setSelectedQuestionsList([...data1.data?.map(q=>q=q.id)]); 
-                // console.log(selectedQuestionsList, 'list **69');
                 setDraftData([...data1.data])
                 console.log(draftData,'&&&&');
                 //  setSelectedQuestionsData(draftData)
@@ -264,9 +261,7 @@ export default function DraftTest() {
 
     
     const onClickCheckBox = (id, i) => {
-        console.log(id, 'id');
         const index = page * rowsPerPage + i;
-        // const Data = 
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
             if (selectedQuestionsList.includes(id)) {
@@ -312,9 +307,8 @@ export default function DraftTest() {
       };
 
       const submitTestForm = () => {
-        // Your form submission logic here using draftData
         console.log('Form submitted:', draftData);
-        setFormData({ ...formData }); // Update formData with draftData
+        setFormData({ ...formData }); 
         handleCloseFormModal();
       };
 
@@ -359,8 +353,8 @@ function formatDate(date) {
     const addToTestHandler = async (isDraft) => {
             setShowLoader(true);
 
-            const resp = await api(null, serverUrl1 + "test/delete/" + id, 'delete');
-            if (resp.status === 200) {
+            // const resp = await api(null, serverUrl1 + "test/delete/" + id, 'delete');
+            // if (resp.status === 200) {
 
         let manualQIds = [];
         if (manualQuestions?.length > 0) {
@@ -384,8 +378,7 @@ function formatDate(date) {
             created_by: 1,
             update_by: 1
         }
-        console.log(payload, 'payload***355');
-        const data = await api(payload, serverUrl + 'add/test', 'post');
+        const data = await api(payload, serverUrl + 'update/test/' + id, 'put');
         if (data.status === 200) {
             setSelectedQuestionsList([]);
             setOpenSnackBar(true);
@@ -406,14 +399,14 @@ function formatDate(date) {
             setSnackBarData(message);
         }
         setShowLoader(false);
-    }else{
-        setOpenSnackBar(true);
-        const message = {
-            type: "error",
-            message: "Add test failed"
-        }
-        setSnackBarData(message);
-    }
+    // }else{
+    //     setOpenSnackBar(true);
+    //     const message = {
+    //         type: "error",
+    //         message: "Add test failed"
+    //     }
+    //     setSnackBarData(message);
+    // }
     }
 
     function closeSnakBar() {
@@ -517,12 +510,10 @@ function formatDate(date) {
     const openPreviewForm = () => {
         if (selectedQuestionsList.length + manualQuestions.length > 0) {
             const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id ));
-            console.log(manualQuestions, draftData,selectedQData, '**473');
-            // console.log(selectedQData, 'selectedQData');
             // setSelectedQuestionsData(draftData.concat(manualQuestions, selectedQuestionsData));
             // setSelectedQuestionsData(selectedQuestionsData.concat( manualQuestions, draftData));
             setSelectedQuestionsData(selectedQData.concat( manualQuestions));
-            console.log(selectedQuestionsData ,"iuhgyhvb");
+            // console.log(selectedQuestionsData ,"iuhgyhvb");
             setPreviewOpen(true);
         } else {
             console.error("selectedQuestionsList is empty.");
@@ -532,8 +523,6 @@ function formatDate(date) {
 
     const handleDeleteQuestion = (questionId, questionTitle) => {
           const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
-           console.log(isQuestionExist, 'isQuestionExist', selectedQuestionsList , typeof(selectedQuestionsList[0]));
-
            if (isQuestionExist) {
             const draftQuestion = draftData.filter((q) =>q.q_id !== questionId)
             const updatedQuestionsList = selectedQuestionsList.filter(id => id !== questionId);

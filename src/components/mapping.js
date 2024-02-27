@@ -13,6 +13,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import EditQuestionDialog from './Map/editQuestionDialog';
+import Loader from './Loader';
 
 export default function Mapping() {
   const serverUrl = `http://localhost:8080/`
@@ -36,6 +37,19 @@ export default function Mapping() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showLoader, setShowLoader] = React.useState(false);
+
+
+  // Function to handle search query change
+const handleSearchQueryChange = (event) => {
+  setSearchQuery(event.target.value);
+};
+
+// Function to filter questions based on search query
+const filteredQuestions = questionData?.filter((question) =>
+  question?.question.toLowerCase().includes(searchQuery.toLowerCase())
+);
 
   const handleEditClick = (question) => {
     setSelectedQuestion(question);
@@ -175,7 +189,8 @@ function TablePaginationActions(props) {
   React.useEffect(() => {
     async function fetchData() {
       // You can await here
-      setLoading(true);
+      
+    setShowLoader(true);
       const user = await api(null, serverUrl + 'get/users/' + type, 'get');
       if (user.status === 200) {
         // setSelectedUser(user.data.res[0].user);
@@ -183,6 +198,7 @@ function TablePaginationActions(props) {
         if (user?.data?.res[0]?.user && type) {
           const data = await api(null, serverUrl + 'get/data/' + type + '/' + user.data.res[0].user, 'get');
           if (data.status === 200) {
+            setSearchQuery('');
             setQuestionData(data.data?.res)
           }
         }
@@ -192,7 +208,7 @@ function TablePaginationActions(props) {
       if (catData.status === 200) {
         setCategoryData(catData.data);
       }
-      setLoading(false);
+      setShowLoader(false);
     }
     fetchData();
   }, []);
@@ -205,12 +221,13 @@ function TablePaginationActions(props) {
   React.useEffect(() => {
     async function fetchData() {
       if (selectedUser && type) {
-        setLoading(true);
+        setShowLoader(true);
         const data = await api(null, serverUrl + 'get/data/' + type + '/' + selectedUser, 'get');
         if (data.status === 200) {
           setQuestionData(data.data?.res)
+          setSearchQuery('');
         }
-        setLoading(false);
+        setShowLoader(false);
       }
     }
     fetchData();
@@ -224,15 +241,16 @@ function TablePaginationActions(props) {
   }, []);
   const getQuestions = async () => {
     if (from && to) {
-      setLoading(true);
+      setShowLoader(true);
       const data = await api(null, serverUrl + 'get/data/' + type + '/' + selectedUser + '/' + from + '/' + to, 'get');
       console.log(data,'data from to ***');
       if (data.status === 200) {
         setQuestionData(data.data.res);
         setFrom("");
         setTo("");
+        setSearchQuery('');
       }
-      setLoading(false);
+      setShowLoader(false);
     } else {
       alert('please try with from and to values')
     }
@@ -324,7 +342,7 @@ function TablePaginationActions(props) {
     setQuestionData(questionData);
   }
   const removeTag = async (tagId, i, qId) => {
-    setLoading(true);
+    setShowLoader(true);
     const data = await api({ tagToBeRemoved: tagId }, serverUrl + 'delete/tag/' + type + '/' + qId, 'put');
     if (data.status === 200) {
       const data = await api(null, serverUrl + 'get/data/' + type + '/' + selectedUser, 'get');
@@ -332,7 +350,7 @@ function TablePaginationActions(props) {
         setQuestionData(data.data.res);
       }
     }
-    setLoading(false);
+    setShowLoader(false);
     // /delete/tag
   }
   const applyTags = async () => {
@@ -341,17 +359,18 @@ function TablePaginationActions(props) {
 
       // const catIds = generateCategoryIds(checked);
       const catIds = getExpandedKeys();
-      setLoading(true);
+      setShowLoader(true);
       const data = await api({ selectedQuestions, checked: catIds, type }, serverUrl + 'add/tags', 'post');
       //comment for not allow unreview questions
       if (data.status === 200) {
         const data = await api(null, serverUrl + 'get/data/' + type + '/' + selectedUser, 'get');
         if (data.status === 200) {
           setQuestionData([...data.data.res]);
+          setSearchQuery('');
           setChecked([])
         }
       }
-      setLoading(false);
+      setShowLoader(false);
     } else {
       alert('please select categories and question to apply tags')
     }
@@ -420,18 +439,19 @@ function TablePaginationActions(props) {
     if (selectedQuestions?.length > 0 && checked?.length > 0) {
       // const catIds = generateCategoryIds(checked);
       const catIds = getExpandedKeys();
-      setLoading(true);
+      setShowLoader(true);
       const data = await api({ selectedQuestions, checked: catIds, type }, serverUrl + 'add/tags', 'post');
       if (data.status === 200) {
         setFrom("");
         setTo("");
         setChecked([]);
+        setSearchQuery('');
         const data = await api(null, serverUrl + 'get/data/' + type + '/' + selectedUser, 'get');
         if (data.status === 200) {
           setQuestionData(data.data.res);
         }
       }
-      setLoading(false);
+      setShowLoader(false);
     } else {
       alert('please select categories and question to apply tags')
     }
@@ -454,12 +474,13 @@ function TablePaginationActions(props) {
   const onChangeUser = async (user) => {
     setSelectedUser(user);
     setQuestionData([])
-    setLoading(true);
+    setSearchQuery('');
+    setShowLoader(true);
     const data = await api(null, serverUrl + 'get/data/' + type + '/' + user, 'get');
     if (data.status === 200) {
       setQuestionData(data.data?.res)
     }
-    setLoading(false);
+    setShowLoader(false);
   }
   const onChangeRange = () => {
     setIsRange(!isRange);
@@ -568,12 +589,25 @@ function TablePaginationActions(props) {
 
 
             {/* //mapping table with pagination */}
+            <TextField
+              label="Search Questions"
+              value={searchQuery}
+              onChange={handleSearchQueryChange}
+              variant="outlined"
+              size="small"
+              style={{ marginBottom: '20px' , marginTop: '10px'}}
+            />
            
-          {questionData?.length > 0 && (
+          {((searchQuery !== '' && filteredQuestions.length > 0) || (searchQuery === '' && questionData.length > 0)) ? ((searchQuery !== '' && filteredQuestions.length > 0) || (searchQuery === '' && questionData.length > 0))&& (
         <div>
+           
           <TableContainer component={Paper}>
-          {questionData?.length > 0 && <><p>Select All:</p><input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" /></>}
-
+          {((searchQuery !== '' && filteredQuestions.length > 0) || (searchQuery === '' && questionData.length > 0)) && (
+                <p>Select All:</p>
+              )}
+              {((searchQuery !== '' && filteredQuestions.length > 0) || (searchQuery === '' && questionData.length > 0)) && (
+                <input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" />
+              )}
 
             <Table>
               <TableHead>
@@ -585,7 +619,7 @@ function TablePaginationActions(props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(rowsPerPage > 0 ? questionData.slice(page*rowsPerPage, page*rowsPerPage+rowsPerPage):questionData
+              {(rowsPerPage > 0 ? (searchQuery !== '' ? filteredQuestions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : questionData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)) : (searchQuery !== '' ? filteredQuestions : questionData)
                   ).map((row, i) => (
           <TableRow key={row.q_id}>
           <TableCell>
@@ -599,7 +633,6 @@ function TablePaginationActions(props) {
               color="primary"
             />
           </TableCell>
-          {/* <TableCell>edit</TableCell> */}
           <TableCell>
             <TableCell>{(!row.type || (row.type === "null")) && getOtherQuestions(row)}
                       {(row.type === 'MCQ1') && getMCQ1Questions(row)}
@@ -673,6 +706,9 @@ function TablePaginationActions(props) {
             Next
           </Button> */}
         </div>
+      ) : (
+        // Render an empty message or table when filtered data is empty
+        <div>No data found</div>
       )}
 
         </div>
@@ -687,6 +723,7 @@ function TablePaginationActions(props) {
           />}
         </div>
 
+        {showLoader && <Loader />}
 
       </div>}
     </>
