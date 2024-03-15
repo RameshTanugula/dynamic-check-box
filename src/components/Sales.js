@@ -45,7 +45,7 @@ export default function Sales() {
         type: "",
         // date: new Date() 
     }
-    
+
     const [filters, setFilters] = React.useState(filterNames);
     const [selectedFields, setSelectedFields] = React.useState(['user_name', 'email', 'type', 'price']);
     const columnsNames = [
@@ -54,17 +54,22 @@ export default function Sales() {
         { field: 'type', headerName: 'Type', minWidth: 200, },
         { field: 'price', headerName: 'Price', minWidth: 150, },
         { field: 'mobile', headerName: 'Mobile', minWidth: 200, },
-        { field: 'purchased_date', headerName: 'Purchased Date', minWidth: 250,
-        // renderCell: (params) => {
-        //     return (
-        //         <TableCell>
-        //             {formatDate(params.row.purchased_date.$d)}
-        //         </TableCell>
-        //     );
-        // }
+        {
+            field: 'purchased_date', headerName: 'Purchased Date', minWidth: 250,
+            // renderCell: (params) => {
+            //     return (
+            //         <TableCell>
+            //             {formatDate(params.row.purchased_date.$d)}
+            //         </TableCell>
+            //     );
+            // }
         },
         { field: 'order_id', headerName: 'Order Id', minWidth: 200 },
-        { field: 'promo_code', headerName: 'Promo Code', minWidth: 200}
+        { field: 'promo_code', headerName: 'Promo Code', minWidth: 200 },
+        { field: 'address', headerName: 'Address', minWidth: 200 },
+        { field: 'course_name', headerName: 'Course Name', minWidth: 200},
+        // { field: 'country', headerName: 'Country', minWidth: 200 },
+        // { field: 'district', headerName: 'District', minWidth: 200 },
 
     ];
     const [columns, setColumns] = React.useState(columnsNames);
@@ -98,7 +103,7 @@ export default function Sales() {
             "xmlns='http://www.w3.org/TR/REC-html40'>" +
             "<head><meta charset='utf-8'></head><body>";
         var footer = "</body></html>";
-            var tableHTML = "<table border='1' cellspacing='0' cellpadding='5'><thead><tr>";
+        var tableHTML = "<table border='1' cellspacing='0' cellpadding='5'><thead><tr>";
         selectedFields.forEach(field => {
             tableHTML += "<th>" + field + "</th>";
         });
@@ -110,11 +115,11 @@ export default function Sales() {
             });
             tableHTML += "</tr>";
         });
-        tableHTML += "</tbody></table>";   
+        tableHTML += "</tbody></table>";
         // Combine the HTML content
-        var sourceHTML = header + tableHTML + footer;   
+        var sourceHTML = header + tableHTML + footer;
         // Convert HTML to data URL
-        var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML); 
+        var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
         // Create a download link and trigger the download
         var fileDownload = document.createElement("a");
         document.body.appendChild(fileDownload);
@@ -123,8 +128,8 @@ export default function Sales() {
         fileDownload.click();
         document.body.removeChild(fileDownload);
     }
-    
-    
+
+
 
     const renderSelectedFieldsTable = () => {
         return (
@@ -139,35 +144,40 @@ export default function Sales() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                        {orderSList?.data?.map((row, rowIndex) => (
+                            {orderSList?.data?.map((row, rowIndex) => (
+                                
                                 <TableRow key={rowIndex}>
-                                  {selectedFields.map((column, colIndex) => (
-                                   <TableCell key={colIndex}>
-                                   {column === 'price' ? 
-                                  (isNaN(parseFloat(row[column])) ? 0 : parseFloat(row[column]).toFixed(2)) :
-                                    row[column]}
-                                      </TableCell>
-                                          ))}
-                                 </TableRow>
-                                ))}
-                        </TableBody>                           
+                                    {selectedFields.map((column, colIndex) => (
+                                        <TableCell key={colIndex}>
+                                            {column === 'address' && (row[column] === null || row[column] === "undefined") ?
+                                            'Address not added' :
+                                            (column === 'price' ?
+                                                (isNaN(parseFloat(row[column])) ? 0 : parseFloat(row[column]).toFixed(2)) :
+                                                row[column])
+                                        }
+
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
                         <TableFooter>
                             <TableRow>
-                            <TablePagination
-                            rowsPerPageOptions={[5, 10, 20,100,200]}
-                            colSpan={5}
-                            count={orderSList?.count}
-                            rowsPerPage={paginationModel.pageSize}
-                            SelectProps={{
-                                inputProps: {
-                                    'aria-label': 'questionData per page',
-                                },
-                                native: true,
-                            }}
-                            page={paginationModel.page}
-                            onPageChange={(e, page) => applayPagination(page, paginationModel.pageSize)}
-                            onRowsPerPageChange={(e) => applayPagination(0, parseInt(e.target.value))}
-                        />
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 20, 100, 200]}
+                                    colSpan={5}
+                                    count={orderSList?.count}
+                                    rowsPerPage={paginationModel.pageSize}
+                                    SelectProps={{
+                                        inputProps: {
+                                            'aria-label': 'questionData per page',
+                                        },
+                                        native: true,
+                                    }}
+                                    page={paginationModel.page}
+                                    onPageChange={(e, page) => applayPagination(page, paginationModel.pageSize)}
+                                    onRowsPerPageChange={(e) => applayPagination(0, parseInt(e.target.value))}
+                                />
                             </TableRow>
                         </TableFooter>
                     </Table>
@@ -211,19 +221,19 @@ export default function Sales() {
             setSnackBarData(data);
         }
     }
-  
-      function formatDate(date) {
+
+    function formatDate(date) {
         const year = date.getUTCFullYear();
         const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
         const day = date.getUTCDate().toString().padStart(2, '0');
         const hours = date.getUTCHours().toString().padStart(2, '0');
         const minutes = date.getUTCMinutes().toString().padStart(2, '0');
         const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-    
+
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
-    
-      async function getSalesData() {
+
+    async function getSalesData() {
         setShowLoader(true);
         let url = serverUrl + 'orders/list?pageSize=' + paginationModel.pageSize + '&pageNumber=' + paginationModel.page;
         const finalData = Object.entries(filters).reduce((a, [k, v]) => (v ? (a[k] = v, a) : a), {});
@@ -235,20 +245,20 @@ export default function Sales() {
             const toDateFormatted = formatDate(toDate.$d);
             url = url + '&fromDate=' + fromDateFormatted + '&toDate=' + toDateFormatted;
         }
-            const data = await api(null, url, 'get');
-            // console.log(data, 'data**128');
-    
-            if (data.status === 200) {
-                setShowLoader(false);
-                // setFromDate(null);
-                // setToDate(null);
-                setOrderSList(data.data);
-                // console.log(orderSList.data[0].purchased_date, 'list');  
+        const data = await api(null, url, 'get');
+        console.log(data, 'data**128');
+
+        if (data.status === 200) {
+            setShowLoader(false);
+            // setFromDate(null);
+            // setToDate(null);
+            setOrderSList(data.data);
+            // console.log(orderSList.data[0].purchased_date, 'list');  
             // }
-        } 
+        }
     }
-    
-    
+
+
     async function getSalesData1() {
         setShowLoader(true);
         let url = serverUrl + "orders/list?pageSize=" + paginationModel.pageSize + "&pageNumber=" + paginationModel.page;
@@ -257,12 +267,12 @@ export default function Sales() {
             url = url + "&" + key + "=" + finalData[key]
         }
         const resp = await api(null, url, 'get');
-        // console.log(resp, 'resp***124');
+        console.log(resp, 'resp***124');
         if (resp.status === 200) {
             setShowLoader(false);
             setOrderSList(resp.data);
             // console.log(orderSList, 'orderslist***124');
-          }
+        }
     }
 
     function closeSnackBar() {
@@ -369,18 +379,18 @@ export default function Sales() {
 
     return (
         <div>
-            <Grid container spacing={0} style={{ margin: '30px'}}>
+            <Grid container spacing={0}  >
                 <Grid item xs={3} lg={2} >
-                    <Card sx={{ maxWidth: 150 }} >
+                    <Card sx={{ maxWidth: 150 ,marginBottom:'10px'}} >
                         <div>
                             {/* <h1>0</h1> */}
-                            <h1>{orderSList?.count?orderSList.count:0}</h1>
+                            <h1>{orderSList?.count ? orderSList.count : 0}</h1>
                             <h5>total No of Sales</h5>
                         </div>
                     </Card>
                 </Grid>
                 <Grid item xs={3} lg={2} >
-                    <Card sx={{ maxWidth: 150, alignItems:'center' }}>
+                    <Card sx={{ maxWidth: 150, alignItems: 'center' , marginBottom:'10px'}}>
                         <div>
                             <h1>{orderSList?.total_price}</h1>
                             <h5>  Total Amount</h5>
@@ -459,54 +469,54 @@ export default function Sales() {
                     </FormControl>
                 </Grid>
                 <Grid item xs={3} lg={2} >
-                <FormControl sx={{ minWidth: 200 }} >
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                 label="From Date"
-                 value={fromDate}
-                 onChange={(date) => {setFromDate(date)}}
-                  renderInput={(params) => <TextField {...params} />}
-                 />
-                 </LocalizationProvider>
-                 </FormControl>
-              </Grid>
-            <Grid item xs={3}lg={2} >
-            <FormControl sx={{ minWidth: 200 }} >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-               <DatePicker
-                  label="To Date"
-                  value={toDate}
-                  onChange={(date) => {setToDate(date)}}
-                  renderInput={(params) => <TextField {...params} />}
-                 />
-                 </LocalizationProvider>
-                 </FormControl>
-             </Grid>
+                    <FormControl sx={{ minWidth: 200 }} >
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="From Date"
+                                value={fromDate}
+                                onChange={(date) => { setFromDate(date) }}
+                                renderInput={(params) => <TextField {...params} />}
+                            />
+                        </LocalizationProvider>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={3} lg={2} >
+                    <FormControl sx={{ minWidth: 200 }} >
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="To Date"
+                                value={toDate}
+                                onChange={(date) => { setToDate(date) }}
+                                renderInput={(params) => <TextField {...params} />}
+                            />
+                        </LocalizationProvider>
+                    </FormControl>
+                </Grid>
                 <Grid item xs={12} >
                     &nbsp;&nbsp;&nbsp;  <Button variant="outlined" onClick={() => resetForm()} >clear</Button> &nbsp;
                     <Button variant="contained" onClick={() => getSalesData()} >Apply Filter</Button>
                 </Grid>
             </Grid>
             <br />
-            <div style={{display:'flex'}}>
-             </div>
-             <br/>
+            <div style={{ display: 'flex' }}>
+            </div>
+            <br />
 
             <Grid item xs={12} >
-            <Grid item xs={12}>
-                    <Button variant="contained" onClick={() => exportToWord() }  style={{marginBottom:'15px'}}>Export as Word</Button>
-                    <Button variant="contained" onClick={toggleModal} style={{marginBottom:'15px', marginLeft:'10px'}}>Select Fields</Button>
+                <Grid item xs={12}>
+                    <Button variant="contained" onClick={() => exportToWord()} style={{ marginBottom: '15px' }}>Export as Word</Button>
+                    <Button variant="contained" onClick={toggleModal} style={{ marginBottom: '15px', marginLeft: '10px' }}>Select Fields</Button>
                     <Dialog open={openModal} onClose={toggleModal}>
                         <DialogContent>
                             <h3>Select Fields</h3>
                             {renderFieldCheckboxes()}
-                            <br/>   
+                            <br />
                             <Button variant='contained' onClick={toggleModal}>Done</Button>
                         </DialogContent>
                     </Dialog>
                 </Grid>
                 <div style={{ height: 400, width: '100%' }}>
-                {selectedFields.length > 0 && renderSelectedFieldsTable()}
+                    {selectedFields.length > 0 && renderSelectedFieldsTable()}
                 </div>
             </Grid>
             {userData.userId === 1 &&

@@ -126,8 +126,25 @@ export default function TestDashBoard() {
                 </Button>
             ),
         },
+        {
+            field: 'rank', headerName: 'Rank', minWidth: 150,
+            renderCell: (params) => (
+                <Button
+                    variant="outlined"
+                    onClick={() => handleRankButtonClick(params)}
+                    disabled={!readAndWriteAccess}
+                >
+                    Rank
+                </Button>
+            ),
+        },
     ];
 
+    const handleRankButtonClick = (params) => {
+        const id = params.row.id;
+
+        window.location.href = `/Rank/${id}`;
+    };
 
 
     function getStatusText(isActive) {
@@ -267,33 +284,6 @@ export default function TestDashBoard() {
         const url = serverUrl + "test/list/bytestid/" + row.id;
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
-            // const updatedQuestions = resp.data.map(item => {
-            //     if (item.type === "MCQ2") {
-            //         const newOptions = getOptionsAsStatement([item.Option1, item.Option2, item.Option3, item.Option4]);
-            //         return {
-            //             ...item,
-            //             Option1: newOptions[0],
-            //             Option2: newOptions[1],
-            //             Option3: newOptions[2],
-            //             Option4: newOptions[3],
-            //         };
-            //     } else if(item.type === "MCQ1")  {
-                
-            //             const newOptions = getOptionsAsStatementMCQ1([item.Option1, item.Option2, item.Option3, item.Option4]);
-            //             return {
-            //                 ...item,
-            //                 Option1: newOptions[0],
-            //                 Option2: newOptions[1],
-            //                 Option3: newOptions[2],
-            //                 Option4: newOptions[3],
-            //             };
-            //     }
-            //     else {
-            //         return {
-            //             ...item
-            //         };
-            //     }
-            // });
 
             setQuestionsData(resp.data);
             setShowLoader(false);
@@ -301,46 +291,6 @@ export default function TestDashBoard() {
             console.log(questionsData, "questionsData")
         }
     }
-
-
-    // const getOptionsAsStatement = (arr) => {
-    //     const list = arr.map((ele) => {
-    //         const optionarr = ele.split(",");
-    //         let trueOptions = [];
-    //         let falseOptions = [];
-    //         optionarr.map((newVal, index) => {
-    //             if (newVal.trim() == 'true') {
-    //                 trueOptions.push(String.fromCharCode(65 + index));
-    //                 return trueOptions;
-    //             }
-    //             else {
-    //                 falseOptions.push(String.fromCharCode(65 + index));
-    //                 return falseOptions;
-    //             }
-    //         });
-    //         // console.log(trueOptions, "trueOptions");
-    //         // console.log(falseOptions, "falseOptions");
-    //         const trueStatement = trueOptions.length > 0
-    //             ? `Statement ${trueOptions.length > 1 ? trueOptions.join(' & ') : trueOptions[0]} true`
-    //             : '';
-    //         const falseStatement = falseOptions.length > 0
-    //             ? `Statement ${falseOptions.length > 1 ? falseOptions.join(' & ') : falseOptions[0]} false`
-    //             : '';
-
-    //             return `${trueStatement}${trueStatement && falseStatement ? ', ' : ''}${falseStatement}`.trim();
-
-
-    //     });
-    //     return list;
-    // }
-
-    // const getOptionsAsStatementMCQ1 = (arr) => {
-    //     return arr.map((ele) => {
-    //         const optionArr = ele.split(",");
-    //         const formattedOptions = optionArr.map((option, index) => `${String.fromCharCode(65 + index)}${option.trim()}`);
-    //         return formattedOptions.join(', ');
-    //     });
-    // }
 
 
 

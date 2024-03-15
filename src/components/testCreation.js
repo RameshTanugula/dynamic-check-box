@@ -209,7 +209,6 @@ export default function TestCreation() {
     async function fetchData() {
         setShowLoader(true);
         const data = await api(null, serverUrl + 'get/data', 'get');
-        console.log(data, 'data');
         const catData = await api(null, serverUrl + 'get/categories', 'get');
         if (catData.status === 200) {
             setCategoryData(catData.data);
@@ -266,10 +265,7 @@ export default function TestCreation() {
     }
     
     const onClickCheckBox = (id, i) => {
-        console.log(id, 'id');
         const index = page * rowsPerPage + i;
-
-        console.log(index, 'index');
         // const Data = 
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
@@ -277,14 +273,12 @@ export default function TestCreation() {
                 var Index = selectedQuestionsList.findIndex(x => x === id);
                 selectedQuestionsList.splice(Index, 1);
                 setSelectedQuestionsList([...selectedQuestionsList]);
-                console.log(selectedQuestionsList, 'selectedQuestionsList1');
             }
             else {
                 if ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions)) {
                     selectedQuestionsList.push(id) //,  qData
                     // setSelectedQuestionsList(prevList => [...prevList, id]);
                     setSelectedQuestionsList([...selectedQuestionsList]);
-                    console.log(selectedQuestionsList, 'selectedQuestionsList');
                 }
                 else {
                     alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
@@ -297,6 +291,7 @@ export default function TestCreation() {
             console.log();
         }
         setQuestionData(questionData);
+        console.log(questionData, ' data**301');
 
     }
 
@@ -332,7 +327,6 @@ export default function TestCreation() {
     }
 
     function submitTestForm() {
-        console.log(scheduledDate , 'scheduledDate');
         if (valid()) {
             setShowForm(false)
         }
@@ -356,7 +350,6 @@ export default function TestCreation() {
         if (manualQuestions?.length > 0) {
             for (let i = 0; i < manualQuestions.length; i++) {
                 const data1 = await api(manualQuestions[i], securedLocalStorage.baseUrl + 'question/' + 'create/questions/mcq', 'post');
-                console.log(data1, 'data1');
                 if (data1.status === 200) {
                     manualQIds.push(data1.data.res.insertId)
                 }   
@@ -376,7 +369,6 @@ export default function TestCreation() {
             created_by: 1,
             update_by: 1
         }
-        console.log(payload, 'payload');
         const data = await api(payload, serverUrl + 'add/test', 'post');
         if (data.status === 200) {
             setShowForm(true);
@@ -387,7 +379,6 @@ export default function TestCreation() {
             const message = {
                 type: "success",
                 message: isDraft ? "Test draft created successfully!" : "Test added successfully!..."
-                // message: "Test added successfully!..."
             };
     
             setSnackBarData(message);
@@ -416,6 +407,7 @@ export default function TestCreation() {
 
     React.useEffect(() => {
         async function getData() {
+            if (!checked) return; 
             const catIds = prepareCatIds();
             setShowLoader(true);
             const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
@@ -521,14 +513,13 @@ export default function TestCreation() {
 
 
     const handleDeleteQuestion = (questionId, questionTitle) => {
-        console.log(questionId, 'questionId');
-        console.log(questionTitle, 'questionTitle');
+        // console.log(questionTitle, 'questionTitle');
         // Update state by removing the deleted question
           const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
            if (isQuestionExist) {
 
             const updatedQuestionsList = selectedQuestionsList.filter(id => id !== questionId);
-            console.log(updatedQuestionsList, 'updatedQuestionsList11111');
+            // console.log(updatedQuestionsList, 'updatedQuestionsList11111');
             const updatedQuestionsData = selectedQuestionsData.filter(question => question.q_id !== questionId);
             setSelectedQuestionsList(updatedQuestionsList);
             setSelectedQuestionsData(updatedQuestionsData);
@@ -549,13 +540,9 @@ export default function TestCreation() {
     const openPreviewForm = () => {
         if (selectedQuestionsList.length + manualQuestions.length > 0) {
             const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id));
-            console.log(selectedQData, 'selectedQData');
             setSelectedQuestionsData(selectedQData.concat(manualQuestions));
-            console.log(selectedQuestionsData, 'setSelectedQuestionsData');
             setPreviewOpen(true);
-        } else {
-            console.error("selectedQuestionsList is empty.");
-        }
+        } 
     };
 
 
@@ -595,7 +582,7 @@ export default function TestCreation() {
                     <Grid item xs={12} style={{ overflow: "auto", height: "900px", marginTop: "10px" }} >
                         {questionData?.length > 0 &&
                             <TableContainer component={Paper}>
-                                <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                                <Table sx={{ minWidth: 500  }} aria-label="custom pagination table">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">
@@ -674,7 +661,7 @@ export default function TestCreation() {
                                             </div>
                                             <div style={{
                                                 paddingTop: '5px',
-                                                border: '1px solid blue'
+                                                border: '1px solid blue'   
                                             }}>
                                                 {((!qData.type) || (qData.type === "null")) && getQuestions(qData)}
                                                 {(qData.type === 'MCQ1') && getMCQ1Questions(qData)}
