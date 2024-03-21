@@ -263,7 +263,7 @@ export default function TestCreation() {
         }
         return [ids1, ids2, ids3, ids4]
     }
-    
+
     const onClickCheckBox = (id, i) => {
         const index = page * rowsPerPage + i;
         // const Data = 
@@ -285,14 +285,24 @@ export default function TestCreation() {
                 }
 
             }
-        } else {
+        }
+        // else if (id === 'selectAll') {
+        //     // Select all or deselect all questions based on the current state of allCheckBoxValue
+        //     const allQuestionIds = questionData.map(q => q.q_id);
+        //     if (!allCheckBoxValue && ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions))) {
+        //         setSelectedQuestionsList(allQuestionIds);
+        //     } else {
+        //         alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
+        //     }
+        //     setAllCheckBoxValue(!allCheckBoxValue);
+        // }
+        else {
             setAllCheckBoxValue(!allCheckBoxValue)
             questionData.map(q => q.checked = !allCheckBoxValue)
             console.log();
         }
         setQuestionData(questionData);
         console.log(questionData, ' data**301');
-
     }
 
 
@@ -345,14 +355,14 @@ export default function TestCreation() {
     const addToTestHandler = async (isDraft) => {
         // const addToTestHandler = async () => {
 
-            setShowLoader(true);
+        setShowLoader(true);
         let manualQIds = [];
         if (manualQuestions?.length > 0) {
             for (let i = 0; i < manualQuestions.length; i++) {
                 const data1 = await api(manualQuestions[i], securedLocalStorage.baseUrl + 'question/' + 'create/questions/mcq', 'post');
                 if (data1.status === 200) {
                     manualQIds.push(data1.data.res.insertId)
-                }   
+                }
             }
         }
         const payload = {
@@ -380,7 +390,7 @@ export default function TestCreation() {
                 type: "success",
                 message: isDraft ? "Test draft created successfully!" : "Test added successfully!..."
             };
-    
+
             setSnackBarData(message);
         }
         else {
@@ -407,7 +417,7 @@ export default function TestCreation() {
 
     React.useEffect(() => {
         async function getData() {
-            if (!checked) return; 
+            if (!checked) return;
             const catIds = prepareCatIds();
             setShowLoader(true);
             const data = await api({ catIds: catIds }, serverUrl + 'get/questions/bycategory', 'post');
@@ -435,7 +445,7 @@ export default function TestCreation() {
             </>
         )
     }
-   const getMCQ1Questions = (row) => {
+    const getMCQ1Questions = (row) => {
         return (
             <><span>Question: {row.question}</span>
                 <br />
@@ -467,16 +477,16 @@ export default function TestCreation() {
             <>
                 <span>Question: {qData.question}</span> <br />
                 <div>
-                  {qData.part_a && qData.part_a?.split(',').map((a, i) => (
-                   <div key={i}>
-                        <br />
-                       <div style={{ width: "100%" }}>
-                      <span>{String.fromCharCode(65 + i)}.{a}</span>
-         
-                       </div>
-                   </div>
-                   ))}
-                 </div>
+                    {qData.part_a && qData.part_a?.split(',').map((a, i) => (
+                        <div key={i}>
+                            <br />
+                            <div style={{ width: "100%" }}>
+                                <span>{String.fromCharCode(65 + i)}.{a}</span>
+
+                            </div>
+                        </div>
+                    ))}
+                </div>
                 <br />
                 {/* <span>B: {qData.part_b}</span> */}
                 <br />
@@ -515,8 +525,8 @@ export default function TestCreation() {
     const handleDeleteQuestion = (questionId, questionTitle) => {
         // console.log(questionTitle, 'questionTitle');
         // Update state by removing the deleted question
-          const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
-           if (isQuestionExist) {
+        const isQuestionExist = selectedQuestionsList.find(id => id === questionId);
+        if (isQuestionExist) {
 
             const updatedQuestionsList = selectedQuestionsList.filter(id => id !== questionId);
             // console.log(updatedQuestionsList, 'updatedQuestionsList11111');
@@ -528,11 +538,11 @@ export default function TestCreation() {
             // Remove manual question with matching title
             const updatedQuestionsListByTitle = selectedQuestionsList.filter(question => question.title !== questionId);
             const updatedQuestionsDataByTitle = selectedQuestionsData.filter(question => question.title !== questionId);
-            const Questions = manualQuestions.filter((q)=>q.title !== questionId)
+            const Questions = manualQuestions.filter((q) => q.title !== questionId)
             setSelectedQuestionsList(updatedQuestionsListByTitle);
             setSelectedQuestionsData(updatedQuestionsDataByTitle);
             setManualQuestions(Questions)
-            
+
         }
     };
 
@@ -542,7 +552,7 @@ export default function TestCreation() {
             const selectedQData = questionData.filter(question => selectedQuestionsList.includes(question.q_id));
             setSelectedQuestionsData(selectedQData.concat(manualQuestions));
             setPreviewOpen(true);
-        } 
+        }
     };
 
 
@@ -556,7 +566,7 @@ export default function TestCreation() {
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={openAddNewQuestionsModal}>Add New Question</Button>
                             <Button variant="contained" onClick={() => setShowForm(true)}>Back</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length === 0} onClick={openPreviewForm} >Preview</Button>
-                            <Button variant='contained' disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={()=>addToTestHandler(true)} >Draft Test</Button>
+                            <Button variant='contained' disabled={selectedQuestionsList.length + manualQuestions.length === parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler(true)} >Draft Test</Button>
                             <Button variant="contained" disabled={selectedQuestionsList.length + manualQuestions.length !== parseInt(testForm.numberOfQuestions)} onClick={() => addToTestHandler()}>Add Test</Button>
                             <Badge color="secondary" badgeContent={selectedQuestionsList.length + manualQuestions.length + "/" + parseInt(testForm.numberOfQuestions)}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
@@ -582,11 +592,18 @@ export default function TestCreation() {
                     <Grid item xs={12} style={{ overflow: "auto", height: "900px", marginTop: "10px" }} >
                         {questionData?.length > 0 &&
                             <TableContainer component={Paper}>
-                                <Table sx={{ minWidth: 500  }} aria-label="custom pagination table">
+                                <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">
                                                 Action
+                                                {/* <TableCell>
+                                                <Checkbox
+                                                    disabled={!readAndWriteAccess}
+                                                    checked={selectedQuestionsList?.length === questionData?.length}
+                                                    onClick={() => onClickCheckBox('selectAll')}
+                                                />
+                                                </TableCell> */}
                                             </TableCell>
                                             <TableCell align="center">Questions </TableCell>
                                         </TableRow>

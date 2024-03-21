@@ -334,12 +334,12 @@ export default function CeateCourse() {
     
 
     function AddSubjectData(i, j, k) {
-        var data = ""
+        var data = ''
         var showList = [];
         var urls = [];
         if (selectedList.length > 0) {
             selectedList.forEach(ele => {
-                data = data + ele + ",";
+                data = data + ele + ',';
                 multiSelectList?.forEach(obj => {
                     if (obj.id === ele) {
                         showList.push(obj.title);
@@ -348,10 +348,10 @@ export default function CeateCourse() {
                 })
             });
 
-            console.log(parseInt(data.slice(0, -1), 10),"Data");
+            console.log(parseInt(data?.slice(0, -1), 10),'Data');
             // console.log(testScheduledDate,"testScheduledDate");
-            const testIdVal = parseInt(data.slice(0, -1), 10);
-            const scheduleNewDate = testScheduledDate.filter((item) => {
+            const testIdVal = parseInt(data?.slice(0, -1), 10);
+            const scheduleNewDate = testScheduledDate?.filter((item) => {
                return item.id == testIdVal
             });
 
@@ -501,7 +501,7 @@ export default function CeateCourse() {
                 setOpenSnackBar(true);
                 const data = {
                     type: "error",
-                    message: resp.response.data.error
+                    message: resp.response?.data.error
                 }
                 setSnackBarData(data);
             }
@@ -548,7 +548,7 @@ export default function CeateCourse() {
             setOpenSnackBar(true);
             const data = {
                 type: "error",
-                message: resp.response.data.error
+                message: resp.response?.data.error
             }
             setSnackBarData(data);
         }
@@ -600,14 +600,14 @@ export default function CeateCourse() {
     async function getCourseList() {
         const resp = await api(null, serverUrl + "list", 'get');
         if (resp.status === 200) {
-            setCourseList(resp.data);
+            setCourseList(resp?.data);
         }
     }
 
     async function getSubjectsList() {
         const resp = await api(null, serverUrl + "get/subjects", 'get');
         if (resp.status === 200) {
-            setSubjectList(resp.data);
+            setSubjectList(resp?.data);
         }
     }
 
@@ -634,9 +634,9 @@ export default function CeateCourse() {
         const url = serverUrl + "get/topic/data/" + data.topicType + "/" + data.topicName;
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
-            setmultiSelectList(resp.data);
+            setmultiSelectList(resp?.data);
             setSelectedList([]);
-            setTestScheduledDate(resp.data)
+            setTestScheduledDate(resp?.data)
             // console.log(testScheduledDate, 'date');
         }
     }
@@ -674,7 +674,7 @@ export default function CeateCourse() {
         setSearchActive(true);
     };
 
-    const filteredList = multiSelectList.filter(data => data.title.toLowerCase().includes(searchText.toLowerCase()));
+    const filteredList = multiSelectList.filter(data => data?.title.toLowerCase().includes(searchText.toLowerCase()));
 
 
 

@@ -32,9 +32,9 @@ export default function Categories() {
     React.useEffect(() => {
         async function getData() {
             const mainCatData = await api(null, serverUrl + 'get/categories/main', 'get');
-            console.log(mainCatData , 'mainCatData');
+            // console.log(mainCatData, 'mainCatData');
             const subCatData = await api(null, serverUrl + 'get/categories/sub', 'get');
-            console.log(subCatData, 'subCatData');
+            // console.log(subCatData, 'subCatData');
             if (mainCatData.status === 200) {
                 setMainCategoryData([...mainCatData.data]);
             }
@@ -105,65 +105,62 @@ export default function Categories() {
             }
         }
     }
-
-
-
     // Flattening the hierarchical data
-const flattenData = (data, parentId = null) => {
-    return data.reduce((acc, item) => {
-        const flattenedItem = {
-            id: item.id,
-            parentId: parentId,
-            label: item.label,
-            children: item.children?.length > 0 // Checking if the item has children
-        };
-        acc.push(flattenedItem);
-        if (item.children?.length > 0) {
-            acc = [...acc, ...flattenData(item.children, item.id)];
-        }
-        return acc;
-    }, []);
-};
-
-
-const flattenedData = flattenData(subCategoryData);
-console.log(flattenedData, 'subCategoryData', subCategoryData);
-
-const handleEdit = (id, label, IsActive) => {
-    setEditingId(id);
-    setEditLabel(label);
-    setEditStatus(IsActive === 1 ? 'Active' : 'Inactive');
-    console.log(editStatus, '***');
-    setOpenEditDialog(true);
-};
-
-
-
-const handleEditCancel = () => {    
-    setEditingId(null);
-    setOpenEditDialog(false);
-};
-
-const handleEditSave = async(id) => {
-// console.log(id,Active,Inactive);
-    const body = {
-        id: editingId,
-             label: editLabel,
-             IsActive: editStatus === 'Active'? 1 : 0 ,
+    const flattenData = (data, parentId = null) => {
+        return data.reduce((acc, item) => {
+            const flattenedItem = {
+                id: item.id,
+                parentId: parentId,
+                label: item.label,
+                children: item.children?.length > 0 // Checking if the item has children
+            };
+            acc.push(flattenedItem);
+            if (item.children?.length > 0) {
+                acc = [...acc, ...flattenData(item.children, item.id)];
+            }
+            return acc;
+        }, []);
     };
-    const subCatData = await api(body, serverUrl + 'save/category/sub/'+id, 'put');
-    console.log(subCatData, 'subCatData');
-    if (subCatData.status === 200) {
-        setEditDialogOpen(false);
+
+
+    const flattenedData = flattenData(subCategoryData);
+    console.log(flattenedData, 'subCategoryData', subCategoryData);
+
+    const handleEdit = (id, label, IsActive) => {
+        setEditingId(id);
+        setEditLabel(label);
+        setEditStatus(IsActive === 1 ? 'Active' : 'Inactive');
+        console.log(editStatus, '***');
+        setOpenEditDialog(true);
+    };
+
+
+
+    const handleEditCancel = () => {
+        setEditingId(null);
         setOpenEditDialog(false);
-        alert('Category Updated!');
-        setEditingId(null); 
-        resetAll();
-    } else {
-        alert('Failed to update category!');
+    };
+
+    const handleEditSave = async (id) => {
+        // console.log(id,Active,Inactive);
+        const body = {
+            id: editingId,
+            label: editLabel,
+            IsActive: editStatus === 'Active' ? 1 : 0,
+        };
+        const subCatData = await api(body, serverUrl + 'save/category/sub/' + id, 'put');
+        console.log(subCatData, 'subCatData');
+        if (subCatData.status === 200) {
+            setEditDialogOpen(false);
+            setOpenEditDialog(false);
+            alert('Category Updated!');
+            setEditingId(null);
+            resetAll();
+        } else {
+            alert('Failed to update category!');
+        }
+        console.log('Editing category with ID:', id);
     }
-    console.log('Editing category with ID:', id);
-}
 
     return (
         <div>
@@ -225,9 +222,9 @@ const handleEditSave = async(id) => {
                         // control={<Switch checked={editStatus} onChange={(e) => setEditStatus(e.target.value)} />}
                         // control={<Switch checked={editStatus === 'true' ? 'true': 'false'} onChange={(e) => setEditStatus(e.target.checked)} />}
                         // control={<Switch checked={editStatus === 'Active' || 'Inactive' } onChange={() => setEditStatus(editStatus === 'Active' ? 'Active': 'Inactive' )} />}
-                        control={<Switch 
-                            checked={editStatus == 'Active'} 
-                            onChange={(e) => setEditStatus(e.target.checked ? 'Active' : 'Inactive')} 
+                        control={<Switch
+                            checked={editStatus == 'Active'}
+                            onChange={(e) => setEditStatus(e.target.checked ? 'Active' : 'Inactive')}
                         />}
                         label="Status"
                     />

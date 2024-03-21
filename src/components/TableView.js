@@ -131,12 +131,12 @@ export default function CommonTableView(props) {
                     ).map((row, i) => (
                         <TableRow key={i}>
                             <TableCell component="th" scope="row">
-                                {row.Complete_Statement}
+                                {row.Complete_Statement || row.question}
                             </TableCell>
                             <TableCell style={{ width: 160 }} align="right">
                                 {/* {row.parts_b} */}
-                                <Button disabled={!readAndWriteAccess} variant="contained" onClick={() => onClickFakeCreate(row)}>Add False</Button>
-                                <Button disabled={!readAndWriteAccess} sx={{ marginTop: '5px' }} variant="contained" onClick={() => hideStatement(row.StatementId)}>Hide</Button>
+                                <Button  variant="contained" onClick={() => onClickFakeCreate(row)}>Add False</Button>
+                                <Button  sx={{ marginTop: '5px' }} variant="contained" onClick={() => hideStatement(row.StatementId || row.q_id)}>Hide</Button>
 
                             </TableCell>
 

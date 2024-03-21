@@ -108,7 +108,7 @@ export default function QuestionCreationFromStatements() {
     const [generatedData, setGeneratedData] = useState([]);
     const [showLoader, setShowLoader] = React.useState(false);
     const [showContent, setShowContent] = useState(true);
-    const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+    // const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -138,7 +138,7 @@ export default function QuestionCreationFromStatements() {
     React.useEffect(() => {
         const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
         if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
-            setReadAndWriteAccess(true);
+            // setReadAndWriteAccess(true);
         }
     }, []);
     const renderFalseStatements = (falseList) => {
@@ -146,7 +146,7 @@ export default function QuestionCreationFromStatements() {
             {falseList?.map((fl, i) => {
                 return (
                     <div style={{background: fl?.IsActive === 6 ? 'yellow' : ''}}>
-                        <input disabled={!readAndWriteAccess} checked={fl.checked} onClick={() => onClickCheckBox(fl, i, 2)} type="checkbox" />.
+                        <input  checked={fl.checked} onClick={() => onClickCheckBox(fl, i, 2)} type="checkbox" />.
                     
                         <span>{fl.Statement}</span>
                     </div>
@@ -154,32 +154,131 @@ export default function QuestionCreationFromStatements() {
             })}
         </div>)
     }
+    // const renderStatements = () => {
+    //     return (<div>
+    //         {statementsList?.map((qData, i) => {
+    //             return (
+    //                 <div style={{ padding: '5px' }}>
+
+    //                     <div style={{ display: 'flex' }}>
+    //                         <div>
+    //                             <span>{qData.q_id}.</span>
+    //                             <input  checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i, 1)} type="checkbox" />
+    //                         </div>
+    //                         <div style={{
+    //                             paddingTop: '5px',
+    //                             border: '1px solid blue'
+    //                         }}>
+
+    //                             <span><b>Statements: </b><span style={{background: qData?.IsActive === 6 ? 'yellow' : ''}}>{qData.statement}</span></span> <br />
+    //                             {/* <span>Answer: {qData.answer}</span> */}
+    //                             <span><b>False Statements:</b> <br/> {renderFalseStatements(qData.falseList)}</span>
+    //                         </div>
+    //                     </div>
+    //                 </div>)
+    //         })
+    //         }
+    //     </div>)
+    // }
+
     const renderStatements = () => {
-        return (<div>
-            {statementsList?.map((qData, i) => {
-                return (
-                    <div style={{ padding: '5px' }}>
+        return (
+          <div>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                <TableHead>
+                  <TableRow>
+                    {/* <TableCell align="center">
+                      <span>
+                        <input
+                          checked={allCheckBoxValue}
+                          value={allCheckBoxValue}
+                          onClick={() => onClickCheckBoxQuestion()}
+                          type="checkbox"
+                        />
+                      </span>
+                    </TableCell> */}
+                    {/* <TableCell align="center">Question Title</TableCell> */}
+                    <TableCell align="center">Question Number</TableCell>
 
-                        <div style={{ display: 'flex' }}>
+                    <TableCell align="center">Statements</TableCell>
+                    {/* <TableCell align="right">Answers</TableCell> */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {statementsList
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((qData, i) => (
+                      <TableRow key={i}>
+                   
+                        <TableCell align="center">
+                        {(page * rowsPerPage) + i + 1}
+                        </TableCell>
+                        <TableCell align="center">
+                          {/* Include your statement rendering logic here */}
+                          <div style={{ display: 'flex' }}>
                             <div>
-                                <span>{qData.q_id}.</span>
-                                <input disabled={!readAndWriteAccess} checked={qData.checked} onClick={() => onClickCheckBox(qData.q_id, i, 1)} type="checkbox" />
+                              {/* <span>{qData.StatementId}.</span> */}
+                              <input
+                                checked={qData.checked}
+                                onClick={() => onClickCheckBox(qData.StatementId, i, 1)}
+                                type="checkbox"
+                              />
                             </div>
-                            <div style={{
+                            <div
+                              style={{
                                 paddingTop: '5px',
-                                border: '1px solid blue'
-                            }}>
-
-                                <span><b>Statements: </b><span style={{background: qData?.IsActive === 6 ? 'yellow' : ''}}>{qData.statement}</span></span> <br />
-                                {/* <span>Answer: {qData.answer}</span> */}
-                                <span><b>False Statements:</b> <br/> {renderFalseStatements(qData.falseList)}</span>
+                                border: '1px solid blue',
+                              }}
+                            >
+                              <span>
+                                <b>Statements: </b>
+                                <span
+                                  style={{
+                                    background: qData?.IsActive === 6 ? 'yellow' : '',
+                                  }}
+                                >
+                                  {qData.statement}
+                                </span>
+                              </span>
+                              <br />
+                              <span>
+                                <b>False Statements:</b> <br />
+                                {renderFalseStatements(qData.falseList)}
+                              </span>
                             </div>
-                        </div>
-                    </div>)
-            })
-            }
-        </div>)
-    }
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TablePagination
+                      rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
+                      colSpan={4} 
+                      count={statementsList.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      SelectProps={{
+                        inputProps: {
+                          'aria-label': 'questionData per page',
+                        },
+                        native: true,
+                      }}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActions}
+                    />
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </TableContainer>
+          </div>
+        );
+      };
+      
+
     React.useEffect(() => {
         async function fetchData() {
             setShowLoader(true);
@@ -219,6 +318,8 @@ export default function QuestionCreationFromStatements() {
     }
     const generateQuestions = async () => {
         let selectedStatements = [];
+        console.log(selectedStatements , 'selectedStatements');
+
         statementsList.forEach(element=>{
             if(element?.checked){
                 selectedStatements.push({id:element.StatementId, statement:element.statement, isTrueStatement: true})
@@ -253,8 +354,11 @@ export default function QuestionCreationFromStatements() {
         return sourceArray;
       }
     const onClickCheckBox = (info, index, type) => {
+        const globalIndex = page * rowsPerPage + index;
+        console.log(globalIndex , 'globalIndexselectedStatements');
+
         if(type===1){
-            statementsList[index]['checked']=!statementsList[index]['checked'];
+            statementsList[globalIndex]['checked']=!statementsList[globalIndex]['checked'];
         } else if(type===2){
             const trueStatement = statementsList.find(s=>s.StatementId===info.StatementId);
             if(trueStatement && trueStatement['falseList'] && trueStatement['falseList']?.length>0){
@@ -283,7 +387,7 @@ export default function QuestionCreationFromStatements() {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center"><span>
-                                    <input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBoxQuestion()} type="checkbox" />
+                                    <input checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBoxQuestion()} type="checkbox" />
                                 </span></TableCell>
                                 <TableCell align="center">Question Title</TableCell>
                                 <TableCell align="center">Statements</TableCell>
@@ -299,7 +403,7 @@ export default function QuestionCreationFromStatements() {
                                     {(row.questionData?.length ===2)&&
                                     <><><TableCell component="th" scope="row">
                                             <span>
-                                                <input disabled={!readAndWriteAccess} checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
+                                                <input checked={row.checked} value={row.checked} onClick={() => onClickCheckBoxQuestion(row.id, i)} type="checkbox" />
                                             </span>
                                         </TableCell><TableCell component="th" scope="row">
                                                 Choose the correct statements
@@ -334,7 +438,6 @@ export default function QuestionCreationFromStatements() {
                                     onPageChange={handleChangePage}
                                     onRowsPerPageChange={handleChangeRowsPerPage}
                                     ActionsComponent={TablePaginationActions}
-                                    disabled={!readAndWriteAccess}
                                 />
                             </TableRow>
                         </TableFooter>
@@ -355,7 +458,7 @@ export default function QuestionCreationFromStatements() {
                 {!showContent && (generatedData.length > 0) && <Button variant="contained" onClick={() => createQuestions()}>Create Questions</Button>}
 
                 </div>
-                {showContent && <div style={{ height: '30rem', overflow: 'auto', width: '65%', float: 'left', paddingLeft: '5%', marginTop: '5%' }}>
+                {showContent && <div style={{ height: '30rem', overflow: 'auto',  width: '65%', float: 'left', paddingLeft: '5%', marginTop: '5%' }}>
                     {statementsList && statementsList.length > 0 && renderStatements()}
                 </div>}
                 <div style={{ height: '30rem', width: '20%', float: 'right', paddingRight: '5%', overflow: 'auto', paddingTop: '5%' }}>
@@ -364,7 +467,7 @@ export default function QuestionCreationFromStatements() {
                         nodes={catagoryData}
                         checked={checked}
                         onCheck={checked => setChecked(checked)}
-                        disabled={!readAndWriteAccess}
+                        // disabled={!readAndWriteAccess}
                     //   onClick={(e) => onClickCheckBox(e)}
                     />}
                 </div>

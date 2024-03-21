@@ -29,6 +29,7 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
 import * as CheckAccess from "./CheckAccess";
+import Loader from './Loader';
 
 function TablePaginationActions(props) {
     const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
@@ -127,26 +128,32 @@ export default function CreatePairs() {
     const [page, setPage] = React.useState(0);
     const [user, setUser] = React.useState("");
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [showLoader, setShowLoader] = React.useState(false);
 
     const [allCheckBoxValue, setAllCheckBoxValue] = React.useState(false);
     React.useEffect(() => {
         async function fetchData() {
+            setShowLoader(true)
             const userRes = await api(null, securedLocalStorage.usersUrl + type, 'get');
             if (userRes.status === 200) {
                 setUsersList(userRes.data.res);
                 if (userRes?.data?.res[0]?.user && type) {
                     setUser(userRes?.data?.res[0]?.user);
+                    setShowLoader(true)
                     const response = await api(null, serverUrl + 'get/list/' + userRes?.data?.res[0]?.user + '/' + type + '/' + from + '/' + to, 'get');
                     if (response.status === 200) {
                         setData(response.data)
                     }
                 }
             }
+            setShowLoader(true)
             const pairsRes = await api(null, serverUrl + 'get/data', 'get');
             if (pairsRes.status === 200) {
                 pairsRes.data.map(p => p.checked = false)
                 setPairsData(pairsRes.data)
             }
+            setShowLoader(false)
+
         }
         fetchData();
     }, [type]);
@@ -214,20 +221,82 @@ export default function CreatePairs() {
         setSelectedId(d.id);
         setTags(d.tags);
     }
+    // const renderContent = () => {
+    //     return (
+    //         <div>
+    //             {data.map(((d, i) => {
+    //                 return (<div style={{ display: 'flex' }}>
+    //                     <span style={{ paddingRight: '1rem', paddingTop: '1rem' }}>    <input disabled={!readAndWriteAccess} checked={d.checked} value={d.checked} onClick={() => onClickPairCheckBox(i)} type="checkbox" />
+    //                     </span>
+    //                     <span disabled={!readAndWriteAccess} onClick={() => onClickHandler(d)} style={{ display: 'flex' }}>
+
+    //                         <p style={{ "fontWeight": "bold" }}>{d.id}:</p>&nbsp;<p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span></div>)
+    //             }))}
+    //         </div>
+    //     )
+    // }
+
     const renderContent = () => {
         return (
-            <div>
-                {data.map(((d, i) => {
-                    return (<div style={{ display: 'flex' }}>
-                        <span style={{ paddingRight: '1rem', paddingTop: '1rem' }}>    <input disabled={!readAndWriteAccess} checked={d.checked} value={d.checked} onClick={() => onClickPairCheckBox(i)} type="checkbox" />
-                        </span>
-                        <span disabled={!readAndWriteAccess} onClick={() => onClickHandler(d)} style={{ display: 'flex' }}>
+            <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="center">
+                                <span>
+                                Action
+                                </span>
+                            </TableCell>
+                            <TableCell align="center">ID</TableCell>
+                            <TableCell align="center">Question</TableCell>
+                            <TableCell align="center">Answer</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                    {(rowsPerPage > 0
+                                ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : data
+                            ).map((d, i) => (
+                            <TableRow key={i}>
+                                <TableCell>
+                                    <span>
+                                        <input disabled={!readAndWriteAccess} checked={d.checked} value={d.checked} onClick={() => onClickPairCheckBox(i)} type="checkbox" />
+                                    </span>
+                                </TableCell>
+                                <TableCell>{d.id}</TableCell>
+                                <TableCell>{d.question}</TableCell>
+                                <TableCell>{d.answer}</TableCell>
+                               
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                    <TableFooter>
+                    <TableRow>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 50, 100, 1000, { label: 'All', value: -1 }]}
+                            colSpan={5}
+                            count={data.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            SelectProps={{
+                                inputProps: {
+                                    'aria-label': 'Rows per page',
+                                },
+                                native: true,
+                            }}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                    </TableRow>
+                </TableFooter>
 
-                            <p style={{ "fontWeight": "bold" }}>{d.id}:</p>&nbsp;<p>{d.question} &nbsp;</p> <p> -&nbsp;{d.answer}</p></span></div>)
-                }))}
-            </div>
-        )
-    }
+                </Table>
+            </TableContainer>
+        );
+    };
+    
+
+
     const renderPairContent = () => {
         return (
             <div>
@@ -281,7 +350,9 @@ export default function CreatePairs() {
         )
     }
     const onClickPairCheckBox = (i) => {
-        data[i].checked = !data[i].checked;
+        const Index = page * rowsPerPage + i;
+
+        data[Index].checked = !data[Index].checked;
         setData([...data]);
     }
     const onClickCheckBox = (id, index) => {
@@ -296,16 +367,24 @@ export default function CreatePairs() {
     }
     const createGroup = async () => {
         const selectedIds = pairsData.filter(p => p.checked)?.map(pm => pm.id);
+        setShowLoader(true)
         const postResponse = await api(selectedIds, serverUrl + 'save/groups', 'post');
 
         if (postResponse.status === 200) {
+            setShowLoader(true)
             const getRes = await api(null, serverUrl + 'get/data', 'get');
             if (getRes.status === 200) {
                 setPairsData(getRes.data);
             }
             alert('Pair Group Created Successfully!');
-        }
+        }setShowLoader(false)
     }
+    const handleDelete = (id) => {
+        // Perform the deletion logic, either in state or by making an API call.
+        const updatedPairsData = pairsData.filter(row => row.id !== id);
+        // const updatedPairsData = pairsData.filter((row) => row.id !== id);
+        setPairsData(updatedPairsData);
+      };
     const renderTable = () => {
         return (
             <>
@@ -324,6 +403,7 @@ export default function CreatePairs() {
                                 </TableCell>
                                 <TableCell align="center" sx={{ fontWeight: 'bold' }}>Part A</TableCell>
                                 <TableCell align="center" sx={{ fontWeight: 'bold' }}>Part B</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Delete</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -341,6 +421,7 @@ export default function CreatePairs() {
                                     <TableCell style={{ width: 160 }} align="right">
                                         {row.parts_b}
                                     </TableCell>
+                                    <TableCell onClick={() => handleDelete(row.id)}>Delete</TableCell>
 
                                 </TableRow>
                             ))}
@@ -350,7 +431,7 @@ export default function CreatePairs() {
                         <TableFooter>
                             <TableRow>
                                 <TablePagination
-                                    rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
+                                    rowsPerPageOptions={[10, 25, 50, 100, 1000,  { label: 'All', value: -1 }]}
                                     colSpan={5}
                                     count={pairsData.length}
                                     rowsPerPage={rowsPerPage}
@@ -450,7 +531,7 @@ export default function CreatePairs() {
                                 <br />
                             </div>
                         </div>
-                        <div style={{ marginTop: '-20%', width: '50%', height: '30rem', overflow: 'auto' }}>
+                        <div style={{ marginTop: '-10%', width: '50%', height: '30rem', overflow: 'auto' }}>
                             {data?.length > 0 && renderContent()}
                         </div>
 
@@ -459,6 +540,7 @@ export default function CreatePairs() {
 
                 </div>
             }
+      {showLoader && <Loader />}
         </div>
     )
 }

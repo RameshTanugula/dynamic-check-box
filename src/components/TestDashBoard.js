@@ -22,9 +22,20 @@ export default function TestDashBoard() {
     const [showSreen, setShowSreen] = React.useState("Grid");
     const [openSnackBar, setOpenSnackBar] = React.useState(false);
     const [snackBarData, setSnackBarData] = React.useState();
-    const [showKey , setShowKey] = React.useState(false)
+    const [showKey, setShowKey] = React.useState(false)
     const [page, setPage] = React.useState(0);
     const [pageSize, setPageSize] = React.useState(5);
+
+    function formatDate(date) {
+        const year = date.getUTCFullYear();
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
 
     const handlePageChange = (newPage) => {
         setPage(newPage);
@@ -34,12 +45,12 @@ export default function TestDashBoard() {
         setPageSize(newPageSize);
     };
     const handleEditTestClick = (params) => {
-        
+
         const id = params.row.id;
 
         window.location.href = `/draft-test/${id}`;
         // deleteTest(params.row);
-      };
+    };
     const sample = {
         type: "testdashboard",
         list: []
@@ -84,36 +95,39 @@ export default function TestDashBoard() {
         },
         { field: 'no_of_questions', headerName: 'Number OF Questions', minWidth: 200, },
         { field: 'price', headerName: 'Price', minWidth: 200, },
-        { field: 'created_at', headerName: 'Created Date', minWidth: 250, },
-        { field: 'key', headerName:'Test Key', minWidth:100,
-          renderCell: (params) => (
-            <Button
-               variant='outlined'              
-                disabled={!readAndWriteAccess}
-                onClick={() => showKeyDetails(params.row)}
+        { field: 'created_at', headerName: 'Created Date', minWidth: 250, valueFormatter: (params) => formatDate(new Date(params.value)) },
+        {
+            field: 'key', headerName: 'Test Key', minWidth: 100,
+            renderCell: (params) => (
+                <Button
+                    variant='outlined'
+                    disabled={!readAndWriteAccess}
+                    onClick={() => showKeyDetails(params.row)}
                 >
-                 Key
-                 
-            </Button>
-          )},
-          {field:'is_active', headerName:'Status', minWidth:100,
-          renderCell: (params) => getStatusText(params.row.is_active)
+                    Key
+
+                </Button>
+            )
+        },
+        {
+            field: 'is_active', headerName: 'Status', minWidth: 100,
+            renderCell: (params) => getStatusText(params.row.is_active)
         },
         {
             field: 'editTest', headerName: 'Edit Test', minWidth: 150,
             renderCell: (params) => (
-             
+
                 <Button
-                  variant="outlined"
-                  onClick={() => handleEditTestClick(params)}
+                    variant="outlined"
+                    onClick={() => handleEditTestClick(params)}
                 //   disabled={params.row.is_active === 1}
                 >
-                  Edit Test
+                    Edit Test
                 </Button>
-               
+
             ),
-          },
-      
+        },
+
         {
             field: 'deleteTest', headerName: 'Delete Test', minWidth: 150,
             renderCell: (params) => (
@@ -148,11 +162,20 @@ export default function TestDashBoard() {
 
 
     function getStatusText(isActive) {
-        return  isActive === 1 ? 'Active' : 'Draft'
-      }
-    const showKeyDetails = (row) => {
-        setShowKey(true);
-        setShowSreen("Key");
+        return isActive === 1 ? 'Active' : 'Draft'
+    }
+    const showKeyDetails = async (row) => {
+        setShowLoader(true);
+        const url = serverUrl + "test/list/bytestid/" + row.id;
+        const resp = await api(null, url, 'get');
+        if (resp.status === 200) {
+            setQuestionsData(resp.data);
+            setShowLoader(false);
+            setShowKey(true);
+            setShowSreen("Key");
+            console.log(questionsData, "questionsData")
+        }
+
     };
     async function deleteTest(row) {
 
@@ -284,7 +307,6 @@ export default function TestDashBoard() {
         const url = serverUrl + "test/list/bytestid/" + row.id;
         const resp = await api(null, url, 'get');
         if (resp.status === 200) {
-
             setQuestionsData(resp.data);
             setShowLoader(false);
             setShowSreen("Questions");
@@ -337,26 +359,26 @@ export default function TestDashBoard() {
                     </div>
                 </div>
             }
-             {showSreen === "Key" &&  ( 
+            {showSreen === "Key" && (
                 <span>
                     <Stack style={{ float: "right", top: "110px", position: "sticky" }} direction="row" spacing={1}>
                         <Button variant="outlined" onClick={() => setShowSreen("Grid")} >Back</Button>
                         {/* <Button variant="outlined" onClick={() => exportToWord()} >Export as Word</Button>
                         <Button variant="outlined" onClick={exportToExcel} >Export as Excel</Button> */}
                     </Stack>
-                 <div style={{ marginTop:"20px" }}>
-                    <span style={{fontSize:"25px" , marginBottom:"10px"}}>TEST KEY</span>
-                    <br/>
-                   {  questionsData.map((ques , i) => (
-                    <span key={i}>
-                      <span style={{ fontWeight: "bold" }}>{i + 1}.{ques.answer || ques.ans}</span>. <br />
-                    </span>
-                   ))
-                   }
+                    <div style={{ marginTop: "20px" }}>
+                        <span style={{ fontSize: "25px", marginBottom: "10px" }}>TEST KEY</span>
+                        <br />
+                        {questionsData.map((ques, i) => (
+                            <span key={i}>
+                                <span style={{ fontWeight: "bold" }}>{i + 1}.{ques.answer || ques.ans}</span>. <br />
+                            </span>
+                        ))
+                        }
 
-                 </div>
+                    </div>
                 </span>
-           ) }
+            )}
 
             {showSreen === "Questions" &&
                 <span>
@@ -370,76 +392,76 @@ export default function TestDashBoard() {
                         <br />
                         <br />
                         {
-                    questionsData && questionsData.map((question, i) => (
-                        <span key={i}>
-                            <span style={{ fontWeight: "bold", color:"red" }}>{i + 1}.{question.QuestionTitle}</span>. <br />
+                            questionsData && questionsData.map((question, i) => (
+                                <span key={i}>
+                                    <span style={{ fontWeight: "bold", color: "red" }}>{i + 1}.{question.QuestionTitle}</span>. <br />
 
-                            <span>
-                                {
-                                    question.type !== '' ? (
-                                        (question.type === "MCQ2") ? (
-                                            <div>
-                                                {question.part_a.split(',').map((part, index) => (
-                                                    <div key={index}><strong>{String.fromCharCode(65 + index)}. {part.trim()}</strong></div>
-                                                ))}
-                                            </div>
-                                        ) : question.type === "IMG" ? (
-                                            <span>
-                                                {question.QUrls && <img style={{
-                                                    height: '10rem',
-                                                    width: 'auto'
-                                                }} src={question.QUrls} />}
-                                            </span>
-                                        ) : question.type === "MCQ1" ? (
-                                            <div style={{ width: '300px' }}>
-                                            <table style={{ border: '1px solid black' }}>
-                                            <thead>
-                                        <tr>
-                                            <th>Part-A</th>
-                                            <th>Part-B</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                        <td>
-                                                {question.part_a && question.part_a.split(',').map((part, index) => (
-                                                    <div key={index}>
-                                                        {String.fromCharCode(65 + index)}. {part.trim()}
-                                                        {index !== question.part_a.split(',').length - 1 && <hr />}
-                                                    </div>
-                                                ))}
-                                            </td>
-                                            <td>
-                                                {question.part_b && question.part_b.split(',').map((part, index) => (
-                                                    <div key={index}>
-                                                        {(index + 1)}. {part.trim()}
-                                                        {index !== question.part_b.split(',').length - 1 && <hr />}
-                                                    </div>
-                                                ))}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                            </table>
-                                        </div>
-
-                                        ) : ''
-                                    ) : ''
-                                }
-                            </span> <br />
-
-                            <span>
-                                {question.type === 'IMG' ? '' : (
                                     <span>
-                                        <span>A.{question.Option1}.</span><br />
-                                        <span>B.{question.Option2}.</span><br />
-                                        <span>C.{question.Option3}.</span> <br />
-                                        <span>D.{question.Option4}.</span><br /><br />
+                                        {
+                                            question.type !== '' ? (
+                                                (question.type === "MCQ2") ? (
+                                                    <div>
+                                                        {question.part_a.split(',').map((part, index) => (
+                                                            <div key={index}><strong>{String.fromCharCode(65 + index)}. {part.trim()}</strong></div>
+                                                        ))}
+                                                    </div>
+                                                ) : question.type === "IMG" ? (
+                                                    <span>
+                                                        {question.QUrls && <img style={{
+                                                            height: '10rem',
+                                                            width: 'auto'
+                                                        }} src={question.QUrls} />}
+                                                    </span>
+                                                ) : question.type === "MCQ1" ? (
+                                                    <div style={{ width: '300px' }}>
+                                                        <table style={{ border: '1px solid black' }}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Part-A</th>
+                                                                    <th>Part-B</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        {question.part_a && question.part_a.split(',').map((part, index) => (
+                                                                            <div key={index}>
+                                                                                {String.fromCharCode(65 + index)}. {part.trim()}
+                                                                                {index !== question.part_a.split(',').length - 1 && <hr />}
+                                                                            </div>
+                                                                        ))}
+                                                                    </td>
+                                                                    <td>
+                                                                        {question.part_b && question.part_b.split(',').map((part, index) => (
+                                                                            <div key={index}>
+                                                                                {(index + 1)}. {part.trim()}
+                                                                                {index !== question.part_b.split(',').length - 1 && <hr />}
+                                                                            </div>
+                                                                        ))}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                ) : ''
+                                            ) : ''
+                                        }
+                                    </span> <br />
+
+                                    <span>
+                                        {question.type === 'IMG' ? '' : (
+                                            <span>
+                                                <span>A.{question.Option1}.</span><br />
+                                                <span>B.{question.Option2}.</span><br />
+                                                <span>C.{question.Option3}.</span> <br />
+                                                <span>D.{question.Option4}.</span><br /><br />
+                                            </span>
+                                        )}
                                     </span>
-                                )}
-                            </span>
-                        </span>
-                    ))
-                }
+                                </span>
+                            ))
+                        }
 
                     </div>
                 </span>

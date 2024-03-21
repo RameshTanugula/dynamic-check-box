@@ -389,6 +389,7 @@ function formatDate(date) {
             };
     
             setSnackBarData(message);
+            window.location.href = `/Test Dashboard`
         }
         else {
             setOpenSnackBar(true);

@@ -70,118 +70,118 @@ export default function BitbankSetCreation() {
         setOpenModal(false);
     }
 
- 
+
     //pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const BpIcon = styled('span')(({ theme }) => ({
+        borderRadius: '50%',
+        width: '65%',
+        height: 16,
+        boxShadow:
+            theme.palette.mode === 'dark'
+                ? '0 0 0 1px rgb(16 22 26 / 40%)'
+                : 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
+        backgroundColor: theme.palette.mode === 'dark' ? '#394b59' : '#f5f8fa',
+        backgroundImage:
+            theme.palette.mode === 'dark'
+                ? 'linear-gradient(180deg,hsla(0,0%,100%,.05),hsla(0,0%,100%,0))'
+                : 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
+        '.Mui-focusVisible &': {
+            outline: '2px auto rgba(19,124,189,.6)',
+            outlineOffset: 2,
+        },
+        'input:hover ~ &': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#30404d' : '#ebf1f5',
+        },
+        'input:disabled ~ &': {
+            boxShadow: 'none',
+            background:
+                theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
+        },
+    }));
+
+    const BpCheckedIcon = styled(BpIcon)({
+        backgroundColor: '#137cbd',
+        backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
+        '&:before': {
+            display: 'block',
+            width: 16,
+            height: 16,
+            backgroundImage: 'radial-gradient(#fff,#fff 28%,transparent 32%)',
+            content: '""',
+        },
+        'input:hover ~ &': {
+            backgroundColor: '#106ba3',
+        },
+    });
+
+    function TablePaginationActions(props) {
+        const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
+        const theme = useTheme();
+        const { count, page, rowsPerPage, onPageChange } = props;
+
+        const handleFirstPageButtonClick = (event) => {
+            onPageChange(event, 0);
         };
-        const handleChangeRowsPerPage = (event) => {
-          setRowsPerPage(parseInt(event.target.value, 10));
-          setPage(0);
+
+        const handleBackButtonClick = (event) => {
+            onPageChange(event, page - 1);
         };
-        
-        const BpIcon = styled('span')(({ theme }) => ({
-          borderRadius: '50%',
-          width: '65%',
-          height: 16,
-          boxShadow:
-              theme.palette.mode === 'dark'
-                  ? '0 0 0 1px rgb(16 22 26 / 40%)'
-                  : 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
-          backgroundColor: theme.palette.mode === 'dark' ? '#394b59' : '#f5f8fa',
-          backgroundImage:
-              theme.palette.mode === 'dark'
-                  ? 'linear-gradient(180deg,hsla(0,0%,100%,.05),hsla(0,0%,100%,0))'
-                  : 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
-          '.Mui-focusVisible &': {
-              outline: '2px auto rgba(19,124,189,.6)',
-              outlineOffset: 2,
-          },
-          'input:hover ~ &': {
-              backgroundColor: theme.palette.mode === 'dark' ? '#30404d' : '#ebf1f5',
-          },
-          'input:disabled ~ &': {
-              boxShadow: 'none',
-              background:
-                  theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
-          },
-        }));
-        
-        const BpCheckedIcon = styled(BpIcon)({
-          backgroundColor: '#137cbd',
-          backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
-          '&:before': {
-              display: 'block',
-              width: 16,
-              height: 16,
-              backgroundImage: 'radial-gradient(#fff,#fff 28%,transparent 32%)',
-              content: '""',
-          },
-          'input:hover ~ &': {
-              backgroundColor: '#106ba3',
-          },
-        });
-        
-        function TablePaginationActions(props) {
-          const [readAndWriteAccess, setReadAndWriteAccess] = React.useState(false);
-          const theme = useTheme();
-          const { count, page, rowsPerPage, onPageChange } = props;
-        
-          const handleFirstPageButtonClick = (event) => {
-              onPageChange(event, 0);
-          };
-        
-          const handleBackButtonClick = (event) => {
-              onPageChange(event, page - 1);
-          };
-        
-          const handleNextButtonClick = (event) => {
-              onPageChange(event, page + 1);
-          };
-        
-          const handleLastPageButtonClick = (event) => {
-              onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-          };
-          React.useEffect(() => {
-              const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
-              if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
-                  setReadAndWriteAccess(true);
-              }
-          }, []);
-        
-          return (
-              <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-                  <IconButton
-                      onClick={handleFirstPageButtonClick}
-                      disabled={page === 0 && !readAndWriteAccess}
-                      aria-label="first page"
-                  >
-                      {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-                  </IconButton>
-                  <IconButton
-                      onClick={handleBackButtonClick}
-                      disabled={page === 0 && !readAndWriteAccess}
-                      aria-label="previous page"
-                  >
-                      {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-                  </IconButton>
-                  <IconButton
-                      onClick={handleNextButtonClick}
-                      disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
-                      aria-label="next page"
-                  >
-                      {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-                  </IconButton>
-                  <IconButton
-                      onClick={handleLastPageButtonClick}
-                      disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
-                      aria-label="last page"
-                  >
-                      {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-                  </IconButton>
-              </Box>
-          );
-        }
+
+        const handleNextButtonClick = (event) => {
+            onPageChange(event, page + 1);
+        };
+
+        const handleLastPageButtonClick = (event) => {
+            onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+        };
+        React.useEffect(() => {
+            const currentScreen = (window.location.pathname.slice(1)).replace(/%20/g, ' ');
+            if (CheckAccess.checkAccess(currentScreen, 'read') && CheckAccess.checkAccess(currentScreen, 'write')) {
+                setReadAndWriteAccess(true);
+            }
+        }, []);
+
+        return (
+            <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+                <IconButton
+                    onClick={handleFirstPageButtonClick}
+                    disabled={page === 0 && !readAndWriteAccess}
+                    aria-label="first page"
+                >
+                    {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+                </IconButton>
+                <IconButton
+                    onClick={handleBackButtonClick}
+                    disabled={page === 0 && !readAndWriteAccess}
+                    aria-label="previous page"
+                >
+                    {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                </IconButton>
+                <IconButton
+                    onClick={handleNextButtonClick}
+                    disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
+                    aria-label="next page"
+                >
+                    {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+                </IconButton>
+                <IconButton
+                    onClick={handleLastPageButtonClick}
+                    disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !readAndWriteAccess}
+                    aria-label="last page"
+                >
+                    {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+                </IconButton>
+            </Box>
+        );
+    }
 
 
 
@@ -243,65 +243,83 @@ export default function BitbankSetCreation() {
     //     setQuestionData(questionData);
     // }
 
-//working
+    //working
 
-const onClickCheckBox = (id, index) => {
-    if (id === 'selectAll') {
-        // If the "Select All" checkbox is clicked
-        const allQuestionIds = questionData.map(q => q.q_id);
-        if (selectedQuestionsList.length === allQuestionIds.length) {
-            // Deselect all questions if all are currently selected
-            setSelectedQuestionsList([]);
+    const onClickCheckBox = (id, index) => {
+        if (id === 'selectAll') {
+            // If the "Select All" checkbox is clicked
+            const allQuestionIds = questionData?.map(q => q.q_id);
+            if (selectedQuestionsList.length === allQuestionIds.length) {
+                // Deselect all questions if all are currently selected
+                setSelectedQuestionsList([]);
+            } else {
+                // Select all questions if not all are currently selected
+                setSelectedQuestionsList(allQuestionIds);
+            }
         } else {
-            // Select all questions if not all are currently selected
-            setSelectedQuestionsList(allQuestionIds);
+            // If a specific question checkbox is clicked
+            if (selectedQuestionsList.includes(id)) {
+                var Index = selectedQuestionsList.findIndex(x => x === id);
+                selectedQuestionsList.splice(Index, 1);
+                setSelectedQuestionsList([...selectedQuestionsList]);
+            } else {
+                selectedQuestionsList.push(id)
+                setSelectedQuestionsList([...selectedQuestionsList]);
+            }
         }
-    } else {
-        // If a specific question checkbox is clicked
-        if (selectedQuestionsList.includes(id)) {
-            var Index = selectedQuestionsList.findIndex(x => x === id);
-            selectedQuestionsList.splice(Index, 1);
-            setSelectedQuestionsList([...selectedQuestionsList]);
-        } else {
-            selectedQuestionsList.push(id)
-            setSelectedQuestionsList([...selectedQuestionsList]);
-        }
-    }
-    setAllCheckBoxValue(!allCheckBoxValue);
-    questionData.map(q => q.checked = !allCheckBoxValue);
-    setQuestionData(questionData);
-};
+        setAllCheckBoxValue(!allCheckBoxValue);
+        questionData?.map(q => q.checked = !allCheckBoxValue);
+        setQuestionData(questionData);
+    };
 
 
 
-    
-    
-    
+
+
+
     const oepnModalPopup = () => {
         setOpenModal(true);
     }
     const addToTestHandler = async () => {
         setOpenModal(false)
 
-  // Assuming selectedQuestionsList is an array of questions with properties q_id, question, and answer
-  const questionDataToSend = selectedQuestionsList.map(questionId => {
-    const selectedQuestion = questionData.find(q => q.q_id === questionId);
-    return {
-      q_id: selectedQuestion.q_id,
-      qus: selectedQuestion.question,
-      ans: selectedQuestion.answer,
-    };
-  });
+        const regex = /[^\w\s]/gi;
 
-  console.log(questionDataToSend, 'questionIds***271');
+        // Remove special characters using the regular expression and replace method
 
-  // Create a payload with selected questions
-  const payload = {
-    title: formData.title,
-    payload: JSON.stringify(questionDataToSend),
-  };
+        // Assuming selectedQuestionsList is an array of questions with properties q_id, question, and answer
+        const questionDataToSend = selectedQuestionsList?.map(questionId => {
+            const selectedQuestion = questionData.find(q => q.q_id === questionId);
+            return {
+                q_id: selectedQuestion.q_id,
+                qus: selectedQuestion.question,
+                ans: selectedQuestion.answer,
+            };
+        });
+        console.log(questionDataToSend, 'question***');
+        questionDataToSend.forEach(question => {
+            if (typeof question.qus === 'string') {
+                console.log(question.qus);
+                // question.qus = question.qus.replace( /[\.,\-"“”\(\)&@:?!<>{}\*]/g, '');
+                question.qus = JSON.stringify(question.qus).replace(/["“'*(){}\t]/g, '').replace(/\\r\\n/g, '').trim();
+            }
+            if (typeof question.ans === 'string') {
+                console.log(question.ans);
+                // question.qus = question.qus.replace( /[\.,\-"“”\(\)&@:?!<>{}\*]/g, '');
+                question.ans = JSON.stringify(question.ans).replace(/["“'*(){}\t]/g, '').replace(/\\r\\n/g, '').trim();
+            }
+        });
+        // }
+        // console.log(questionDataToSend,  'questionDataToSend');
+        // Create a payload with selected questions
+        const payload = {
+            title: formData.title,
+            payload: JSON.stringify(questionDataToSend),
+            // payload: questionDataToSend,
 
-//   console.log(payload, 'pa***289');
+        };
+
+        console.log(payload, 'pa***289');
 
         setShowLoader(true);
         const data = await api(payload, serverUrl + 'bitbank/set', 'post');
@@ -324,20 +342,21 @@ const onClickCheckBox = (id, index) => {
                 type: "error",
                 message: data?.response?.data?.error || "Unknown error"
             };
+            console.log(message, 'message**327');
             setSnackBarData(message);
         }
 
-    //  catch (error) {
-    //     console.error('Error in addToTestHandler:', error);
-    //     setOpenSnackBar(true);
-    //     const message = {
-    //         type: "error",
-    //         message: "An unexpected error occurred"
-    //     };
-    //     setSnackBarData(message);
-    // }
-    setShowLoader(false); 
-}
+        //  catch (error) {
+        //     console.error('Error in addToTestHandler:', error);
+        //     setOpenSnackBar(true);
+        //     const message = {
+        //         type: "error",
+        //         message: "An unexpected error occurred"
+        //     };
+        //     setSnackBarData(message);
+        // }
+        setShowLoader(false);
+    }
 
     function closeSnakBar() {
         setOpenSnackBar(false)
@@ -374,15 +393,15 @@ const onClickCheckBox = (id, index) => {
             const catIds = prepareCatIds();
             setShowLoader(true);
             let data;
-            if (catIds && ((catIds[0] && catIds[0].length > 0)) || (catIds[1] && catIds[1].length > 0)
-                || (catIds[2] && catIds[2].length > 0) || (catIds[3] && catIds[3].length > 0)) {
+            if (catIds && ((catIds[0] && catIds[0]?.length > 0)) || (catIds[1] && catIds[1]?.length > 0)
+                || (catIds[2] && catIds[2]?.length > 0) || (catIds[3] && catIds[3]?.length > 0)) {
                 data = await api({ catIds: catIds }, serverUrl + 'get/bitbank/bycategory', 'post');
             } else {
                 data = await api(null, serverUrl + 'set/bitbank/data', 'get');
             }
             if (data.status === 200) {
                 setQuestionData(data.data?.res)
-                console.log(questionData,'qu**320');
+                console.log(questionData, 'qu**320');
             }
 
             setShowLoader(false);
@@ -419,8 +438,8 @@ const onClickCheckBox = (id, index) => {
                                 helperText={"" !== "" ? 'Test Name is reuired' : ' '}
                                 disabled={!readAndWriteAccess}
                             />
-                            <Button variant="contained" style={{ height: 'max-content' }} disabled={formData.title === "" || selectedQuestionsList.length===0} onClick={() => oepnModalPopup()}>Add Test</Button>
-                            <Badge color="secondary" badgeContent={selectedQuestionsList.length}>
+                            <Button variant="contained" style={{ height: 'max-content' }} disabled={formData.title === "" || selectedQuestionsList?.length === 0} onClick={() => oepnModalPopup()}>Add Test</Button>
+                            <Badge color="secondary" badgeContent={selectedQuestionsList?.length}>
                                 <span style={{ marginTop: "7px" }}> <ShoppingCartIcon /></span>
                             </Badge>
                         </Stack>
@@ -438,66 +457,66 @@ const onClickCheckBox = (id, index) => {
                     </Grid>
 
                     <Grid item xs={12} style={{ overflow: "auto", height: "900px", marginTop: "10px" }} >
-                    {/* {questionData?.length > 0 && <><p>Select All:</p><input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" /></>} */}
-                    <TableContainer component={Paper}>
-                   <Table>
-                 <TableHead>
-                     <TableRow>
-                     <TableCell>No</TableCell>
-                     <TableCell>
-                    <Checkbox
-                        disabled={!readAndWriteAccess}
-                        checked={selectedQuestionsList.length === questionData.length}
-                        onClick={() => onClickCheckBox('selectAll')}
-                    />
-                </TableCell>
-            <TableCell>Question</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-              {(rowsPerPage > 0
-                                ? questionData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                : questionData
-                            ).map((qData, i) => (
-              <TableRow key={i}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>
-                  <Checkbox
-                    disabled={!readAndWriteAccess}
-                    checked={selectedQuestionsList.includes(qData.q_id)}
-                    onClick={() => onClickCheckBox(qData.q_id, i)}
-                  />
-                </TableCell>
-                <TableCell>
-                  {/* Render your question content here */}
-                  {getQuestions(qData)}
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>.
-                 <TableFooter>
-                         <TableRow>
-                                <TablePagination
-                                    rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
-                                    colSpan={5}
-                                    count={questionData.length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    SelectProps={{
-                                        inputProps: {
-                                            'aria-label': 'questionData per page',
-                                        },
-                                        native: true,
-                                    }}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    ActionsComponent={TablePaginationActions}
-                                    // disabled={!readAndWriteAccess}
-                                />
-                            </TableRow>
-                        </TableFooter>
-                  </Table>
-             </TableContainer>
+                        {/* {questionData?.length > 0 && <><p>Select All:</p><input disabled={!readAndWriteAccess} checked={allCheckBoxValue} value={allCheckBoxValue} onClick={() => onClickCheckBox()} type="checkbox" /></>} */}
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>No</TableCell>
+                                        <TableCell>
+                                            <Checkbox
+                                                disabled={!readAndWriteAccess}
+                                                checked={selectedQuestionsList?.length === questionData?.length}
+                                                onClick={() => onClickCheckBox('selectAll')}
+                                            />
+                                        </TableCell>
+                                        <TableCell>Question</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {(rowsPerPage > 0
+                                        ? questionData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        : questionData
+                                    )?.map((qData, i) => (
+                                        <TableRow key={i}>
+                                            <TableCell>{i + 1}</TableCell>
+                                            <TableCell>
+                                                <Checkbox
+                                                    disabled={!readAndWriteAccess}
+                                                    checked={selectedQuestionsList.includes(qData.q_id)}
+                                                    onClick={() => onClickCheckBox(qData.q_id, i)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                {/* Render your question content here */}
+                                                {getQuestions(qData)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>.
+                                <TableFooter>
+                                    <TableRow>
+                                        <TablePagination
+                                            rowsPerPageOptions={[10, 25, 50, 100, { label: 'All', value: -1 }]}
+                                            colSpan={5}
+                                            count={questionData?.length}
+                                            rowsPerPage={rowsPerPage}
+                                            page={page}
+                                            SelectProps={{
+                                                inputProps: {
+                                                    'aria-label': 'questionData per page',
+                                                },
+                                                native: true,
+                                            }}
+                                            onPageChange={handleChangePage}
+                                            onRowsPerPageChange={handleChangeRowsPerPage}
+                                            ActionsComponent={TablePaginationActions}
+                                        // disabled={!readAndWriteAccess}
+                                        />
+                                    </TableRow>
+                                </TableFooter>
+                            </Table>
+                        </TableContainer>
 
                         {/* {questionData?.length > 0 &&
                             questionData?.map((qData, i) => {
@@ -512,9 +531,9 @@ const onClickCheckBox = (id, index) => {
                                                     onClick={() => onClickCheckBox(qData.q_id, i)}
                                                 />
                                             </div> */}
-                                            {/* <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={selectedQuestionsList.includes(qData.q_id)} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div> */}
+                        {/* <div><input style={{ cursor: "pointer" }} disabled={!readAndWriteAccess} checked={selectedQuestionsList.includes(qData.q_id)} onClick={() => onClickCheckBox(qData.q_id, i)} type="checkbox" /></div> */}
 
-                                            {/* <div style={{
+                        {/* <div style={{
                                                 paddingTop: '5px',
                                                 border: '1px solid blue'
                                             }}>
@@ -543,7 +562,7 @@ const onClickCheckBox = (id, index) => {
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        You have selected {selectedQuestionsList.length} questons...!
+                        You have selected {selectedQuestionsList?.length} questons...!
                     </Typography>
 
                     <Button variant="contained" disabled={!readAndWriteAccess} onClick={() => onCloseMOdal()}>close</Button> &nbsp;
