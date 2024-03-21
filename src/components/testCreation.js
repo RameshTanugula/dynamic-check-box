@@ -264,49 +264,82 @@ export default function TestCreation() {
         return [ids1, ids2, ids3, ids4]
     }
 
+    // const onClickCheckBox = (id, i) => {
+    //     const index = page * rowsPerPage + i;
+    //     // const Data = 
+    //     if (id && index >= 0) {
+    //         setAllCheckBoxValue(false);
+    //         if (selectedQuestionsList.includes(id)) {
+    //             var Index = selectedQuestionsList.findIndex(x => x === id);
+    //             selectedQuestionsList.splice(Index, 1);
+    //             setSelectedQuestionsList([...selectedQuestionsList]);
+    //         }
+    //         else {
+    //             if ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions)) {
+    //                 selectedQuestionsList.push(id) //,  qData
+    //                 // setSelectedQuestionsList(prevList => [...prevList, id]);
+    //                 setSelectedQuestionsList([...selectedQuestionsList]);
+    //             }
+    //             else {
+    //                 alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
+    //             }
+
+    //         }
+    //     }
+    //     else {
+    //         setAllCheckBoxValue(!allCheckBoxValue)
+    //         questionData.map(q => q.checked = !allCheckBoxValue)
+    //         console.log();
+    //     }
+    //     setQuestionData(questionData);
+    //     console.log(questionData, ' data**301');
+    // }
+
+
     const onClickCheckBox = (id, i) => {
         const index = page * rowsPerPage + i;
-        // const Data = 
+
         if (id && index >= 0) {
             setAllCheckBoxValue(false);
             if (selectedQuestionsList.includes(id)) {
-                var Index = selectedQuestionsList.findIndex(x => x === id);
-                selectedQuestionsList.splice(Index, 1);
-                setSelectedQuestionsList([...selectedQuestionsList]);
-            }
-            else {
+                const updatedList = selectedQuestionsList.filter(questionId => questionId !== id);
+                setSelectedQuestionsList(updatedList);
+            } else {
                 if ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions)) {
-                    selectedQuestionsList.push(id) //,  qData
-                    // setSelectedQuestionsList(prevList => [...prevList, id]);
-                    setSelectedQuestionsList([...selectedQuestionsList]);
+                    setSelectedQuestionsList(prevList => [...prevList, id]);
+                } else {
+                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`);
                 }
-                else {
-                    alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
-                }
-
             }
+        } else {
+            const updatedQuestionData = questionData.map(question => ({
+                ...question,
+                checked: !allCheckBoxValue
+            }));
+            setQuestionData(updatedQuestionData);
+
+            if (allCheckBoxValue) {
+                setSelectedQuestionsList([]);
+            } else {
+                const allQuestionIds = questionData.map(question => question.q_id);
+                setSelectedQuestionsList(allQuestionIds);
+            }
+            setAllCheckBoxValue(!allCheckBoxValue);
         }
-        // else if (id === 'selectAll') {
-        //     // Select all or deselect all questions based on the current state of allCheckBoxValue
-        //     const allQuestionIds = questionData.map(q => q.q_id);
-        //     if (!allCheckBoxValue && ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions))) {
-        //         setSelectedQuestionsList(allQuestionIds);
-        //     } else {
-        //         alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
-        //     }
-        //     setAllCheckBoxValue(!allCheckBoxValue);
-        // }
-        else {
-            setAllCheckBoxValue(!allCheckBoxValue)
-            questionData.map(q => q.checked = !allCheckBoxValue)
-            console.log();
-        }
-        setQuestionData(questionData);
-        console.log(questionData, ' data**301');
-    }
+    };
 
+    
 
-
+    // else if (id === 'selectAll') {
+    //     // Select all or deselect all questions based on the current state of allCheckBoxValue
+    //     const allQuestionIds = questionData.map(q => q.q_id);
+    //     if (!allCheckBoxValue && ((selectedQuestionsList.length + manualQuestions?.length) < parseInt(testForm.numberOfQuestions))) {
+    //         setSelectedQuestionsList(allQuestionIds);
+    //     } else {
+    //         alert(`You are able select maximum ${testForm.numberOfQuestions} questions only.`)
+    //     }
+    //     setAllCheckBoxValue(!allCheckBoxValue);
+    // }
 
     function valid() {
         let retunValue = false;
@@ -596,14 +629,16 @@ export default function TestCreation() {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">
-                                                Action
-                                                {/* <TableCell>
-                                                <Checkbox
+                                                <span>
+                                                <input
+                                                    style={{ cursor: "pointer" }}
                                                     disabled={!readAndWriteAccess}
-                                                    checked={selectedQuestionsList?.length === questionData?.length}
-                                                    onClick={() => onClickCheckBox('selectAll')}
+                                                    checked={allCheckBoxValue}
+                                                    onChange={() => onClickCheckBox()}
+                                                    type="checkbox"
                                                 />
-                                                </TableCell> */}
+                                                Select All
+                                            </span>
                                             </TableCell>
                                             <TableCell align="center">Questions </TableCell>
                                         </TableRow>
