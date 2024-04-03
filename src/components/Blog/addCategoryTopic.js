@@ -1,6 +1,6 @@
 import { CheckBox } from '@mui/icons-material';
-import { Button, Container, FormControlLabel, Grid, InputLabel, Switch, TextField, Typography } from '@mui/material';
-import React from 'react'
+import { Button, Container, FormControlLabel, Grid, InputLabel, MenuItem, Select, Switch, TextField, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react'
 import Loader from '../Loader';
 import * as securedLocalStorage from '../SecureLocalaStorage';
 import api from '../../services/api';
@@ -9,6 +9,7 @@ const AddBlogCategoryTopic = () => {
     const serverUrl = securedLocalStorage.baseUrl + 'blog/';
     const [checked, setChecked] = React.useState(false);
     const [showLoader, setShowLoader] = React.useState(false);
+    const [blogCategory, setBlogCategory] = useState([]);
 
     const [formData , setFormData] = React.useState({
         blog_category_topic:'',
@@ -25,13 +26,35 @@ const AddBlogCategoryTopic = () => {
         }));
     };
 
-    const handleSubmit =  async() => {
-        // Gather form data
-        const { blog_category_topic, is_active } = formData;
-        console.log('Question:', blog_category_topic, is_active);
-        const resp = await api(formData, serverUrl + 'add/topic', 'post');
-        console.log(resp, 'resp***');
+    useEffect(() => {
+        setShowLoader(true);
+        const fetchData = async () => {
+            try {
+                const categoryData = await api(null, serverUrl + 'category', 'get');
+                console.log(categoryData,'response***');
+                setBlogCategory(categoryData?.data)
+                // console.log( blogCategory);
+                setShowLoader(false);
+            } catch (error) {
+                // console.error('Error fetching data:', error);
+                setShowLoader(false);
+            }
+        };
 
+        fetchData();
+    }, []);
+    const handleSubmit =  async() => {
+        const resp = await api(formData, serverUrl + 'add/topic', 'post');
+        // console.log(resp, 'resp***');
+        if (resp.status === 200) {
+          alert('Category-Topic added');
+          setFormData({
+            blog_category_topic:'',
+        is_active: false,
+        });
+        }else {
+            alert('Category-Topic added failed');
+        }
 
 
     }
@@ -42,6 +65,21 @@ const AddBlogCategoryTopic = () => {
             <Typography></Typography>
             <form className='container'>
                 <Grid container spacing={2} >
+                <Grid item xs={12} lg={7} sm={12}>
+                            <InputLabel>Category:</InputLabel>
+                            <Select
+                                fullWidth
+                                name='category_id'
+                                value={formData.category_id}
+                                onChange={handleChange}
+                                variant='outlined'
+                                required
+                            >
+                                {blogCategory?.map(topic => (
+                                    <MenuItem key={topic.id} value={topic.id}>{topic.blog_category}</MenuItem>
+                                ))}
+                            </Select>
+                        </Grid>
                     <Grid item xs={12} lg={7} sm={12}>
                         <InputLabel>Add BlogCategory Topic:</InputLabel>
                         <TextField
@@ -54,7 +92,7 @@ const AddBlogCategoryTopic = () => {
                         required
                         />
                     </Grid>
-                    <Grid item xs={12} lg={5} sm={12}>
+                    <Grid item xs={12} lg={12} sm={12}>
                         <FormControlLabel
                             control={<Switch
                                 name="is_active"

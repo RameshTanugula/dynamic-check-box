@@ -1,19 +1,62 @@
-import { Button, Container, FormControlLabel, Grid, InputLabel, Switch, TextField, Typography } from '@mui/material';
-import React from 'react'
+import { Alert, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, InputLabel, Pagination, Switch, TextField, Typography } from '@mui/material';
+import React, { useEffect } from 'react'
 import Loader from '../Loader';
 import * as securedLocalStorage from '../SecureLocalaStorage';
 import api from '../../services/api';
+import { DataGrid } from '@mui/x-data-grid';
 
 
 const AddBlogCategory = () => {
     const serverUrl = securedLocalStorage.baseUrl + 'blog/';
     const [showLoader, setShowLoader] = React.useState(false);
+    const [data , setData] = React.useState('')
+    // const [page, setPage] = React.useState(0);
+    // const [pageSize, setPageSize] = React.useState(5);
+    // const pageCount = Math.ceil(data.length / pageSize);
+    // const [editingId, setEditingId] = React.useState(null);
+    // const [openEditDialog, setOpenEditDialog] = React.useState(false);
+    // const [editLabel, setEditLabel] = React.useState('');
+    // const [editStatus, setEditStatus] = React.useState('');
 
+
+
+    // const handlePageChange = (event, value) => {
+    //     setPage(value - 1);
+    // };
     const [formData , setFormData] = React.useState({
         blog_category:'',
         is_active: false, 
 
     })
+
+    // const columns = [
+    //     { field: 'id', headerName: 'ID', width: 100 },
+    //     { field: 'blog_category', headerName: 'Blog Category', width: 200 },
+    //     { field: 'is_active', headerName: 'Status', width: 120, renderCell: (params) => (
+    //         <span>{params.value === 1 ? 'Active' : 'Inactive'}</span>
+    //     )},
+    //     {
+    //         field: 'edit', headerName: 'Edit', width: 100, renderCell: (params) => (
+    //             <Button variant="contained" onClick={() => handleEdit(params.row.id, params.row.label, params.row.IsActive)}>Edit</Button>
+    //         )
+    //     },
+    // ];
+
+    // const handleEdit = (id, blog_category, is_active) => {
+    //     setEditingId(id);
+    //     setEditLabel(blog_category);
+    //     setEditStatus(is_active === 1 ? 'Active' : 'Inactive');
+    //     console.log(editStatus, '***');
+    //     setOpenEditDialog(true);
+    // };
+    // const handleEditCancel = () => {
+    //     setEditingId(null);
+    //     setOpenEditDialog(false);
+    // };
+
+    // const handleEditSave = async (id) => {
+    //     console.log(id);
+    // }
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -27,15 +70,28 @@ const AddBlogCategory = () => {
 
     const handleSubmit =  async() => {
         // Gather form data
-        const { blog_category , is_active} = formData;
-        console.log('Question:', blog_category);
-        console.log('Question:', is_active);
-        console.log(formData);
         const resp = await api(formData, serverUrl + 'add/category', 'post');
-        console.log(resp, 'resp***');
+        if (resp.status === 200) {
+          alert('Category added');
+          setFormData({
+            blog_category: '',
+            is_active: false
+        });
+        }else {
+            alert('Category added failed');
+        }
     }
 
+    useEffect(() => {
+        const fetchData = async() =>{
+            const categoryData = await api(null, serverUrl + 'category', 'get');
+            // console.log(categoryData, 'categoryData***');
+            setData(categoryData?.data)
+        };fetchData();
+    }, [])
+
   return (
+    <>
     <div>
         <Container>
             <Typography></Typography>
@@ -74,7 +130,50 @@ const AddBlogCategory = () => {
                 <Loader />
             }
     </div>
-    
+
+           {/* <div>
+            <div style={{ height: 400, width: '60%' }}>
+                <DataGrid
+                    rows={data.slice(page * pageSize, (page + 1) * pageSize)} // Slice the data based on current page and page size
+                    columns={columns}
+                    pageSize={pageSize}
+                    pagination
+                />
+            </div>
+            <Pagination
+                count={pageCount}
+                page={page + 1}
+                onChange={handlePageChange}
+                variant="outlined"
+                shape="rounded"
+                style={{ marginTop: '10px' }}
+            />
+        </div>
+
+        <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+                <DialogTitle>Edit Category</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        fullWidth
+                        label="Label"
+                        value={editLabel}
+                        onChange={(e) => setEditLabel(e.target.value)}
+                    />
+                    <FormControlLabel
+                        control={<Switch
+                            checked={editStatus === 'Active'}
+                            onChange={(e) => setEditStatus(e.target.checked ? 'Active' : 'Inactive')}
+                        />}
+                        label="Status"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => handleEditSave(editingId)} color="primary">Save</Button>
+                    <Button onClick={() => handleEditCancel(false)} color="secondary">Cancel</Button>
+                </DialogActions>
+            </Dialog> */}
+
+    </>
   )
 }
 
