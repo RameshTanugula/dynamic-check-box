@@ -51,7 +51,11 @@ import TestDashBoard from './components/TestDashBoard';
 import Syllabus from './components/Syllabus';
 import BitbankSetCreation from './components/BitBankSetCreation';
 import AddQuestions from './components/AddQuestion';
-import DraftTest from './components/draftTest';
+import BlogDashboard from './components/Blog/dashboard';
+import AddBlogPage from './components/Blog';
+import BitBankQuestions from './components/BitBank';
+
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -108,6 +112,8 @@ export default function App() {
 
   const [anchorEl, setAnchorEl] = React.useState(false);
   const [menuList, setMenuList] = React.useState([]);
+
+
 
   const handleMenu = (event) => {
     setAnchorEl(true);
@@ -254,7 +260,10 @@ export default function App() {
                 <Route exact path="/Test Dashboard" element={<TestDashBoard />} />
                 <Route exact path="/Syllabus" element={<Syllabus />} />
                 <Route exact path="/Add Questions" element={<AddQuestions />}/>
-                <Route  exact path="/draft-test/:id"  element={<DraftTest />} />                  
+                <Route exact path="/BitBank Questions page" element={<BitBankQuestions />} />
+                <Route exact path="/Add Blog Page" element={<AddBlogPage/>} />
+                <Route exact path="/BlogDashboard" element={<BlogDashboard/>} />
+
               </Routes>
             </Main>
           </BrowserRouter>
