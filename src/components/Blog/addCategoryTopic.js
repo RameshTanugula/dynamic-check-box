@@ -11,9 +11,10 @@ const AddBlogCategoryTopic = () => {
     const [showLoader, setShowLoader] = React.useState(false);
     const [blogCategory, setBlogCategory] = useState([]);
 
-    const [formData , setFormData] = React.useState({
-        blog_category_topic:'',
-        is_active: false, 
+    const [formData, setFormData] = React.useState({
+        category_id: '',
+        blog_category_topic: '',
+        is_active: false,
 
     })
 
@@ -24,6 +25,7 @@ const AddBlogCategoryTopic = () => {
             ...prevState,
             [name]: inputValue
         }));
+        // console.log(formData,'***formdata');
     };
 
     useEffect(() => {
@@ -31,7 +33,7 @@ const AddBlogCategoryTopic = () => {
         const fetchData = async () => {
             try {
                 const categoryData = await api(null, serverUrl + 'category', 'get');
-                console.log(categoryData,'response***');
+                console.log(categoryData, 'response***');
                 setBlogCategory(categoryData?.data)
                 // console.log( blogCategory);
                 setShowLoader(false);
@@ -43,29 +45,30 @@ const AddBlogCategoryTopic = () => {
 
         fetchData();
     }, []);
-    const handleSubmit =  async() => {
+    const handleSubmit = async () => {
         const resp = await api(formData, serverUrl + 'add/topic', 'post');
         // console.log(resp, 'resp***');
         if (resp.status === 200) {
-          alert('Category-Topic added');
-          setFormData({
-            blog_category_topic:'',
-        is_active: false,
-        });
-        }else {
+            alert('Category-Topic added');
+            setFormData({
+                category_id: '',
+                blog_category_topic: '',
+                is_active: false,
+            });
+        } else {
             alert('Category-Topic added failed');
         }
 
 
     }
 
-  return (
-    <div>
-        <Container>
-            <Typography></Typography>
-            <form className='container'>
-                <Grid container spacing={2} >
-                <Grid item xs={12} lg={7} sm={12}>
+    return (
+        <div>
+            <Container>
+                <Typography></Typography>
+                <form className='container'>
+                    <Grid container spacing={2} >
+                        <Grid item xs={12} lg={7} sm={12}>
                             <InputLabel>Category:</InputLabel>
                             <Select
                                 fullWidth
@@ -80,41 +83,41 @@ const AddBlogCategoryTopic = () => {
                                 ))}
                             </Select>
                         </Grid>
-                    <Grid item xs={12} lg={7} sm={12}>
-                        <InputLabel>Add BlogCategory Topic:</InputLabel>
-                        <TextField
-                        fullWidth
-                        name='blog_category_topic'
-                        placeholder='enter question'
-                        variant='outlined'
-                        value={formData.blog_category_topic}
-                        onChange={handleChange}
-                        required
-                        />
-                    </Grid>
-                    <Grid item xs={12} lg={12} sm={12}>
-                        <FormControlLabel
-                            control={<Switch
-                                name="is_active"
-                                checked={formData.is_active}
+                        <Grid item xs={12} lg={7} sm={12}>
+                            <InputLabel>Add BlogCategory Topic:</InputLabel>
+                            <TextField
+                                fullWidth
+                                name='blog_category_topic'
+                                placeholder='enter question'
+                                variant='outlined'
+                                value={formData.blog_category_topic}
                                 onChange={handleChange}
-                            />}
-                            label="Status"
-                        />
-                    </Grid>
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} lg={12} sm={12}>
+                            <FormControlLabel
+                                control={<Switch
+                                    name="is_active"
+                                    checked={formData.is_active}
+                                    onChange={handleChange}
+                                />}
+                                label="Status"
+                            />
+                        </Grid>
                         <Grid item spacing={5} xs={12} sm={12}>
                             <Button variant='contained' onClick={handleSubmit}>Add & New</Button>&nbsp;&nbsp;
                             <Button variant='contained' >Cancel</Button>
                         </Grid>
-                </Grid>
-            </form>
-        </Container>
-        {showLoader &&
+                    </Grid>
+                </form>
+            </Container>
+            {showLoader &&
                 <Loader />
             }
-    </div>
-    
-  )
+        </div>
+
+    )
 }
 
 export default AddBlogCategoryTopic;

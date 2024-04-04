@@ -3,7 +3,7 @@ import './style.css' ;
 import * as securedLocalStorage from '../SecureLocalaStorage';
 import api from '../../services/api';
 import Loader from '../Loader';
-import { Card, CardActions, CardContent, CardHeader, Container, Grid, Typography } from '@mui/material';
+import { Card, CardActions, CardContent, CardHeader, Container, Grid, Pagination, Stack, Typography } from '@mui/material';
 
 const BlogDashboard = () => {
     const [showLoader, setShowLoader] = React.useState(false);
@@ -11,6 +11,9 @@ const BlogDashboard = () => {
     const [blogCategory, setBlogCategory] = useState([]);
     const [blogCategoryTopic, setBlogCategoryTopic] = useState([]);
     const [blogCategoryAllTopic, setBlogCategoryAllTopic] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 9; 
+
 
     useEffect(() => {
         setShowLoader(true);
@@ -33,7 +36,7 @@ const BlogDashboard = () => {
 
     const handleCategoryClick = async(id) => {
         // Handle click event for blog category
-        console.log('Clicked category:', id);
+        // console.log('Clicked category:', id);
         const topicData = await api(null, serverUrl + 'topic/' + id, 'get');
         // console.log(topicData);
         setBlogCategoryTopic(topicData?.data);
@@ -42,9 +45,18 @@ const BlogDashboard = () => {
 
     };
     const handleTopicClick = async(id) => {
-        console.log(id);
+        // console.log(id);
         window.location.href = `/BlogContent/${id}`;
     };
+
+    const handleChangePage = (event, newPage) => {
+        setCurrentPage(newPage);
+    };
+
+    // Calculate pagination values
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const paginatedData = blogCategoryAllTopic?.slice(indexOfFirstItem, indexOfLastItem);
 
 
   return (
@@ -66,7 +78,7 @@ const BlogDashboard = () => {
                 </Grid>
 
                 <Grid container spacing={1} style={{marginTop:'30px' , marginBottom:'40px'}}>
-                    {blogCategoryAllTopic&&blogCategoryAllTopic?.map(blog => (
+                    {paginatedData&&paginatedData?.map(blog => (
                         <Grid item key={blog.id} xs={3} md={4} lg={4} >
                              <Card className='card'>
                              <div className="topicWrapper" onClick={() => handleTopicClick(blog.id)}>
@@ -83,15 +95,12 @@ const BlogDashboard = () => {
                              </div>
                             </Card>
                         </Grid>
-                    ))}
-                    
+                    ))}                     
                     {blogCategoryTopic&&blogCategoryTopic?.map(blog => (
                         <Grid item key={blog.id} xs={3} md={4} lg={4} >
                              <Card className='card'>
                              <div className="topicWrapper" onClick={() => handleTopicClick(blog.id)}>
-
                              <CardHeader>
-                             {/* <Typography  variant="h6">{blog.blog_category}</Typography> */}
                              </CardHeader>
                              <CardContent>
                              <Typography className='CardContent' variant="h5">{blog.blog_category_topic}</Typography>
@@ -106,6 +115,18 @@ const BlogDashboard = () => {
                         </Grid>
                     ))}
                 </Grid>
+                {blogCategoryTopic.length === 0 && (
+                    <div className='pagination'>
+                        <Stack spacing={2} justifyContent="center">
+                            <Pagination
+                                count={Math.ceil(blogCategoryAllTopic?.length / itemsPerPage)}
+                                color="primary"
+                                page={currentPage}
+                                onChange={handleChangePage}
+                            />
+                        </Stack>
+                        </div>
+                    )}
         </Container>
 
     </div>
